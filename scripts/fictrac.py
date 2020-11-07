@@ -7,6 +7,7 @@ import matplotlib as mpl
 import brainsss
 import pandas as pd
 import scipy
+from scipy.interpolate import interp1d
 
 def main(args):
 

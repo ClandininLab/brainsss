@@ -156,7 +156,7 @@ for fly in flies:
     ### Create dependent stitcher ###
     #################################
 
-    args = {'logfile': logfile, 'directory': moco_dir, 'dirtype': dirtype}
+    args = {'logfile': logfile, 'directory': moco_dir}
     script = 'moco_stitcher.py'
     job_id = brainsss.sbatch(jobname='stitch',
                          script=os.path.join(scripts_path, script),
