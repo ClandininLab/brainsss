@@ -7,10 +7,12 @@ For clarity, this package currently only contains a few functions to demonstrate
 
 Installing the package:
 login to sherlock and navigate to where you would like to install this package.
+```shell
 git clone https://github.com/ClandininLab/brainsss.git
 cd brainsss
 ml python/3.6.1
 pip3 install -e . --user
+```
 change the paths:
   - in scripts/main.sh, line 13 must point to scripts/main.py
   - in scripts/main.py, scripts_path, com_path, and dataset_path must be set
