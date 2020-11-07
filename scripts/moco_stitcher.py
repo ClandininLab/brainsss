@@ -89,7 +89,9 @@ def save_motion_figure(transform_matrix, directory, motcorr_directory, dirtype):
         file = os.path.join(directory, 'functional.xml')
     elif dirtype == 'anat':
         file = os.path.join(directory, 'anatomy.xml')
-    x_res, y_res, z_res = brainsss.get_resolution(file)
+    #x_res, y_res, z_res = brainsss.get_resolution(file)
+    x_res, y_res, z_res = (2.6,2.6,5)
+
 
     # Save figure of motion over time
     save_file = os.path.join(motcorr_directory, 'motion_correction.png')
