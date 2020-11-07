@@ -62,14 +62,14 @@ for fly in flies:
     if os.path.exists(directory):
         args = {'logfile': logfile, 'directory': directory}
         script = 'fictrac.py'
-        job_id = flow.sbatch(jobname='fictrac',
+        job_id = brainsss.sbatch(jobname='fictrac',
                              script=os.path.join(scripts_path, script),
                              modules=modules,
                              args=args,
                              logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
         job_ids.append(job_id)
 for job_id in job_ids:
-    flow.wait_for_job(job_id, logfile, com_path)
+    brainsss.wait_for_job(job_id, logfile, com_path)
 
 ####################
 ### Bleaching QC ###
