@@ -29,6 +29,7 @@ def main(args):
                 files[color].append(os.path.join(directory, file))
         brainsss.sort_nicely(files[color])
 
+    printlog(files)
     #####################
     ### Stitch brains ###
     #####################
@@ -56,7 +57,7 @@ def main(args):
             stitched_brain = None
 
             # delete partial brains
-            [os.remove(file) for file in files[color]]
+            #[os.remove(file) for file in files[color]]
 
     ##########################
     ### Stitch moco params ###
