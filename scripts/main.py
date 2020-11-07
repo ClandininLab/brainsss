@@ -150,7 +150,9 @@ for fly in flies:
 
     printlog(F"| moco_partials | SUBMITTED | {fly_print} | {len(job_ids)} jobs, {step} vols each |")
     job_ids_colons = ':'.join(job_ids)
-    progress_tracker[fly] = {'job_ids': job_ids, 'total_vol': timepoints}
+    for_tracker = '/'.join(directory.split('/')[-2:])
+    printlog(for_tracker)
+    progress_tracker[for_tracker] = {'job_ids': job_ids, 'total_vol': timepoints}
 
     #################################
     ### Create dependent stitcher ###
