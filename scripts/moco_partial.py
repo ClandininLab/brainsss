@@ -7,7 +7,7 @@ import brainsss
 import warnings
 warnings.filterwarnings("ignore")
 
-sys.path.insert(0, '/home/users/brezovec/.local/lib/python3.6/site-packages/lib/python/')
+#sys.path.insert(0, '/home/users/brezovec/.local/lib/python3.6/site-packages/lib/python/')
 import ants
 
 def main(args):
