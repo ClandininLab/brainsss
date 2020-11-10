@@ -56,7 +56,7 @@ def main(args):
             stitched_brain = None
 
             # delete partial brains
-            #[os.remove(file) for file in files[color]]
+            [os.remove(file) for file in files[color]]
 
     ##########################
     ### Stitch moco params ###
