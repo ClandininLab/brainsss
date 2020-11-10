@@ -12,7 +12,6 @@ from time import sleep
 from functools import wraps
 import numpy as np
 import nibabel as nib
-from scipy.ndimage import imread
 from xml.etree import ElementTree as ET
 import subprocess
 
