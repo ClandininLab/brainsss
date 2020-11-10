@@ -180,7 +180,7 @@ printlog(f"\n{'   Z-SCORE   ':=^{width}}")
 job_ids = []
 for fly in flies:
     directory = os.path.join(dataset_path, fly)
-    args = {'logfile': logfile, 'directory': directory}
+    args = {'logfile': logfile, 'directory': directory, 'smooth': False, 'colors': ['green']}
     script = 'zscore.py'
     job_id = brainsss.sbatch(jobname='zscore',
                          script=os.path.join(scripts_path, script),

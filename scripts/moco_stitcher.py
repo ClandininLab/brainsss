@@ -29,7 +29,6 @@ def main(args):
                 files[color].append(os.path.join(directory, file))
         brainsss.sort_nicely(files[color])
 
-    printlog(files)
     #####################
     ### Stitch brains ###
     #####################
