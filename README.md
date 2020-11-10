@@ -8,8 +8,8 @@ For clarity, this package currently only contains a few functions to demonstrate
 Installing the package:  
 First, add our lab's custom modules to you modulepath (allows access to ANTs, a brain-warping tool) by adding:  
 ```export MODULEPATH=/home/groups/trc/modules:$MODULEPATH``` to your
-```~/.bashrc```
-you will need to source to load the changes:
+```~/.bashrc```  
+you will need to source to load the changes:  
 ```source ~/.bashrc```
 
 login to sherlock and navigate to where you would like to install this package.  
