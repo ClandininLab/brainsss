@@ -22,4 +22,11 @@ Running the demo:
 cd scripts
 sbatch main.sh
 ```
-progress and errors will be printed into a file in the scripts/logs folder
+progress and errors will be printed into a file in the scripts/logs folder.
+mainlog.out keeps track of all the times the script was run, as well as high-level errors
+Once the job launches, a log with a date-time string will be created and messages will continue to be appended to it until the job is complete.
+The demo should perform and print information about Fictrac QC, Bleaching QC, creation of meanbrains, Motion Correction, and Z-scoring.
+Upon completion, the demo_data directory should contain some new files:
+- /fly_001/fictrac will contain a velocity trace and a 2D histogram
+- /fly_001 will contain a "bleaching" figure, the meanbrains for each channel, as well as the z-scored motion-corrected green-channel brain
+- /fly_001/moco will contain each channel motion corrected, as well as a figure of x/y/z translations involved in the motion correction.
