@@ -12,26 +12,26 @@ First, add our lab's custom modules to you modulepath (allows access to ANTs, a 
 you will need to source to load the changes:
 ```source ~/.bashrc```
 
-login to sherlock and navigate to where you would like to install this package.
+login to sherlock and navigate to where you would like to install this package.  
 ```shell
 > git clone https://github.com/ClandininLab/brainsss.git
 > cd brainsss
 > ml python/3.6.1
 > pip3 install -e . --user
 ```
-change the paths:
+change the paths:  
   - in scripts/main.sh, line 13 must point to scripts/main.py
   - in scripts/main.py, scripts_path, com_path, and dataset_path must be set
 
-Running the demo:
+Running the demo:  
 ```shell
 cd scripts
 sbatch main.sh
 ```
-progress and errors will be printed into a file in the scripts/logs folder.
-mainlog.out keeps track of all the times the script was run, as well as high-level errors
-Once the job launches, a log with a date-time string will be created and messages will continue to be appended to it until the job is complete.
-The demo should perform and print information about Fictrac QC, Bleaching QC, creation of meanbrains, Motion Correction, and Z-scoring.
+progress and errors will be printed into a file in the scripts/logs folder.  
+mainlog.out keeps track of all the times the script was run, as well as high-level errors. 
+Once the job launches, a log with a date-time string will be created and messages will continue to be appended to it until the job is complete.  
+The demo should perform and print information about Fictrac QC, Bleaching QC, creation of meanbrains, Motion Correction, and Z-scoring.  
 
 ![example_log_file](example_log_file.png)
 
