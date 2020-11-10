@@ -9,10 +9,10 @@ from contextlib import contextmanager
 import warnings
 warnings.filterwarnings("ignore")
 
-import platform
-if platform.system() != 'Windows':
-    sys.path.insert(0, '/home/users/brezovec/.local/lib/python3.6/site-packages/lib/python/')
-    import ants
+# import platform
+# if platform.system() != 'Windows':
+#     sys.path.insert(0, '/home/users/brezovec/.local/lib/python3.6/site-packages/lib/python/')
+import ants
 
 def align_volume(fixed, moving, vol):
 
