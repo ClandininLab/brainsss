@@ -35,6 +35,8 @@ The demo should perform and print information about Fictrac QC, Bleaching QC, cr
 
 ![example_log_file](example_log_file.png)
 
+*** (Jolie) - you will possibly see errors in the mainlog.out file, about certain packages not being able to import. You will need to install these packages using pip3 install. Let me know if this happens, and if so which packages you needed to install so I can add it to this readme. And let me know if you need help with this, but basically you will type ```pip3 install "package name" --user```
+
 Upon completion, the demo_data directory should contain some new files:
 - /fly_001/fictrac will contain a velocity trace and a 2D histogram
 - /fly_001 will contain a "bleaching" figure, the meanbrains for each channel, as well as the z-scored motion-corrected green-channel brain
