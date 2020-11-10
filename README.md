@@ -33,6 +33,7 @@ mainlog.out keeps track of all the times the script was run, as well as high-lev
 Once the job launches, a log with a date-time string will be created and messages will continue to be appended to it until the job is complete.  
 The demo should perform and print information about Fictrac QC, Bleaching QC, creation of meanbrains, Motion Correction, and Z-scoring.  
 
+Example log file:
 ![example_log_file](example_log_file.png)
 
 *** (Jolie) - you will possibly see errors in the mainlog.out file, about certain packages not being able to import. You will need to install these packages using pip3 install. Let me know if this happens, and if so which packages you needed to install so I can add it to this readme. And let me know if you need help with this, but basically you will type ```pip3 install "package name" --user```
