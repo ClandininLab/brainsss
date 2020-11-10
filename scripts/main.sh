@@ -9,5 +9,6 @@
 #SBATCH --mail-type=ALL
 
 ml python/3.6.1
+ml ants/0.2.2
 date
 python3 -u /home/users/brezovec/projects/brainsss/scripts/main.py
