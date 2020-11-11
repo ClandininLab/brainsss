@@ -42,3 +42,12 @@ Upon completion, the demo_data directory should contain some new files:
 - /fly_001/fictrac will contain a velocity trace and a 2D histogram
 - /fly_001 will contain a "bleaching" figure, the meanbrains for each channel, as well as the z-scored motion-corrected green-channel brain
 - /fly_001/moco will contain each channel motion corrected, as well as a figure of x/y/z translations involved in the motion correction.
+
+A few notes on parameters:  
+- this toy data set only contains 10 timepoints, giving arrays of [256,128,49,10] (x,y,z,t).
+- A more standard functional array will be [256,128,49,3384], for which I recommend during moco:
+  - partials: step=100, mem=4, time_moco=4
+  - stitcher: mem=12, time=2
+- For an anatomical volume, of roughly [1024,512,200,100], I recommend:
+  - step=10, mem=7, time_moco=6
+- for z-scoring these large functional volumes, I recommend mem=18
