@@ -52,4 +52,12 @@ A few notes on parameters:
   - step=10, mem=7, time_moco=6
 - for z-scoring these large functional volumes, I recommend mem=18
 
-A final note that should be mentioned: to achieve creation of a common log file, I have stolen the print() function. So, for anything you want to print, you must use the printlog() function, but otherwise it is the same.
+A note that should be mentioned: to achieve creation of a common log file, I have stolen the print() function. So, for anything you want to print, you must use the printlog() function, but otherwise it is the same.
+
+Here is a little more detail on how to use this package as a wrapper for job submission:
+main.sh will always be called via sbatch to start the program. This will start main.py, which will use a single core and manage the submission of jobs. Two core functions are:
+- brainsss.sbatch
+- brainsss.wait_for_job
+These are in the utils.py file if you want to check them out.
+Essentially, you will tell brainsss.sbatch what python script you would like to run, as well as which modules to load, memory and time, etc.
+The function will return the job_id that was assigned to it via slurm. Then, you can use brainsss.wait_for_job to wait until this job is complete before continuing through main.py
