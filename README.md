@@ -6,8 +6,8 @@ At its core, brainsss is a wrapper to interface with Slurm via python. It can ha
 For clarity, this package currently only contains a few functions to demonstrate its usage (and includes some demo data). One function that may be particularly useful is motion correction.
 
 Installing the package:
-Log onto sherlock (ssh sunetid@login.sherlock.stanford.edu)
-First, add our lab's custom modules to you modulepath (allows access to ANTs, a brain-warping tool) by adding:  
+Log onto sherlock (ssh sunetid@login.sherlock.stanford.edu)  
+Add our lab's custom modules to you modulepath (allows access to ANTs, a brain-warping tool) by adding:  
 ```export MODULEPATH=/home/groups/trc/modules:$MODULEPATH``` to your
 ```~/.bashrc```  
 you will need to source to load the changes:  
