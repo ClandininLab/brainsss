@@ -79,7 +79,7 @@ def main(args):
         np.save(save_file, stitched_params)
         [os.remove(file) for file in motcorr_param_files]
         xml_dir = os.path.join(os.path.split(directory)[0], 'imaging')
-        save_motion_figure(stitched_params, xml_dir, directory, dirtype)
+        #save_motion_figure(stitched_params, xml_dir, directory, dirtype)
     else:
         printlog('Empty motcorr params - skipping saving moco figure.')
 
