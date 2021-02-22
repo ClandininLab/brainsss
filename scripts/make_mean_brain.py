@@ -14,7 +14,7 @@ def main(args):
     width = 120
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
-    files = ['functional_channel_1', 'functional_channel_2']
+    files = ['functional_channel_1', 'functional_channel_2', 'anatomy_channel_1', 'anatomy_channel_2']
     for file in files:
         try:
             ### make mean ###

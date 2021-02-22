@@ -19,14 +19,26 @@ def main(args):
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
     moco_dir = os.path.join(directory, 'moco')
-    master_path = os.path.join(directory, 'functional_channel_1.nii')
-    moving_path = os.path.join(directory, 'functional_channel_2.nii')
-    master_path_mean = os.path.join(directory, 'functional_channel_1_mean.nii')
 
-    # For the sake of memory, load only the part of the brain we will need.
-    master_brain = load_partial_brain(master_path,start,stop)
-    moving_brain = load_partial_brain(moving_path,start,stop)
-    mean_brain = ants.from_numpy(np.asarray(nib.load(master_path_mean).get_data(), dtype='float32'))
+    try:
+      master_path = os.path.join(directory, 'functional_channel_1.nii')
+      moving_path = os.path.join(directory, 'functional_channel_2.nii')
+      master_path_mean = os.path.join(directory, 'functional_channel_1_mean.nii')
+
+      # For the sake of memory, load only the part of the brain we will need.
+      master_brain = load_partial_brain(master_path,start,stop)
+      moving_brain = load_partial_brain(moving_path,start,stop)
+      mean_brain = ants.from_numpy(np.asarray(nib.load(master_path_mean).get_data(), dtype='float32'))
+    except:
+      printlog('fuctional data not found; trying anatomical')
+      master_path = os.path.join(directory, 'anatomy_channel_1.nii')
+      moving_path = os.path.join(directory, 'anatomy_channel_2.nii')
+      master_path_mean = os.path.join(directory, 'anatomy_channel_1_mean.nii')
+
+      # For the sake of memory, load only the part of the brain we will need.
+      master_brain = load_partial_brain(master_path,start,stop)
+      moving_brain = load_partial_brain(moving_path,start,stop)
+      mean_brain = ants.from_numpy(np.asarray(nib.load(master_path_mean).get_data(), dtype='float32'))
 
     brainsss.motion_correction(master_brain,
                            moving_brain,
