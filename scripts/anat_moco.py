@@ -76,7 +76,7 @@ for fly in flies:
     step = 10 #how many volumes one job will handle
     mem = 7
     time_moco = 6
-    begintime='now'
+    begin='now'
 
     printlog(f"\n{'   MOTION CORRECTION   ':=^{width}}")
     # This will immediately launch all partial mocos and their corresponding dependent moco stitchers
@@ -104,7 +104,7 @@ for fly in flies:
                              script=os.path.join(scripts_path, script),
                              modules=modules,
                              args=args,
-                             logfile=logfile, time=time_moco, mem=mem, nice=nice, silence_print=True, nodes=nodes, begintime=begintime)
+                             logfile=logfile, time=time_moco, mem=mem, nice=nice, silence_print=True, nodes=nodes, begin=begin)
         job_ids.append(job_id)
 
     printlog(F"| moco_partials | SUBMITTED | {fly_print} | {len(job_ids)} jobs, {step} vols each |")
