@@ -80,8 +80,8 @@ for fly in flies:
 
     # printlog(f"\n{'   MOTION CORRECTION   ':=^{width}}")
     # # This will immediately launch all partial mocos and their corresponding dependent moco stitchers
-    # stitcher_job_ids = []
-    # progress_tracker = {}
+    stitcher_job_ids = []
+    progress_tracker = {}
 
     directory = os.path.join(dataset_path, fly)
     fly_print = directory.split('/')[-1]
@@ -115,6 +115,7 @@ for fly in flies:
     #################################
     ### Create dependent stitcher ###
     #################################
+    job_ids_colons = '' #<----------------------------- DELETE
     args = {'logfile': logfile, 'directory': moco_dir}
     script = 'moco_stitcher.py'
     job_id = brainsss.sbatch(jobname='stitch',
