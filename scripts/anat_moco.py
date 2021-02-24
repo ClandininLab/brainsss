@@ -15,7 +15,7 @@ modules = 'gcc/6.3.0 python/3.6.1 py-numpy/1.14.3_py36 py-pandas/0.23.0_py36 viz
 #########################
 
 width = 120 # width of print log
-flies = ['fly_001'] # set to None, or a list of fly dirs in dataset_path
+flies = ['fly_001', 'fly_002'] # set to None, or a list of fly dirs in dataset_path
 nodes = 2 # 1 or 2
 nice = True # true to lower priority of jobs. ie, other users jobs go first
 
@@ -51,85 +51,85 @@ printlog(F"{day_now+' | '+time_now:^{width}}")
 printlog("")
 
 for fly in flies:
-    # ##########################
-    # ### Create mean brains ###
-    # ##########################
-    # printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
-    # job_ids = []
+    ##########################
+    ### Create mean brains ###
+    ##########################
+    printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
+    job_ids = []
     directory = os.path.join(dataset_path, fly)
-    # files = ['anatomy_channel_1', 'anatomy_channel_2']
-    # args = {'logfile': logfile, 'directory': directory, 'files': files}
-    # script = 'make_mean_brain.py'
-    # job_id = brainsss.sbatch(jobname='meanbrn',
-    #                      script=os.path.join(scripts_path, script),
-    #                      modules=modules,
-    #                      args=args,
-    #                      logfile=logfile, time=1, mem=4, nice=nice, nodes=nodes)
-    # job_ids.append(job_id)
+    files = ['anatomy_channel_1', 'anatomy_channel_2']
+    args = {'logfile': logfile, 'directory': directory, 'files': files}
+    script = 'make_mean_brain.py'
+    job_id = brainsss.sbatch(jobname='meanbrn',
+                         script=os.path.join(scripts_path, script),
+                         modules=modules,
+                         args=args,
+                         logfile=logfile, time=1, mem=4, nice=nice, nodes=nodes)
+    job_ids.append(job_id)
 
-    # for job_id in job_ids:
-    #     brainsss.wait_for_job(job_id, logfile, com_path)
+    for job_id in job_ids:
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
-    # ##################
-    # ### Start MOCO ###
-    # ##################
-    # timepoints = 100 #number of volumes
-    # step = 10 #how many volumes one job will handle
-    # mem = 7
-    # time_moco = 6
-    # begin='now'
+    ##################
+    ### Start MOCO ###
+    ##################
+    timepoints = 100 #number of volumes
+    step = 10 #how many volumes one job will handle
+    mem = 7
+    time_moco = 6
+    begin='21:00'#'now'
 
-    # printlog(f"\n{'   MOTION CORRECTION   ':=^{width}}")
-    # # This will immediately launch all partial mocos and their corresponding dependent moco stitchers
-    # stitcher_job_ids = []
-    # progress_tracker = {}
+    printlog(f"\n{'   MOTION CORRECTION   ':=^{width}}")
+    # This will immediately launch all partial mocos and their corresponding dependent moco stitchers
+    stitcher_job_ids = []
+    progress_tracker = {}
 
-    # directory = os.path.join(dataset_path, fly)
-    # fly_print = directory.split('/')[-1]
+    directory = os.path.join(dataset_path, fly)
+    fly_print = directory.split('/')[-1]
 
     moco_dir = os.path.join(directory, 'moco')
     if not os.path.exists(moco_dir):
         os.makedirs(moco_dir)
 
-    # starts = list(range(0,timepoints,step))
-    # stops = starts[1:] + [timepoints]
+    starts = list(range(0,timepoints,step))
+    stops = starts[1:] + [timepoints]
 
-    # #######################
-    # ### Launch partials ###
-    # #######################
-    # job_ids = []
-    # for start, stop in zip (starts, stops):
-    #     args = {'logfile': logfile, 'directory': directory, 'start': start, 'stop': stop}
-    #     script = 'moco_partial.py'
-    #     job_id = brainsss.sbatch(jobname='moco',
-    #                          script=os.path.join(scripts_path, script),
-    #                          modules=modules,
-    #                          args=args,
-    #                          logfile=logfile, time=time_moco, mem=mem, nice=nice, silence_print=True, nodes=nodes, begin=begin)
-    #     job_ids.append(job_id)
+    #######################
+    ### Launch partials ###
+    #######################
+    job_ids = []
+    for start, stop in zip (starts, stops):
+        args = {'logfile': logfile, 'directory': directory, 'start': start, 'stop': stop}
+        script = 'moco_partial.py'
+        job_id = brainsss.sbatch(jobname='moco',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=time_moco, mem=mem, nice=nice, silence_print=True, nodes=nodes, begin=begin)
+        job_ids.append(job_id)
 
-    # printlog(F"| moco_partials | SUBMITTED | {fly_print} | {len(job_ids)} jobs, {step} vols each |")
-    # job_ids_colons = ':'.join(job_ids)
-    # for_tracker = '/'.join(directory.split('/')[-2:])
-    # progress_tracker[for_tracker] = {'job_ids': job_ids, 'total_vol': timepoints}
+    printlog(F"| moco_partials | SUBMITTED | {fly_print} | {len(job_ids)} jobs, {step} vols each |")
+    job_ids_colons = ':'.join(job_ids)
+    for_tracker = '/'.join(directory.split('/')[-2:])
+    progress_tracker[for_tracker] = {'job_ids': job_ids, 'total_vol': timepoints}
 
-    # #################################
-    # ### Create dependent stitcher ###
-    # #################################
-    # args = {'logfile': logfile, 'directory': moco_dir}
-    # script = 'moco_stitcher.py'
-    # job_id = brainsss.sbatch(jobname='stitch',
-    #                      script=os.path.join(scripts_path, script),
-    #                      modules=modules,
-    #                      args=args,
-    #                      logfile=logfile, time=2, mem=12, dep=job_ids_colons, nice=nice, nodes=nodes)
-    # stitcher_job_ids.append(job_id)
+    #################################
+    ### Create dependent stitcher ###
+    #################################
+    args = {'logfile': logfile, 'directory': moco_dir}
+    script = 'moco_stitcher.py'
+    job_id = brainsss.sbatch(jobname='stitch',
+                         script=os.path.join(scripts_path, script),
+                         modules=modules,
+                         args=args,
+                         logfile=logfile, time=2, mem=12, dep=job_ids_colons, nice=nice, nodes=nodes)
+    stitcher_job_ids.append(job_id)
 
-    # if bool(progress_tracker): #if not empty
-    #     brainsss.moco_progress(progress_tracker, logfile, com_path)
+    if bool(progress_tracker): #if not empty
+        brainsss.moco_progress(progress_tracker, logfile, com_path)
 
-    # for job_id in stitcher_job_ids:
-    #     brainsss.wait_for_job(job_id, logfile, com_path)
+    for job_id in stitcher_job_ids:
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     ##############################
     ### Average stiched brains ###
