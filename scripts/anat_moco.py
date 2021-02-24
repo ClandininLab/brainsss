@@ -56,7 +56,7 @@ for fly in flies:
     # ##########################
     # printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
     # job_ids = []
-    # directory = os.path.join(dataset_path, fly)
+    directory = os.path.join(dataset_path, fly)
     # files = ['anatomy_channel_1', 'anatomy_channel_2']
     # args = {'logfile': logfile, 'directory': directory, 'files': files}
     # script = 'make_mean_brain.py'
@@ -87,9 +87,9 @@ for fly in flies:
     # directory = os.path.join(dataset_path, fly)
     # fly_print = directory.split('/')[-1]
 
-    # moco_dir = os.path.join(directory, 'moco')
-    # if not os.path.exists(moco_dir):
-    #     os.makedirs(moco_dir)
+    moco_dir = os.path.join(directory, 'moco')
+    if not os.path.exists(moco_dir):
+        os.makedirs(moco_dir)
 
     # starts = list(range(0,timepoints,step))
     # stops = starts[1:] + [timepoints]
