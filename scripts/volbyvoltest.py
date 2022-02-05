@@ -7,7 +7,7 @@ import json
 from time import time
 import nibabel as nib
 import brainsss
-import hdf5
+import h5py
 import ants
 
 def main(args):
