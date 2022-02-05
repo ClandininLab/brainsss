@@ -24,7 +24,7 @@ def main(args):
     brain_dims = img.header.get_data_shape()
 
     # calculate the meanbrain, which will be fixed in moco
-    meanbrain = np.zeros(brain_dims)
+    meanbrain = np.zeros(brain_dims[:3])
     for i in range(brain_dims[-1]):
         meanbrain += img.dataobj[...,i]
     meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
