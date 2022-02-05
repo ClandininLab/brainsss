@@ -12,7 +12,7 @@ import ants
 
 def main(args):
 
-    # logfile = args['logfile']
+    logfile = args['logfile']
     # directory = args['directory'] # full fly func path
     # smooth = args['smooth']
     # colors = args['colors']
