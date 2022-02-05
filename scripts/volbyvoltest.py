@@ -25,7 +25,7 @@ def main(args):
 
     # calculate the meanbrain, which will be fixed in moco
     meanbrain = np.zeros(brain_dims)
-    for i in tqdm(brain_dims[-1]):
+    for i in range(brain_dims[-1]):
         meanbrain += img.dataobj[...,i]
     meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
     fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
