@@ -23,16 +23,16 @@ def main(args):
     img = nib.load(brain_file) # this loads a proxy
     brain_dims = img.header.get_data_shape()
 
-    # calculate the meanbrain, which will be fixed in moco
-    # meanbrain = np.zeros(brain_dims[:3])
-    # for i in range(brain_dims[-1]):
-    #     meanbrain += img.dataobj[...,i]
-    # meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
-    # fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
-    # printlog('meanbrain DONE')
+    #calculate the meanbrain, which will be fixed in moco
+    meanbrain = np.zeros(brain_dims[:3])
+    for i in range(brain_dims[-1]):
+        meanbrain += img.dataobj[...,i]
+    meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
+    fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
+    printlog('meanbrain DONE')
 
     # Make empty hdf5 file to append processed volumes to with matching shape
-    save_file = '/oak/stanford/groups/trc/data/Brezovec/20220207_test.h5'
+    save_file = '/oak/stanford/groups/trc/data/Brezovec/20220207_test2.h5'
     with h5py.File(save_file, 'w') as f:
         dset = f.create_dataset('data', (*brain_dims[:3],0), maxshape=(*brain_dims[:3],None), dtype='float32')
     printlog('created empty hdf5 file')
@@ -43,14 +43,28 @@ def main(args):
         t0 = time()
         # Load a single brain volume
         vol = img.dataobj[...,i]
-        
-        # ### Process vol (moco, zscore, etc) ###
-        # # Make ants image
-        # moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 
-        # # Motion correct
-        # moco = ants.registration(fixed,moving,type_of_transform='SyN')
-        # moco_out = moco['warpedmovout'].numpy()
+        ### Process vol (moco, zscore, etc) ###
+        # Make ants image
+        moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
+
+        # Motion correct
+        moco = ants.registration(fixed,moving,type_of_transform='SyN')
+        moco_out = moco['warpedmovout'].numpy()
+
+        ### DELETE INVERSE TRANSFORMS
+        transformlist = motCorr_vol['invtransforms']
+        for x in transformlist:
+            if '.mat' not in x:
+                os.remove(x)
+                printlog('Deleted inv: {}'.format(x))
+
+        ### DELETE FORWARD TRANSFORMS
+        transformlist = motCorr_vol['fwdtransforms']
+        for x in transformlist:
+            if '.mat' not in x:
+                os.remove(x)
+                printlog('Deleted fwd: {}'.format(x))
 
         # Append to hdf5 file
         with h5py.File(save_file, 'a') as f:
@@ -59,7 +73,7 @@ def main(args):
             current_num_vol = f['data'].shape[-1] # this is the last axis, which is time
             new_num_vol = current_num_vol + 1 # will want one more volume
             f['data'].resize(new_num_vol,axis=3) # increase size by one volume
-            
+
             # Append to hdf5 file
             f['data'][...,-1] = vol #moco_out
         printlog(F'vol: {i}, time: {time()-t0}')
