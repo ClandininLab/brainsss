@@ -24,6 +24,7 @@ def main(args):
     brain_dims = img.header.get_data_shape()
 
     #calculate the meanbrain, which will be fixed in moco
+    printlog('meanbrain START...')
     meanbrain = np.zeros(brain_dims[:3])
     for i in range(brain_dims[-1]):
         meanbrain += img.dataobj[...,i]
@@ -53,14 +54,14 @@ def main(args):
         moco_out = moco['warpedmovout'].numpy()
 
         ### DELETE INVERSE TRANSFORMS
-        transformlist = motCorr_vol['invtransforms']
+        transformlist = moco['invtransforms']
         for x in transformlist:
             if '.mat' not in x:
                 os.remove(x)
                 printlog('Deleted inv: {}'.format(x))
 
         ### DELETE FORWARD TRANSFORMS
-        transformlist = motCorr_vol['fwdtransforms']
+        transformlist = moco['fwdtransforms']
         for x in transformlist:
             if '.mat' not in x:
                 os.remove(x)
