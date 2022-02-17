@@ -32,8 +32,8 @@ sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
 ###################
 
 #CHANGE THESE PATHS
-scripts_path = "/home/users/brezovec/projects/brainsss/scripts"
-com_path = "/home/users/brezovec/projects/brainsss/scripts/com"
+scripts_path = "/home/users/yandanw/projects/brainsss/scripts"
+com_path = "/home/users/yandanw/projects/brainsss/scripts/com"
 
 #change this path to your oak directory, something like /oak/stanford/groups/trc/data/Brezovec/data
 dataset_path = "/home/users/brezovec/projects/brainsss/demo_data"
@@ -42,7 +42,7 @@ dataset_path = "/home/users/brezovec/projects/brainsss/demo_data"
 ### Print Title ###
 ###################
 
-title = pyfiglet.figlet_format("Brainsss", font="cyberlarge" ) #28 #shimrod
+title = pyfiglet.figlet_format("Yandan", font="cyberlarge" ) #28 #shimrod
 title_shifted = ('\n').join([' '*28+line for line in title.split('\n')][:-2])
 printlog(title_shifted)
 day_now = datetime.datetime.now().strftime("%B %d, %Y")
@@ -50,22 +50,40 @@ time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
 printlog(F"{day_now+' | '+time_now:^{width}}")
 printlog("")
 
-### quick vol by vol test ###
-printlog(f"\n{'   vol by vol test   ':=^{width}}")
+### toy practice###
+printlog(f"\n{'   hi this is a toy   ':=^{width}}")
 job_ids = []
-for fly in flies:
-    directory = os.path.join(dataset_path, fly)
-    args = {'logfile': logfile, 'directory': directory, 'smooth': False, 'colors': ['green']}
-    script = 'volbyvoltest.py'
-    job_id = brainsss.sbatch(jobname='voltest',
-                         script=os.path.join(scripts_path, script),
-                         modules=modules,
-                         args=args,
-                         logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
-    job_ids.append(job_id)
+a = 5
+b = 10
+
+args = {'logfile': logfile, 'a': a, 'b': b}
+script = 'toy_model.py'
+job_id = brainsss.sbatch(jobname='toy',
+                     script=os.path.join(scripts_path, script),
+                     modules=modules,
+                     args=args,
+                     logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+job_ids.append(job_id)
 
 for job_id in job_ids:
     brainsss.wait_for_job(job_id, logfile, com_path)
+
+### quick vol by vol test ###
+# printlog(f"\n{'   vol by vol test   ':=^{width}}")
+# job_ids = []
+# for fly in flies:
+#     directory = os.path.join(dataset_path, fly)
+#     args = {'logfile': logfile, 'directory': directory, 'smooth': False, 'colors': ['green']}
+#     script = 'volbyvoltest.py'
+#     job_id = brainsss.sbatch(jobname='voltest',
+#                          script=os.path.join(scripts_path, script),
+#                          modules=modules,
+#                          args=args,
+#                          logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
+#     job_ids.append(job_id)
+#
+# for job_id in job_ids:
+#     brainsss.wait_for_job(job_id, logfile, com_path)
 
 
 # ###############
