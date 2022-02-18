@@ -24,6 +24,10 @@ change the paths:
   - in scripts/main.sh, line 13 must point to scripts/main.py
   - in scripts/main.py, scripts_path, com_path, and dataset_path must be set
 
+Install required python packages:
+  - ```ml python/3.6.1```
+  - ```pip3 install pyfiglet```
+
 Running the demo:  
 ```shell
 cd scripts
