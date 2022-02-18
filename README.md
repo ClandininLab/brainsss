@@ -27,6 +27,7 @@ change the paths:
 Install required python packages:
   - ```ml python/3.6.1```
   - ```pip3 install pyfiglet```
+  - ```pip3 install psutil```
 
 Running the demo:  
 ```shell
