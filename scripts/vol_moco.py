@@ -86,10 +86,8 @@ def main(args):
             ch2_img = nib.load(ch2_brain_file) # this loads a proxy
             ch2_vol = ch2_img.dataobj[...,i]
             ch2_moving = ants.from_numpy(np.asarray(ch2_vol, dtype='float32'))
-            #moco_ch2 = ants.apply_transforms(meanbrain, ants.from_numpy(ch2_moving), transformlist).numpy()
-            #moco_ch2 = ants.apply_transforms(meanbrain, ch2_moving, transformlist).numpy()
-            moco_ch2 = ants.apply_transforms(meanbrain, ch2_moving, transformlist)
-            #moco_ch2 = moco_ch2.numpy()
+            moco_ch2 = ants.apply_transforms(fixed, ch2_moving, transformlist)
+            moco_ch2 = moco_ch2.numpy()
             
                  
                  
