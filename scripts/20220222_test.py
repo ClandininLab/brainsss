@@ -11,6 +11,11 @@ import argparse
 
 def main(args):
 
+    dataset_path = args.directory_to_process
+    scripts_path = args.PWD
+    com_path = os.path.join(scripts_path, 'com')
+
+
     modules = 'gcc/6.3.0 python/3.6.1 py-numpy/1.14.3_py36 py-pandas/0.23.0_py36 viz py-scikit-learn/0.19.1_py36 antspy/0.2.2'
 
     #########################
@@ -35,11 +40,11 @@ def main(args):
     ###################
 
     #CHANGE THESE PATHS
-    scripts_path = "/home/users/brezovec/projects/brainsss/scripts"
-    com_path = "/home/users/brezovec/projects/brainsss/scripts/com"
+    # scripts_path = "/home/users/brezovec/projects/brainsss/scripts"
+    # com_path = "/home/users/brezovec/projects/brainsss/scripts/com"
 
-    #change this path to your oak directory, something like /oak/stanford/groups/trc/data/Brezovec/data
-    dataset_path = "/home/users/brezovec/projects/brainsss/demo_data"
+    # #change this path to your oak directory, something like /oak/stanford/groups/trc/data/Brezovec/data
+    # dataset_path = "/home/users/brezovec/projects/brainsss/demo_data"
 
     ###################
     ### Print Title ###
@@ -53,7 +58,7 @@ def main(args):
     printlog(F"{day_now+' | '+time_now:^{width}}")
     printlog("")
 
-    printlog(args.name)
+    printlog(args.directory_to_process)
     printlog(args.PWD)
 
     ### toy practice###
@@ -87,7 +92,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("name")
+    parser.add_argument("directory_to_process", help="Full path to a fly directory to process. \
+        See readme for how to structure your fly directory. This argument is required and must be listed \
+        on the command line directly after the name of the shell file.")
     parser.add_argument("PWD")
     args = parser.parse_args()
 
