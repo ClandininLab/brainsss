@@ -11,7 +11,7 @@ import argparse
 
 def main(args):
 
-    dataset_path = args.directory_to_process
+    dataset_path = args.dataset_path
     scripts_path = args.PWD
     com_path = os.path.join(scripts_path, 'com')
 
@@ -94,12 +94,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("PWD")
+    parser.add_argument("dataset_path")
     try:
-        parser.add_argument("directory_to_process")
+        args = parser.parse_args()
     except:
-        raise Exception("You forgot to provide a fly directory. This argument is required and must be listed \
+        raise Exception("You probably forgot to provide a fly directory. This argument is required and must be listed \
             on the command line directly after the name of the shell file. It must be a full path to the directory \
             See readme for how to structure your fly directory.")
-    args = parser.parse_args()
 
     main(args)
