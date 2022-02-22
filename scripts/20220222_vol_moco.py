@@ -13,7 +13,7 @@ import ants
 def main(args):
 
 	logfile = args['logfile']
-	directory = args['directory'] # full fly path 
+	dataset_path = args['dataset_path'] # full fly path 
 	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 	
 	directory = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20220222_ashley_test"
