@@ -96,20 +96,13 @@ if __name__ == '__main__':
     parser.add_argument("PWD")
     parser.add_argument("dataset_path", default="MISSING", nargs='?')
     args = parser.parse_args()
-    print("hi")
     try:
-        assert (args.dataset_path != "MISSING"), "Python version must be 3"
+        message = '''You probably forgot to provide a fly directory. \n
+        This argument is required and must be listed on the command line directly
+        after the name of the shell file. \n It must be a full path to the directory.
+        \n See readme for how to structure your fly directory.'''
+        assert (args.dataset_path != "MISSING"), message
     except Exception as e:
         print (e)
-
-    #if args.dataset_path == "MISSING":
-    #    raise Exception("You probably forgot to provide a fly directory.")
-
-
-        #pass
-        #print("You probably forgot to provide a fly directory.", flush=True)
-          # n This argument is required and must be listed \
-          #   on the command line directly after the name of the shell file. \n It must be a full path to the directory. \n \
-          #   See readme for how to structure your fly directory.")
 
     main(args)
