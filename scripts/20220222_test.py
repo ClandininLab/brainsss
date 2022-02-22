@@ -54,6 +54,7 @@ def main(args):
     printlog("")
 
     printlog(args.name)
+    printlog(args.PWD)
 
     ### toy practice###
     printlog(f"\n{'   hi this is a toy   ':=^{width}}")
@@ -87,6 +88,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("name")
+    parser.add_argument("PWD")
     args = parser.parse_args()
 
     main(args)
