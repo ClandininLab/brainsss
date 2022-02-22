@@ -58,8 +58,8 @@ def main(args):
     printlog(F"{day_now+' | '+time_now:^{width}}")
     printlog("")
 
-    printlog(args.directory_to_process)
-    printlog(args.PWD)
+    printlog("Dataset path: {}".format(dataset_path))
+    printlog("Scripts path: {}".format(scripts_path))
 
     ### toy practice###
     printlog(f"\n{'   hi this is a toy   ':=^{width}}")
