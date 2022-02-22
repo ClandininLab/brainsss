@@ -42,7 +42,7 @@ def main(args):
 	### Get Brain Shape ###
 	img_ch1 = nib.load(filepath_ch1) # this loads a proxy
 	ch1_shape = img_ch1.header.get_data_shape()
-	braim_dims = ch1_shape
+	brain_dims = ch1_shape
 
 	### Make meanbrain ###
 	printlog('Creating temporal meanbrain...')
@@ -115,13 +115,13 @@ def main(args):
 
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 1 ###
 		with h5py.File(savefile_ch1, 'a') as f:
-			f['data'][...,-1] = moco_ch1																		
+			f['data'][...,i] = moco_ch1																		
 		printlog(F'vol: {i}, time: {time()-t0}')
 																						
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 2 ###
 		if filepath_ch2 is not None:
 			with h5py.File(savefile_ch2, 'a') as f:
-				f['data'][...,-1] = moco_ch2
+				f['data'][...,i] = moco_ch2
 			printlog(F'vol: {i}, time: {time()-t0}')
 
 def check_for_file(file, directory):
