@@ -99,7 +99,7 @@ if __name__ == '__main__':
         args = parser.parse_args()
     except Exception as e:
         #pass
-        raise Exception("You probably forgot to provide a fly directory.")
+        print("You probably forgot to provide a fly directory.")
           # n This argument is required and must be listed \
           #   on the command line directly after the name of the shell file. \n It must be a full path to the directory. \n \
           #   See readme for how to structure your fly directory.")
