@@ -125,8 +125,8 @@ def main(args):
 			printlog(F'vol: {i}, time: {time()-t0}')
 
 def check_for_file(file, directory):
-	filename = os.path.join(directory, file)
-	if os.path.exists(filename):
+	filepath = os.path.join(directory, file)
+	if os.path.exists(filepath):
 		return filepath
 	else:
 		return None
