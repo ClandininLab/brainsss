@@ -55,23 +55,23 @@ def main(args):
 
     printlog(args.name)
 
-    # ### toy practice###
-    # printlog(f"\n{'   hi this is a toy   ':=^{width}}")
-    # job_ids = []
-    # a = 5
-    # b = 10
+    ### toy practice###
+    printlog(f"\n{'   hi this is a toy   ':=^{width}}")
+    job_ids = []
+    a = 5
+    b = 10
 
-    # args = {'logfile': logfile, 'a': a, 'b': b}
-    # script = 'toy_model.py'
-    # job_id = brainsss.sbatch(jobname='toy',
-    #                      script=os.path.join(scripts_path, script),
-    #                      modules=modules,
-    #                      args=args,
-    #                      logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
-    # job_ids.append(job_id)
+    args = {'logfile': logfile, 'a': a, 'b': b}
+    script = 'toy_model.py'
+    job_id = brainsss.sbatch(jobname='toy',
+                         script=os.path.join(scripts_path, script),
+                         modules=modules,
+                         args=args,
+                         logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+    job_ids.append(job_id)
 
-    # for job_id in job_ids:
-    #     brainsss.wait_for_job(job_id, logfile, com_path)
+    for job_id in job_ids:
+        brainsss.wait_for_job(job_id, logfile, com_path)
         
 
     ############
