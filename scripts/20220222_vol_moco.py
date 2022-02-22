@@ -29,6 +29,10 @@ def main(args):
 	if filepath_ch1 is None:
 		printlog("Aborting moco - could not find {}".format(ch1_input))
 		return
+	else:
+		printlog("Channel is 1: {}".format(filepath_ch1))
+	printlog("Channel 2 is: {}".format(filepath_ch2))
+
 
 	########################################
 	### Calculate Meanbrain of Channel 1 ###
@@ -123,10 +127,8 @@ def main(args):
 def check_for_file(file, directory):
 	filename = os.path.join(directory, file)
 	if os.path.exists(filename):
-		printlog("Found file: {}".format(filepath))
 		return filepath
 	else:
-		printlog("Failed to find: {}".format(filepath))
 		return None
 
 if __name__ == '__main__':
