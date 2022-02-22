@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("PWD")
-    parser.add_argument("dataset_path", default="MISSING")
+    parser.add_argument("dataset_path", default="MISSING", required=False)
     args = parser.parse_args()
     print("hi")
     if args.dataset_path == "MISSING":
