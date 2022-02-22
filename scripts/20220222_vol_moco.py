@@ -30,7 +30,7 @@ def main(args):
 		printlog("Aborting moco - could not find {}".format(ch1_input))
 		return
 	else:
-		printlog("Channel is 1: {}".format(filepath_ch1))
+		printlog("Channel 1 is: {}".format(filepath_ch1))
 	printlog("Channel 2 is: {}".format(filepath_ch2))
 
 
@@ -60,8 +60,8 @@ def main(args):
 		ch2_shape = img_ch2.header.get_data_shape()
 		if ch1_shape != ch2_shape:
 			printlog("Channel 1 and 2 do not have the same shape! {} and {}".format(ch1_shape, ch2_shape))
-			printlog("Aborting.")
-			return
+			#printlog("Aborting.")
+			#return
 
 	############################################################
 	### Make Empty MOCO files that will be filled vol by vol ###
