@@ -35,8 +35,8 @@ def main(args):
     ###################
 
     #CHANGE THESE PATHS
-    scripts_path = "/home/users/yandanw/projects/brainsss/scripts"
-    com_path = "/home/users/yandanw/projects/brainsss/scripts/com"
+    scripts_path = "/home/users/brezovec/projects/brainsss/scripts"
+    com_path = "/home/users/brezovec/projects/brainsss/scripts/com"
 
     #change this path to your oak directory, something like /oak/stanford/groups/trc/data/Brezovec/data
     dataset_path = "/home/users/brezovec/projects/brainsss/demo_data"
