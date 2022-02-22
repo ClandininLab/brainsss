@@ -66,14 +66,13 @@ def main(args):
     job_ids = []
     a = 5
     b = 10
-
-    args = {'logfile': logfile, 'a': a, 'b': b}
-    script = 'toy_model.py'
-    job_id = brainsss.sbatch(jobname='toy',
+    args = {'logfile': logfile, 'dataset_path': dataset_path}
+    script = '20220222_vol_moco.py'
+    job_id = brainsss.sbatch(jobname='moco',
                          script=os.path.join(scripts_path, script),
                          modules=modules,
                          args=args,
-                         logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+                         logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
     job_ids.append(job_id)
 
     for job_id in job_ids:
