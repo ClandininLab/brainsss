@@ -97,8 +97,14 @@ if __name__ == '__main__':
     parser.add_argument("dataset_path", default="MISSING", nargs='?')
     args = parser.parse_args()
     print("hi")
-    if args.dataset_path == "MISSING":
-        raise Exception("You probably forgot to provide a fly directory.")
+    try:
+        assert (args.dataset_path != "MISSING"), "Python version must be 3"
+    except Exception as e:
+        print (e)
+
+    #if args.dataset_path == "MISSING":
+    #    raise Exception("You probably forgot to provide a fly directory.")
+
 
         #pass
         #print("You probably forgot to provide a fly directory.", flush=True)
