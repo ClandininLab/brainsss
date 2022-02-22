@@ -91,11 +91,16 @@ def main(args):
     printlog(F"{day_now+' | '+time_now:^{width}}")
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     parser.add_argument("PWD")
-    parser.add_argument("directory_to_process", help="Full path to a fly directory to process. \
-        See readme for how to structure your fly directory. This argument is required and must be listed \
-        on the command line directly after the name of the shell file.")
+    try:
+        parser.add_argument("directory_to_process")
+    except:
+        print("You forgot to provide a fly directory. This argument is required and must be listed \
+            on the command line directly after the name of the shell file. It must be a full path to the directory \
+            See readme for how to structure your fly directory.")
+        return
     args = parser.parse_args()
 
     main(args)
