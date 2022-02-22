@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parser.add_argument("dataset_path")
     try:
         args = parser.parse_args()
-    except:
+    except Exception as e:
         #pass
         raise Exception("You probably forgot to provide a fly directory.")
           # n This argument is required and must be listed \
