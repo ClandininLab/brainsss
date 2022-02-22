@@ -86,7 +86,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("name", help='your name, enter it')
+    parser.add_argument("name")
     args = parser.parse_args()
 
     main(args)
