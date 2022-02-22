@@ -96,6 +96,7 @@ if __name__ == '__main__':
     parser.add_argument("PWD")
     parser.add_argument("dataset_path", default="MISSING")
     args = parser.parse_args()
+    print("hi")
     if args.dataset_path == "MISSING":
         raise Exception("You probably forgot to provide a fly directory.")
 
