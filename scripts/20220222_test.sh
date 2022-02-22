@@ -8,5 +8,6 @@
 #SBATCH --open-mode=append
 
 ml python/3.6.1
+ml antspy/0.2.2
 date
 python3 -u ./20220222_test.py
