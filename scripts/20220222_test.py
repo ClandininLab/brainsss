@@ -98,8 +98,8 @@ if __name__ == '__main__':
     try:
         args = parser.parse_args()
     except:
-        raise Exception("You probably forgot to provide a fly directory. This argument is required and must be listed \
-            on the command line directly after the name of the shell file. It must be a full path to the directory \
+        raise Exception("You probably forgot to provide a fly directory. \n This argument is required and must be listed \
+            on the command line directly after the name of the shell file. \n It must be a full path to the directory. \n \
             See readme for how to structure your fly directory.")
 
     main(args)
