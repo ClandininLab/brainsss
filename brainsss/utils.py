@@ -60,7 +60,9 @@ def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=
     if dep != '':
         dep = '--dependency=afterok:{} --kill-on-invalid-dep=yes '.format(dep)
  
+    #command = f'ml {modules}; python3 {script} {json.dumps(json.dumps(args))}'
     command = f'ml {modules}; python3 {script} {json.dumps(json.dumps(args))}'
+
 
     if nice: # For lowering the priority of the job
         nice = 1000000
@@ -74,7 +76,7 @@ def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=
     sbatch_response = subprocess.getoutput(sbatch_command)
     width = 120
     if not silence_print:
-        Printlog(logfile=logfile).print_to_log(f"{sbatch_response}{jobname:.>{width-27}}")
+        Printlog(logfile=logfile).print_to_log(f"{sbatch_response}{jobname:.>{width-28}}")
     job_id = sbatch_response.split(' ')[-1].strip()
     return job_id
 

@@ -6,7 +6,7 @@ import subprocess
 import json
 from time import time
 import nibabel as nib
-import brainsss
+import brainsss.utils as brainsss
 import h5py
 import ants
 
@@ -72,13 +72,13 @@ def main(args):
 	############################################################
 	savefile_ch1 = os.path.join(directory, "moco_ch1.h5")
 	with h5py.File(savefile_ch1, 'w') as f:
-		dset_ch1 = f.create_dataset('data', brain_dims, dtype='float32')
+		dset_ch1 = f.create_dataset('data', brain_dims, dtype='float32', chunks=True)
 		printlog('created empty hdf5 file: {}'.format(savefile_ch1))
 
 	if filepath_ch2 is not None:
 		savefile_ch2 = os.path.join(directory, "moco_ch2.h5") 
 		with h5py.File(savefile_ch2, 'w') as f:
-			dset_ch2 = f.create_dataset('data', brain_dims, dtype='float32')
+			dset_ch2 = f.create_dataset('data', brain_dims, dtype='float32', chunks=True)
 		printlog('created empty hdf5 file: {}'.format(savefile_ch2))
 
 	#################################
@@ -119,6 +119,7 @@ def main(args):
 			if '.mat' not in x:
 				os.remove(x)
 
+		printlog('here')
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 1 ###
 		with h5py.File(savefile_ch1, 'a') as f:
 			f['data'][...,i] = moco_ch1																		
