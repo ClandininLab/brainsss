@@ -87,6 +87,7 @@ def main(args):
 	printlog("Starting MOCO")
 	
 	### prepare chunks to loop over ###
+	# the stepsize defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
 	stepsize = 10
 	steps = list(range(0,brain_dims[-1],stepsize))
 	# add the last few volumes that are not divisible by stepsize
@@ -101,10 +102,14 @@ def main(args):
 		### LOAD A SINGLE BRAIN VOL ###
 		moco_ch1_chunk = []
 		moco_ch2_chunk = []
-		t0 = time()
 		for i in range(stepsize):
-			print(F"i: {i}")
-			vol = img_ch1.dataobj[...,i]
+			t0 = time()
+			index = steps[j] + i
+			# for the very last j, adding the step size will go over the dim, so need to stop here
+			if index == brain_dims[-1]:
+				break
+
+			vol = img_ch1.dataobj[...,index]
 			moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 
 			### MOTION CORRECT ###
@@ -112,17 +117,17 @@ def main(args):
 			moco_ch1 = moco['warpedmovout'].numpy()
 			moco_ch1_chunk.append(moco_ch1)
 			transformlist = moco['fwdtransforms']
-			printlog(F'vol, ch1 moco: {i}, time: {time()-t0}')
+			#printlog(F'vol, ch1 moco: {index}, time: {time()-t0}')
 			
 			### APPLY TRANSFORMS TO CHANNEL 2 ###
-			t0 = time()
+			#t0 = time()
 			if filepath_ch2 is not None: 
-				vol = img_ch2.dataobj[...,i]
+				vol = img_ch2.dataobj[...,index]
 				ch2_moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 				moco_ch2 = ants.apply_transforms(fixed, ch2_moving, transformlist)
 				moco_ch2 = moco_ch2.numpy()
 				moco_ch2_chunk.append(moco_ch2)
-				printlog(F'vol, ch2 moco: {i}, time: {time()-t0}')
+				printlog(F'moco vol done: {index}, time: {time()-t0}')
 
 			### DELETE INVERSE TRANSFORMS ###
 			transformlist = moco['invtransforms']
@@ -136,15 +141,16 @@ def main(args):
 				if '.mat' not in x:
 					os.remove(x)
 
+		
 		moco_ch1_chunk = np.moveaxis(np.asarray(moco_ch1_chunk),0,-1)
 		moco_ch2_chunk = np.moveaxis(np.asarray(moco_ch2_chunk),0,-1)
-		printlog("chunk shape: {}. Time: {}".format(moco_ch1_chunk.shape, time()-t0))
+		#printlog("chunk shape: {}. Time: {}".format(moco_ch1_chunk.shape, time()-t0))
 
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 1 ###
 		t0 = time()
 		with h5py.File(savefile_ch1, 'a') as f:
 			f['data'][...,steps[j]:steps[j+1]] = moco_ch1_chunk																		
-		printlog(F'vol, ch1 append: {i}, time: {time()-t0}')
+		printlog(F'Ch_1 append time: {time()-t0}')
 																						
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 2 ###
 		t0 = time()
@@ -152,7 +158,7 @@ def main(args):
 			with h5py.File(savefile_ch2, 'a') as f:
 				#f['data'][...,i] = moco_ch2
 				f['data'][...,steps[j]:steps[j+1]] = moco_ch2_chunk
-			printlog(F'vol, ch2 append: {i}, time: {time()-t0}')
+			printlog(F'Ch_2 append time: {time()-t0}')
 
 def check_for_file(file, directory):
 	filepath = os.path.join(directory, file)
