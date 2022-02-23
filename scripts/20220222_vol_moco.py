@@ -70,16 +70,13 @@ def main(args):
 	############################################################
 	### Make Empty MOCO files that will be filled vol by vol ###
 	############################################################
-	savefile_ch1 = os.path.join(directory, "moco_ch1.h5")
-	with h5py.File(savefile_ch1, 'w') as f:
-		dset_ch1 = f.create_dataset('data', brain_dims, dtype='float32', chunks=True)
-		printlog('created empty hdf5 file: {}'.format(savefile_ch1))
+
+	make_empty_h5(directory, "moco_ch1.h5", brain_dims)
+	printlog('created empty hdf5 file: {}'.format("moco_ch1.h5"))
 
 	if filepath_ch2 is not None:
-		savefile_ch2 = os.path.join(directory, "moco_ch2.h5") 
-		with h5py.File(savefile_ch2, 'w') as f:
-			dset_ch2 = f.create_dataset('data', brain_dims, dtype='float32', chunks=True)
-		printlog('created empty hdf5 file: {}'.format(savefile_ch2))
+		make_empty_h5(directory, "moco_ch2.h5", brain_dims)
+		printlog('created empty hdf5 file: {}'.format("moco_ch2.h5"))
 
 	#################################
 	### Perform Motion Correction ###
@@ -88,7 +85,7 @@ def main(args):
 	
 	### prepare chunks to loop over ###
 	# the stepsize defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
-	stepsize = 10
+	stepsize = 100
 	steps = list(range(0,brain_dims[-1],stepsize))
 	# add the last few volumes that are not divisible by stepsize
 	if brain_dims[-1] > steps[-1]:
@@ -159,6 +156,11 @@ def main(args):
 				#f['data'][...,i] = moco_ch2
 				f['data'][...,steps[j]:steps[j+1]] = moco_ch2_chunk
 			printlog(F'Ch_2 append time: {time()-t0}')
+
+def make_empty_h5(directory, file, brain_dims):
+	savefile = os.path.join(directory, file)
+	with h5py.File(savefile, 'w') as f:
+		dset = f.create_dataset('data', brain_dims, dtype='float32', chunks=True)
 
 def check_for_file(file, directory):
 	filepath = os.path.join(directory, file)
