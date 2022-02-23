@@ -43,15 +43,19 @@ def main(args):
 	img_ch1 = nib.load(filepath_ch1) # this loads a proxy
 	ch1_shape = img_ch1.header.get_data_shape()
 	brain_dims = ch1_shape
+	printlog("Channel 1 shape is {}".format(brain_dims))
 
 	### Make meanbrain ###
+	t0 = time()
 	printlog('Creating temporal meanbrain...')
 	meanbrain = np.zeros(brain_dims[:3]) # create empty meanbrain from the first 3 axes, x/y/z
 	for i in range(brain_dims[-1]):
+		if i%1000 == 0:
+			printlog(brainsss.progress_bar(i, brain_dims[:3], 120))
 		meanbrain += img_ch1.dataobj[...,i]
 	meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
 	fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
-	printlog('meanbrain DONE')
+	printlog('meanbrain DONE. Duration: {}'.format(time()-t0))
 
 	### Load channel 2 proxy here ###
 	if filepath_ch2 is not None:
@@ -93,6 +97,7 @@ def main(args):
 		moco = ants.registration(fixed, moving, type_of_transform='SyN')
 		moco_ch1 = moco['warpedmovout'].numpy()
 		transformlist = moco['fwdtransforms']
+		printlog(F'vol, ch1 moco: {i}, time: {time()-t0}')
 		
 		### APPLY TRANSFORMS TO CHANNEL 2 ###
 		if filepath_ch2 is not None: 
@@ -100,6 +105,7 @@ def main(args):
 			ch2_moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 			moco_ch2 = ants.apply_transforms(fixed, ch2_moving, transformlist)
 			moco_ch2 = moco_ch2.numpy()
+			printlog(F'vol, ch2 moco: {i}, time: {time()-t0}')
 
 		### DELETE INVERSE TRANSFORMS ###
 		transformlist = moco['invtransforms']
@@ -116,13 +122,13 @@ def main(args):
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 1 ###
 		with h5py.File(savefile_ch1, 'a') as f:
 			f['data'][...,i] = moco_ch1																		
-		printlog(F'vol: {i}, time: {time()-t0}')
+		printlog(F'vol, ch1 append: {i}, time: {time()-t0}')
 																						
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 2 ###
 		if filepath_ch2 is not None:
 			with h5py.File(savefile_ch2, 'a') as f:
 				f['data'][...,i] = moco_ch2
-			printlog(F'vol: {i}, time: {time()-t0}')
+			printlog(F'vol, ch2 append: {i}, time: {time()-t0}')
 
 def check_for_file(file, directory):
 	filepath = os.path.join(directory, file)
