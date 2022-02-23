@@ -51,7 +51,7 @@ def main(args):
 	meanbrain = np.zeros(brain_dims[:3]) # create empty meanbrain from the first 3 axes, x/y/z
 	for i in range(brain_dims[-1]):
 		if i%1000 == 0:
-			printlog(brainsss.progress_bar(i, brain_dims[:3], 120))
+			printlog(brainsss.progress_bar(i, brain_dims[-1], 120))
 		meanbrain += img_ch1.dataobj[...,i]
 	meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
 	fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
