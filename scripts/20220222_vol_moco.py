@@ -71,11 +71,11 @@ def main(args):
 	### Make Empty MOCO files that will be filled vol by vol ###
 	############################################################
 
-	make_empty_h5(directory, "moco_ch1.h5", brain_dims)
+	savefile_ch1 = make_empty_h5(directory, "moco_ch1.h5", brain_dims)
 	printlog('created empty hdf5 file: {}'.format("moco_ch1.h5"))
 
 	if filepath_ch2 is not None:
-		make_empty_h5(directory, "moco_ch2.h5", brain_dims)
+		savefile_ch2 = make_empty_h5(directory, "moco_ch2.h5", brain_dims)
 		printlog('created empty hdf5 file: {}'.format("moco_ch2.h5"))
 
 	#################################
@@ -140,7 +140,8 @@ def main(args):
 
 		
 		moco_ch1_chunk = np.moveaxis(np.asarray(moco_ch1_chunk),0,-1)
-		moco_ch2_chunk = np.moveaxis(np.asarray(moco_ch2_chunk),0,-1)
+		if filepath_ch2 is not None:
+			moco_ch2_chunk = np.moveaxis(np.asarray(moco_ch2_chunk),0,-1)
 		#printlog("chunk shape: {}. Time: {}".format(moco_ch1_chunk.shape, time()-t0))
 
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 1 ###
@@ -161,6 +162,7 @@ def make_empty_h5(directory, file, brain_dims):
 	savefile = os.path.join(directory, file)
 	with h5py.File(savefile, 'w') as f:
 		dset = f.create_dataset('data', brain_dims, dtype='float32', chunks=True)
+	return savefile
 
 def check_for_file(file, directory):
 	filepath = os.path.join(directory, file)
