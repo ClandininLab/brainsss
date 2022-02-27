@@ -85,7 +85,7 @@ def main(args):
 	
 	### prepare chunks to loop over ###
 	# the stepsize defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
-	stepsize = 100
+	stepsize = 100 # if this is too high if may crash from memory error. If too low it will be slow.
 	steps = list(range(0,brain_dims[-1],stepsize))
 	# add the last few volumes that are not divisible by stepsize
 	if brain_dims[-1] > steps[-1]:
