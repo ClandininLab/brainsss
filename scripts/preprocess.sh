@@ -9,4 +9,4 @@
 
 ml python/3.6
 date
-python3 -u ./20220222_test.py $PWD
+python3 -u ./preprocess.py $PWD
