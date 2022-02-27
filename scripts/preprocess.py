@@ -41,6 +41,7 @@ def main(args):
     if user == "brezovec":
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
+        build_flies = True
     if user == "asmart":
         pass
 
@@ -55,7 +56,7 @@ def main(args):
     ### Print Title ###
     ###################
 
-    title = pyfiglet.figlet_format("Yandan", font="cyberlarge" ) #28 #shimrod
+    title = pyfiglet.figlet_format("Brainsss", font="cyberlarge" ) #28 #shimrod
     title_shifted = ('\n').join([' '*28+line for line in title.split('\n')][:-2])
     printlog(title_shifted)
     day_now = datetime.datetime.now().strftime("%B %d, %Y")
@@ -105,7 +106,7 @@ if __name__ == '__main__':
     # you must provide the dataset path on the command line
     # If you do not, throw an exception
     # parser.add_argument("dataset_path", default="MISSING", nargs='?') 
-    # args = parser.parse_args()
+    args = parser.parse_args()
     # try:
     #     message = "{}\n{}\n{}\n{}".format("Aborted! You probably forgot to provide a fly directory.",
     #     "This argument is required and must be listed on the command line directly after the name of the shell file.",
