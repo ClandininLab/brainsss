@@ -13,38 +13,42 @@ import h5py
 import ants
 
 def main(args):
-
-	print(args)
 	
 	dataset_path = args['directory']
-	ch1_input = args['brain_master']
-	ch2_input = args['brain_mirror']
+	brain_master = args['brain_master']
+	brain_mirror = args['brain_mirror']
+
 	try:
 		logfile = args['logfile']
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+		save_type = 'back_one_dir'
 	except:
 		# no logfile provided; create one
 		logfile = './logs/' + strftime("%Y%m%d-%H%M%S") + '.txt'
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
+		save_type = 'curr_dir'
 
-	printlog(F'dataset_path: {dataset_path}, brain_master: {ch1_input}, brain_mirror: {ch2_input}')
-	sleep(3)
-	return
+	try:
+		scantype = args['scantype']
+	except:
+		scantype = 'func'
+		printlog('scantype not specified. Using default chunksize of 100')
+
+	printlog(F'Arguments:\ndataset_path: {dataset_path},\nbrain_master: {brain_master},\nbrain_mirror: {brain_mirror}')
 
 	##############################
 	### Check that files exist ###
 	##############################
-	filepath_ch1 = check_for_file(ch1_input, dataset_path)
-	filepath_ch2 = check_for_file(ch2_input, dataset_path)
+	filepath_ch1 = check_for_file(brain_master, dataset_path)
+	filepath_ch2 = check_for_file(brain_mirror, dataset_path)
 	# Abort if no channel 1
 	if filepath_ch1 is None:
-		printlog("Aborting moco - could not find {}".format(ch1_input))
+		printlog("Aborting moco - could not find {}".format(brain_master))
 		return
 	else:
 		printlog("Channel 1 is: {}".format(filepath_ch1))
 	printlog("Channel 2 is: {}".format(filepath_ch2))
-
 
 	########################################
 	### Calculate Meanbrain of Channel 1 ###
@@ -83,17 +87,18 @@ def main(args):
 	### Make Empty MOCO files that will be filled vol by vol ###
 	############################################################
 
-	savefile_ch1 = make_empty_h5(dataset_path, f"{ch1_input.split('.')[0]}_moco.h5", brain_dims)
-	printlog(f'created empty hdf5 file: {savefile_ch1}')
+	savefile_master = make_empty_h5(dataset_path, f"{brain_master.split('.')[0]}_moco.h5", brain_dims, save_type)
+	printlog(f'created empty hdf5 file: {savefile_master}')
 
 	if filepath_ch2 is not None:
-		savefile_ch2 = make_empty_h5(dataset_path, f"{ch2_input.split('.')[0]}_moco.h5", brain_dims)
-		printlog(f'created empty hdf5 file: {savefile_ch2}')
+		savefile_mirror = make_empty_h5(dataset_path, f"{brain_mirror.split('.')[0]}_moco.h5", brain_dims, save_type)
+		printlog(f'created empty hdf5 file: {savefile_mirror}')
 
 	#################################
 	### Perform Motion Correction ###
 	#################################
 	printlog("Starting MOCO")
+	transform_matrix = []
 	
 	### prepare chunks to loop over ###
 	# the stepsize defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
@@ -138,11 +143,12 @@ def main(args):
 				moco_ch2_chunk.append(moco_ch2)
 				printlog(F'moco vol done: {index}, time: {time()-t0}')
 
-			### DELETE INVERSE TRANSFORMS ###
-			transformlist = moco['invtransforms']
+			### SAVE AFFINE TRANSFORM PARAMETERS FOR PLOTTING MOTION ###
+			transformlist = moco['fwdtransforms']
 			for x in transformlist:
-				if '.mat' not in x:
-					os.remove(x)
+				if '.mat' in x:
+					temp = ants.read_transform(x)
+					transform_matrix.append(temp.parameters)
 
 			### DELETE FORWARD TRANSFORMS ###
 			transformlist = moco['fwdtransforms']
@@ -150,7 +156,12 @@ def main(args):
 				if '.mat' not in x:
 					os.remove(x)
 
-		
+			### DELETE INVERSE TRANSFORMS ###
+			transformlist = moco['invtransforms']
+			for x in transformlist:
+				if '.mat' not in x:
+					os.remove(x)
+
 		moco_ch1_chunk = np.moveaxis(np.asarray(moco_ch1_chunk),0,-1)
 		if filepath_ch2 is not None:
 			moco_ch2_chunk = np.moveaxis(np.asarray(moco_ch2_chunk),0,-1)
@@ -158,20 +169,46 @@ def main(args):
 
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 1 ###
 		t0 = time()
-		with h5py.File(savefile_ch1, 'a') as f:
+		with h5py.File(savefile_master, 'a') as f:
 			f['data'][...,steps[j]:steps[j+1]] = moco_ch1_chunk																		
 		printlog(F'Ch_1 append time: {time()-t0}')
 																						
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 2 ###
 		t0 = time()
 		if filepath_ch2 is not None:
-			with h5py.File(savefile_ch2, 'a') as f:
+			with h5py.File(savefile_mirror, 'a') as f:
 				#f['data'][...,i] = moco_ch2
 				f['data'][...,steps[j]:steps[j+1]] = moco_ch2_chunk
 			printlog(F'Ch_2 append time: {time()-t0}')
 
-def make_empty_h5(directory, file, brain_dims):
-	savefile = os.path.join(directory, file)
+	### SAVE TRANSFORMS ###
+	printlog("saving transforms")
+    transform_matrix = np.array(transform_matrix)
+    save_file = os.path.join(os.path.dirname(savefile_master), 'motcorr_params')
+    np.save(save_file,transform_matrix)
+
+    ### MAKE MOCO PLOT ###
+    try:
+	    printlog("making moco plot")
+	    moco_dir = os.path.dirname(savefile_master)
+	    xml_dir = os.path.join(os.path.dirname(moco_dir), 'imaging')
+	    save_motion_figure(transform_matrix, xml_dir, moco_dir, scantype)
+	except:
+		printlog("Could not make moco plot, probably can't find xml file to grab image resolution.")
+
+def make_empty_h5(directory, file, brain_dim, save_type):
+
+	if save_type == 'curr_dir':
+		moco_dir = os.path.join(directory,'moco')
+		if not os.path.exists(moco_dir):
+			os.mkdir(moco_dir)
+	elif save_type == 'back_one_dir':
+		directory = os.path.dirname(directory) # go back one directory
+		moco_dir = os.path.join(directory,'moco')
+		if not os.path.exists(moco_dir):
+			os.mkdir(moco_dir)
+
+	savefile = os.path.join(moco_dir, file)
 	with h5py.File(savefile, 'w') as f:
 		dset = f.create_dataset('data', brain_dims, dtype='float32', chunks=True)
 	return savefile
@@ -182,6 +219,26 @@ def check_for_file(file, directory):
 		return filepath
 	else:
 		return None
+
+def save_motion_figure(transform_matrix, directory, motcorr_directory, scantype):
+    # Get voxel resolution for figure
+    if scantype == 'func':
+        file = os.path.join(directory, 'functional.xml')
+    elif scantype == 'anat':
+        file = os.path.join(directory, 'anatomy.xml')
+    x_res, y_res, z_res = brainsss.get_resolution(file)
+
+    # Save figure of motion over time
+    save_file = os.path.join(motcorr_directory, 'motion_correction.png')
+    plt.figure(figsize=(10,10))
+    plt.plot(transform_matrix[:,9]*x_res, label = 'y') # note, resolutions are switched since axes are switched
+    plt.plot(transform_matrix[:,10]*y_res, label = 'x')
+    plt.plot(transform_matrix[:,11]*z_res, label = 'z')
+    plt.ylabel('Motion Correction, um')
+    plt.xlabel('Time')
+    plt.title(directory)
+    plt.legend()
+    plt.savefig(save_file, bbox_inches='tight', dpi=300)
 
 if __name__ == '__main__':
 	print(sys.argv[1])
