@@ -12,11 +12,22 @@ import ants
 
 def main(args):
 
-	logfile = args['logfile']
-	dataset_path = args['dataset_path']
+	print(args)
+	
+	dataset_path = args['directory']
 	ch1_input = args['brain_master']
 	ch2_input = args['brain_mirror']
-	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+	try:
+		logfile = args['logfile']
+		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+	except:
+		# no logfile provided; create one
+		logfile = './logs/' + time.strftime("%Y%m%d-%H%M%S") + '.txt'
+		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
+
+	printlog(F'dataset_path: {dataset_path}, brain_master: {ch1_input}, brain_mirror: {ch2_input}')
+	return
 
 	##############################
 	### Check that files exist ###
@@ -87,7 +98,7 @@ def main(args):
 	steps = list(range(0,brain_dims[-1],stepsize))
 	# add the last few volumes that are not divisible by stepsize
 	if brain_dims[-1] > steps[-1]:
-	    steps.append(brain_dims[-1])
+		steps.append(brain_dims[-1])
 
 	# loop over all brain vols, motion correcting each and insert into hdf5 file on disk
 	#for i in range(brain_dims[-1]):

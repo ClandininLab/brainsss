@@ -38,7 +38,7 @@ def main(args):
     scripts_path = args.PWD
     com_path = os.path.join(scripts_path, 'com')
     user = scripts_path.split('/')[3]
-    user = "asmart"
+
     '''
     is user == "example":
         imports_path: directory where brukerbridge dumps data. This path is only used if build_flies = True
@@ -180,7 +180,7 @@ def main(args):
 
         printlog(f"\n{'   MOTION CORRECT   ':=^{width}}")
         args = {'logfile': logfile,
-                'dataset_path': dataset_path,
+                'directory': dataset_path,
                 'brain_master': brain_master,
                 'brain_mirror': brain_mirror}
         script = 'motion_correction.py'
