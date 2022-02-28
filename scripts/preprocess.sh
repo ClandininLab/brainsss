@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=testing
+#SBATCH --job-name=prepro
 #SBATCH --partition=trc
 #SBATCH --time=4-00:00:00
 #SBATCH --ntasks=1
