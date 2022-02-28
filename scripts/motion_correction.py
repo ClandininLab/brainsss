@@ -196,7 +196,7 @@ def main(args):
 	except:
 		printlog("Could not make moco plot, probably can't find xml file to grab image resolution.")
 
-def make_empty_h5(directory, file, brain_dim, save_type):
+def make_empty_h5(directory, file, brain_dims, save_type):
 
 	if save_type == 'curr_dir':
 		moco_dir = os.path.join(directory,'moco')
