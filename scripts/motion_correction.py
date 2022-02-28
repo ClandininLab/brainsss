@@ -5,6 +5,8 @@ import argparse
 import subprocess
 import json
 from time import time
+from time import strftime
+from time import sleep
 import nibabel as nib
 import brainsss.utils as brainsss
 import h5py
@@ -22,11 +24,12 @@ def main(args):
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 	except:
 		# no logfile provided; create one
-		logfile = './logs/' + time.strftime("%Y%m%d-%H%M%S") + '.txt'
+		logfile = './logs/' + strftime("%Y%m%d-%H%M%S") + '.txt'
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
 
 	printlog(F'dataset_path: {dataset_path}, brain_master: {ch1_input}, brain_mirror: {ch2_input}')
+	sleep(3)
 	return
 
 	##############################
