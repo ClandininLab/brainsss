@@ -183,16 +183,16 @@ def main(args):
 
 	### SAVE TRANSFORMS ###
 	printlog("saving transforms")
-    transform_matrix = np.array(transform_matrix)
-    save_file = os.path.join(os.path.dirname(savefile_master), 'motcorr_params')
-    np.save(save_file,transform_matrix)
+	transform_matrix = np.array(transform_matrix)
+	save_file = os.path.join(os.path.dirname(savefile_master), 'motcorr_params')
+	np.save(save_file,transform_matrix)
 
-    ### MAKE MOCO PLOT ###
-    try:
-	    printlog("making moco plot")
-	    moco_dir = os.path.dirname(savefile_master)
-	    xml_dir = os.path.join(os.path.dirname(moco_dir), 'imaging')
-	    save_motion_figure(transform_matrix, xml_dir, moco_dir, scantype)
+	### MAKE MOCO PLOT ###
+	try:
+		printlog("making moco plot")
+		moco_dir = os.path.dirname(savefile_master)
+		xml_dir = os.path.join(os.path.dirname(moco_dir), 'imaging')
+		save_motion_figure(transform_matrix, xml_dir, moco_dir, scantype)
 	except:
 		printlog("Could not make moco plot, probably can't find xml file to grab image resolution.")
 
@@ -221,24 +221,24 @@ def check_for_file(file, directory):
 		return None
 
 def save_motion_figure(transform_matrix, directory, motcorr_directory, scantype):
-    # Get voxel resolution for figure
-    if scantype == 'func':
-        file = os.path.join(directory, 'functional.xml')
-    elif scantype == 'anat':
-        file = os.path.join(directory, 'anatomy.xml')
-    x_res, y_res, z_res = brainsss.get_resolution(file)
+	# Get voxel resolution for figure
+	if scantype == 'func':
+		file = os.path.join(directory, 'functional.xml')
+	elif scantype == 'anat':
+		file = os.path.join(directory, 'anatomy.xml')
+	x_res, y_res, z_res = brainsss.get_resolution(file)
 
-    # Save figure of motion over time
-    save_file = os.path.join(motcorr_directory, 'motion_correction.png')
-    plt.figure(figsize=(10,10))
-    plt.plot(transform_matrix[:,9]*x_res, label = 'y') # note, resolutions are switched since axes are switched
-    plt.plot(transform_matrix[:,10]*y_res, label = 'x')
-    plt.plot(transform_matrix[:,11]*z_res, label = 'z')
-    plt.ylabel('Motion Correction, um')
-    plt.xlabel('Time')
-    plt.title(directory)
-    plt.legend()
-    plt.savefig(save_file, bbox_inches='tight', dpi=300)
+	# Save figure of motion over time
+	save_file = os.path.join(motcorr_directory, 'motion_correction.png')
+	plt.figure(figsize=(10,10))
+	plt.plot(transform_matrix[:,9]*x_res, label = 'y') # note, resolutions are switched since axes are switched
+	plt.plot(transform_matrix[:,10]*y_res, label = 'x')
+	plt.plot(transform_matrix[:,11]*z_res, label = 'z')
+	plt.ylabel('Motion Correction, um')
+	plt.xlabel('Time')
+	plt.title(directory)
+	plt.legend()
+	plt.savefig(save_file, bbox_inches='tight', dpi=300)
 
 if __name__ == '__main__':
 	print(sys.argv[1])
