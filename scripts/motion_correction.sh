@@ -11,13 +11,13 @@ date
 
 directory=$1
 master_brain=$2
-mirror_brain=$3
+brain_mirror=$3
 
 echo $directory
-echo $master_brain
-echo $mirror_brain
+echo $brain_master
+echo $brain_mirror
 
-args="{\"directory\":\"$directory\",\"master_brain\":\"$master_brain\",\"mirror_brain\":\"$mirror_brain\"}"
+args="{\"directory\":\"$directory\",\"brain_master\":\"$brain_master\",\"brain_mirror\":\"$brain_mirror\"}"
 
 ml python/3.6 antspy/0.2.2
 
