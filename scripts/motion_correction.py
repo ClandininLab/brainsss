@@ -35,7 +35,7 @@ def main(args):
 		scantype = 'func'
 		printlog('scantype not specified. Using default chunksize of 100')
 
-	printlog(F'Arguments:\ndataset_path: {dataset_path},\nbrain_master: {brain_master},\nbrain_mirror: {brain_mirror}')
+	printlog(F'\nArguments:\ndataset_path: {dataset_path}\nbrain_master: {brain_master}\nbrain_mirror: {brain_mirror}\n')
 
 	##############################
 	### Check that files exist ###
