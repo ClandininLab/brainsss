@@ -17,6 +17,6 @@ echo $mirror_brain
 
 args="{directory:$directory, master_brain:$master_brain, mirror_brain:$mirror_brain}"
 
-ml python/3.6
+ml python/3.6 antspy/0.2.2
 date
 python3 -u ./motion_correction.py $args
