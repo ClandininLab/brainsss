@@ -69,11 +69,11 @@ def main(args):
 	### Make Empty MOCO files that will be filled vol by vol ###
 	############################################################
 
-	savefile_ch1 = make_empty_h5(dataset_path, f"{ch1_input}_moco.h5", brain_dims)
+	savefile_ch1 = make_empty_h5(dataset_path, f"{ch1_input.split('.')[0]}_moco.h5", brain_dims)
 	printlog(f'created empty hdf5 file: {savefile_ch1}')
 
 	if filepath_ch2 is not None:
-		savefile_ch2 = make_empty_h5(dataset_path, f"{ch2_input}_moco.h5", brain_dims)
+		savefile_ch2 = make_empty_h5(dataset_path, f"{ch2_input.split('.')[0]}_moco.h5", brain_dims)
 		printlog(f'created empty hdf5 file: {savefile_ch2}')
 
 	#################################
