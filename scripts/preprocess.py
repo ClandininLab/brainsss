@@ -38,19 +38,31 @@ def main(args):
     scripts_path = args.PWD
     com_path = os.path.join(scripts_path, 'com')
     user = scripts_path.split('/')[3]
+    user = "asmart"
+    '''
+    is user == "example":
+        imports_path: directory where brukerbridge dumps data. This path is only used if build_flies = True
+        dataset_path: directory where files to be processed are
+        ... in progress
+    '''
     if user == "brezovec":
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
         build_flies = True
+        fictrac_qc = True
+        bleaching_qc = True
+        create_temporal_meanbrain = True
+        motion_correct = True
+
     if user == "asmart":
-        pass
-
-    #CHANGE THESE PATHS
-    # scripts_path = "/home/users/brezovec/projects/brainsss/scripts"
-    # com_path = "/home/users/brezovec/projects/brainsss/scripts/com"
-
-    # #change this path to your oak directory, something like /oak/stanford/groups/trc/data/Brezovec/data
-    # dataset_path = "/home/users/brezovec/projects/brainsss/demo_data"
+        dataset_path = "/oak/stanford/groups/trc/data/Ashley2/imports"
+        build_flies = False
+        fictrac_qc = False
+        bleaching_qc = False
+        create_temporal_meanbrain = False
+        motion_correct = True
+        brain_master = "ch1_stitched.nii"
+        brain_mirror = "ch2_stitched.nii"
 
     ###################
     ### Print Title ###
@@ -68,23 +80,116 @@ def main(args):
     printlog("Scripts path: {}".format(scripts_path))
     printlog("User: {}".format(user))
 
-    # ### toy practice###
-    # printlog(f"\n{'   hi this is a toy   ':=^{width}}")
-    # job_ids = []
-    # a = 5
-    # b = 10
-    # args = {'logfile': logfile, 'dataset_path': dataset_path}
-    # script = '20220222_vol_moco.py'
-    # job_id = brainsss.sbatch(jobname='moco',
-    #                      script=os.path.join(scripts_path, script),
-    #                      modules=modules,
-    #                      args=args,
-    #                      logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
-    # job_ids.append(job_id)
+    if build_flies:
 
-    # for job_id in job_ids:
-    #     brainsss.wait_for_job(job_id, logfile, com_path)
-        
+        ###################
+        ### Build flies ###
+        ###################
+
+        printlog(f"\n{'   CHECK FOR FLAG   ':=^{width}}")
+        args = {'logfile': logfile, 'imports_path': imports_path}
+        script = 'check_for_flag.py'
+        job_id = flow.sbatch(jobname='flagchk',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+        flagged_dir = flow.wait_for_job(job_id, logfile, com_path)
+
+        printlog(f"\n{'   BUILD FLIES   ':=^{width}}")
+        args = {'logfile': logfile, 'flagged_dir': flagged_dir.strip('\n'), 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
+        script = 'fly_builder.py'
+        job_id = flow.sbatch(jobname='bldfly',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+        func_and_anats = flow.wait_for_job(job_id, logfile, com_path)
+        func_and_anats = func_and_anats.split('\n')[:-1]
+        funcs = [x.split(':')[1] for x in func_and_anats if 'func:' in x] # will be full paths to fly/expt
+        anats = [x.split(':')[1] for x in func_and_anats if 'anat:' in x]
+        flow.sort_nicely(funcs)
+        flow.sort_nicely(anats)
+        funcanats = funcs + anats
+        dirtypes = ['func']*len(funcs) + ['anat']*len(anats)
+
+    if fictrac_qc:
+
+        ##################
+        ### Fictrac QC ###
+        ##################
+
+        printlog(f"\n{'   FICTRAC QC   ':=^{width}}")
+        job_ids = []
+        for func in funcs:
+            directory = os.path.join(func, 'fictrac')
+            if os.path.exists(directory):
+                args = {'logfile': logfile, 'directory': directory, 'fps': 100}
+                script = 'fictrac_qc.py'
+                job_id = flow.sbatch(jobname='fictracqc',
+                                     script=os.path.join(scripts_path, script),
+                                     modules=modules,
+                                     args=args,
+                                     logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+                job_ids.append(job_id)
+        for job_id in job_ids:
+            flow.wait_for_job(job_id, logfile, com_path)
+
+    if bleaching_qc:
+
+        ####################
+        ### Bleaching QC ###
+        ####################
+
+        printlog(f"\n{'   BLEACHING QC   ':=^{width}}")
+        #job_ids = []
+        for funcanat, dirtype in zip(funcanats, dirtypes):
+            directory = os.path.join(funcanat, 'imaging')
+            args = {'logfile': logfile, 'directory': directory, 'dirtype': dirtype}
+            script = 'bleaching_qc.py'
+            job_id = flow.sbatch(jobname='bleachqc',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+            flow.wait_for_job(job_id, logfile, com_path)
+    
+    if create_temporal_meanbrain:
+
+        ###################################
+        ### Create temporal mean brains ###
+        ###################################
+
+        printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
+        for funcanat, dirtype in zip(funcanats, dirtypes):
+            directory = os.path.join(funcanat, 'imaging')
+            args = {'logfile': logfile, 'directory': directory, 'dirtype': dirtype}
+            script = 'make_mean_brain.py'
+            job_id = flow.sbatch(jobname='meanbrn',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+            flow.wait_for_job(job_id, logfile, com_path)
+
+    if motion_correct:
+
+        #########################
+        ### Motion Correction ###
+        #########################
+
+        printlog(f"\n{'   MOTION CORRECT   ':=^{width}}")
+        args = {'logfile': logfile,
+                'dataset_path': dataset_path,
+                'brain_master': brain_master,
+                'brain_mirror': brain_mirror}
+        script = 'motion_correction.py'
+        job_id = brainsss.sbatch(jobname='moco',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###
