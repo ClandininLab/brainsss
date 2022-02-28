@@ -55,7 +55,7 @@ def main(args):
         motion_correct = True
 
     if user == "asmart":
-        dataset_path = "/oak/stanford/groups/trc/data/Ashley2/imports"
+        dataset_path = "/oak/stanford/groups/trc/data/Ashley2/imports/20210806/fly1_20s-011"
         build_flies = False
         fictrac_qc = False
         bleaching_qc = False
