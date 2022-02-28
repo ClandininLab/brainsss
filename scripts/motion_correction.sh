@@ -10,7 +10,7 @@
 date
 
 directory=$1
-master_brain=$2
+brain_master=$2
 brain_mirror=$3
 
 echo $directory
