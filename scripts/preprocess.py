@@ -6,7 +6,7 @@ import json
 import datetime
 import pyfiglet
 import textwrap
-import brainsss.utils as brainsss
+import brainsss
 import argparse
 
 def main(args):

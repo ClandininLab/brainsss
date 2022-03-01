@@ -9,7 +9,7 @@ from xml.etree import ElementTree as ET
 from lxml import etree, objectify
 from openpyxl import Workbook
 from openpyxl import load_workbook
-import brainsss.utils as brainsss
+import brainsss
 #import bigbadbrain as bbb
 #import dataflow as flow
 
@@ -315,16 +315,15 @@ def copy_fictrac(destination_region, printlog):
     # Find .dat file of 1) correct-ish time, 2) correct-ish size
     datetime_correct = None
     for file in os.listdir(fictrac_folder):
-        # Get datetime from file name
-        datetime = datetime_from_fictrac(file)
-        #printlog(f'Datetime: {datetime}')
-        ##print('datetime: {}'.format(datetime))
-        ##sys.stdout.flush()
-        try:
-            test_ymd = datetime.split('_')[0]
-            test_time = datetime.split('_')[1]
-        except:
+
+        # must be .dat file
+        if '.dat' not in file:
             continue
+
+        # Get datetime from file name
+        datetime = file.split('-')[1][:-4]
+        test_ymd = datetime.split('_')[0]
+        test_time = datetime.split('_')[1]
         test_hour = test_time[0:2]
         test_minute = test_time[2:4]
         test_second = test_time[4:6]
@@ -333,40 +332,40 @@ def copy_fictrac(destination_region, printlog):
                              int(test_second)
 
         # Year/month/day must be exact
-        if true_ymd == test_ymd:
-            printlog('Found file from same day: {}'.format(file))
-            ##sys.stdout.flush()
-            # Must be within 3 minutes
-            time_difference = np.abs(true_total_seconds - test_total_seconds)
-            if time_difference < 3 * 60:
-                printlog('Found fictrac file that matches time.')
-                ##sys.stdout.flush()
-                # Must be correct size
-                if file[-4:] == '.dat':
-                    fp = os.path.join(fictrac_folder, file)
-                    file_size = os.path.getsize(fp)
-                    if file_size > 30000000:
-                        width = 120
-                        printlog(F"Found correct .dat file{file:.>{width-23}}")
-                        datetime_correct = datetime
-                        break
+        if true_ymd != test_ymd:
+            continue
+        printlog('Found file from same day: {}'.format(file))
+
+        # Time must be within 10min
+        time_difference = np.abs(true_total_seconds - test_total_seconds)
+        if time_difference > 10 * 60:
+            continue
+        printlog('Found fictrac file that matches time.')
+
+        # Must be correct size
+        fp = os.path.join(fictrac_folder, file)
+        file_size = os.path.getsize(fp)
+        if file_size > 30000000: #30MB
+            width = 120
+            printlog(F"Found correct .dat file{file:.>{width-23}}")
+            datetime_correct = datetime
+            break
 
     if datetime_correct is None:
         width = 120
         printlog(F"{'   No fictrac data found --- continuing without fictrac data   ':*^{width}}")
         return
 
-    # Now collect the 4 files with correct datetime
-    ##print('Correct datetime: {}'.format(datetime_correct))
-    ##sys.stdout.flush()
-    correct_time_files = []
-    for file in os.listdir(fictrac_folder):
-        datetime = datetime_from_fictrac(file)
-        #print('datetime: {}'.format(datetime))
-        if datetime == datetime_correct:
-            correct_time_files.append(file)
+    # Collect all fictrac files with correct datetime
+    correct_time_files = [file for file in os.listdir(fictrac_folder) if datetime_correct in file]
 
-    ##print('Found these files with correct times: {}'.format(correct_time_files))
+    # correct_time_files = []
+    # for file in os.listdir(fictrac_folder):
+    #     if datetime_correct in file:
+    #         correct_time_files.append(file)
+
+
+    #printlog('Found these files with correct times: {}'.format(correct_time_files))
     ##sys.stdout.flush()
 
     # Now transfer these 4 files to the fly
@@ -470,12 +469,6 @@ def create_imaging_json(xml_source_file, printlog):
     # Save data
     with open(os.path.join(os.path.split(xml_source_file)[0], 'scan.json'), 'w') as f:
         json.dump(source_data, f, indent=4)
-
-def datetime_from_fictrac(file):
-    datetime = file.split('-')[1]
-    if '.dat' in datetime or '.log' in datetime:
-        datetime = datetime[:-4]
-    return datetime
 
 def get_expt_time(directory):
     ''' Finds time of experiment based on functional.xml '''
