@@ -131,7 +131,7 @@ def copy_fly(source_fly, destination_fly, printlog):
             # Is this folder an anatomy or functional folder?
             if 'anat' in item:
                 # If anatomy folder, just copy everything
-                # Make imaging folder and copy 
+                # Make imaging folder and copy
                 imaging_destination = os.path.join(expt_folder, 'imaging')
                 os.mkdir(imaging_destination)
                 copy_bruker_data(source_expt_folder, imaging_destination, 'anat', printlog)
@@ -139,7 +139,7 @@ def copy_fly(source_fly, destination_fly, printlog):
                 print(f"anat:{expt_folder}") # IMPORTANT - FOR COMMUNICATING WITH MAIN
                 ######################################################################
             elif 'func' in item:
-                # Make imaging folder and copy 
+                # Make imaging folder and copy
                 imaging_destination = os.path.join(expt_folder, 'imaging')
                 os.mkdir(imaging_destination)
                 copy_bruker_data(source_expt_folder, imaging_destination, 'func', printlog)
@@ -155,7 +155,7 @@ def copy_fly(source_fly, destination_fly, printlog):
 
             else:
                 printlog('Invalid directory in fly folder (skipping): {}'.format(item))
-        
+
         # Copy fly.json file
         else:
             if item == 'fly.json':
@@ -180,7 +180,7 @@ def copy_bruker_data(source, destination, folder_type, printlog):
         if os.path.isdir(source_item):
             # Do not update destination - download all files into that destination
             copy_bruker_data(source_item, destination, folder_type, printlog)
-            
+
         # If the item is a file
         else:
             ### Change file names and filter various files
@@ -263,11 +263,11 @@ def copy_visual(destination_region, printlog):
             if time_difference < 3 * 60:
                 folders.append([folder, test_total_seconds])
                 printlog('Found reasonable visual folder: {}'.format(folder))
-    
+
     #if more than 1 folder, use the oldest folder
     if len(folders) == 1:
         correct_folder = folders[0]
-    #if no matching folder, 
+    #if no matching folder,
     elif len(folders) == 0:
         printlog(F"{'No matching visual folders found; continuing without visual data':.<{width}}")
         return
@@ -310,12 +310,14 @@ def copy_fictrac(destination_region, printlog):
 
     # Find time of experiment based on functional.xml
     true_ymd, true_total_seconds = get_expt_time(os.path.join(destination_region,'imaging'))
+    printlog(f'true_ymd: {true_ymd}; true_total_seconds: {true_total_seconds}')
 
     # Find .dat file of 1) correct-ish time, 2) correct-ish size
     datetime_correct = None
     for file in os.listdir(fictrac_folder):
         # Get datetime from file name
         datetime = datetime_from_fictrac(file)
+        printlog(f'Datetime: {datetime}')
         ##print('datetime: {}'.format(datetime))
         ##sys.stdout.flush()
         test_ymd = datetime.split('_')[0]
@@ -326,7 +328,7 @@ def copy_fictrac(destination_region, printlog):
         test_total_seconds = int(test_hour) * 60 * 60 + \
                              int(test_minute) * 60 + \
                              int(test_second)
-        
+
         # Year/month/day must be exact
         if true_ymd == test_ymd:
             ##print('Found file from same day: {}'.format(file))
@@ -480,7 +482,7 @@ def get_expt_time(directory):
     true_total_seconds = int(datetime_dict['hour']) * 60 * 60 + \
                          int(datetime_dict['minute']) * 60 + \
                          int(datetime_dict['second'])
-    
+
     ##print('dict: {}'.format(datetime_dict))
     ##print('true_ymd: {}'.format(true_ymd))
     ##print('true_total_seconds: {}'.format(true_total_seconds))

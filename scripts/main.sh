@@ -11,4 +11,4 @@
 ml python/3.6.1
 ml antspy/0.2.2
 date
-python3 -u /home/users/yandanw/projects/brainsss/scripts/main.py
+python3 -u /home/users/yandanw/projects/brainsss/scripts/toy_model.py
