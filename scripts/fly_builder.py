@@ -320,8 +320,11 @@ def copy_fictrac(destination_region, printlog):
         printlog(f'Datetime: {datetime}')
         ##print('datetime: {}'.format(datetime))
         ##sys.stdout.flush()
-        test_ymd = datetime.split('_')[0]
-        test_time = datetime.split('_')[1]
+        try:
+            test_ymd = datetime.split('_')[0]
+            test_time = datetime.split('_')[1]
+        except:
+            continue
         test_hour = test_time[0:2]
         test_minute = test_time[2:4]
         test_second = test_time[4:6]
