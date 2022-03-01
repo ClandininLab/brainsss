@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import os
 import scipy
+import scipy.signal
 import pandas as pd
 from scipy.interpolate import interp1d
 

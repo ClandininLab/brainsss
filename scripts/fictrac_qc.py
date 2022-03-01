@@ -4,12 +4,13 @@ import os
 import json
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import brainsss as brainsss
+import brainsss
 
 def main(args):
 
     logfile = args['logfile']
     directory = args['directory'] # directory will be a full path to a func/fictrac folder
+    fps = args['fps'] #of fictrac camera
     width = 120
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
@@ -20,8 +21,7 @@ def main(args):
     full_id = ', '.join(directory.split('/')[-3:-1])
 
     resolution = 10 #desired resolution in ms
-    expt_len = 1000*30*60
-    fps = 50 #of fictrac camera
+    expt_len = fictrac_raw.shape[0]/fps*1000
     behaviors = ['dRotLabY', 'dRotLabZ']
     fictrac = {}
     for behavior in behaviors:

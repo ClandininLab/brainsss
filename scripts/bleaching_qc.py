@@ -5,7 +5,7 @@ import json
 import matplotlib.pyplot as plt
 from skimage.filters import threshold_triangle
 import psutil
-import dataflow as flow
+import brainsss
 import nibabel as nib
 
 def main(args):
@@ -14,7 +14,7 @@ def main(args):
     directory = args['directory'] # directory will be a full path to either an anat/imaging folder or a func/imaging folder
     dirtype = args['dirtype']
     width = 120
-    printlog = getattr(flow.Printlog(logfile=logfile), 'print_to_log')
+    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
     #################
     ### Load Data ###
