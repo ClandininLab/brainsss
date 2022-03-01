@@ -142,7 +142,7 @@ def copy_fly(source_fly, destination_fly, printlog):
                 # Make imaging folder and copy
                 imaging_destination = os.path.join(expt_folder, 'imaging')
                 os.mkdir(imaging_destination)
-                copy_bruker_data(source_expt_folder, imaging_destination, 'func', printlog)
+                #copy_bruker_data(source_expt_folder, imaging_destination, 'func', printlog) <-----------!!!! UNCOMMENT
                 # Copt fictrac data based on timestamps
                 copy_fictrac(expt_folder, printlog)
                 # Copy visual data based on timestamps, and create visual.json
@@ -317,7 +317,7 @@ def copy_fictrac(destination_region, printlog):
     for file in os.listdir(fictrac_folder):
         # Get datetime from file name
         datetime = datetime_from_fictrac(file)
-        printlog(f'Datetime: {datetime}')
+        #printlog(f'Datetime: {datetime}')
         ##print('datetime: {}'.format(datetime))
         ##sys.stdout.flush()
         try:
@@ -334,12 +334,12 @@ def copy_fictrac(destination_region, printlog):
 
         # Year/month/day must be exact
         if true_ymd == test_ymd:
-            ##print('Found file from same day: {}'.format(file))
+            printlog('Found file from same day: {}'.format(file))
             ##sys.stdout.flush()
             # Must be within 3 minutes
             time_difference = np.abs(true_total_seconds - test_total_seconds)
             if time_difference < 3 * 60:
-                ##print('Found fictrac file that matches time.')
+                printlog('Found fictrac file that matches time.')
                 ##sys.stdout.flush()
                 # Must be correct size
                 if file[-4:] == '.dat':

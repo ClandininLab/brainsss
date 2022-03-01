@@ -4,7 +4,7 @@ import os
 import json
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import brainsss.utils as brainsss
+import brainsss as brainsss
 
 def main(args):
 
