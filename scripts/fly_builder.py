@@ -310,7 +310,7 @@ def copy_fictrac(destination_region, printlog):
 
     # Find time of experiment based on functional.xml
     true_ymd, true_total_seconds = get_expt_time(os.path.join(destination_region,'imaging'))
-    printlog(f'true_ymd: {true_ymd}; true_total_seconds: {true_total_seconds}')
+    #printlog(f'true_ymd: {true_ymd}; true_total_seconds: {true_total_seconds}')
 
     # Find .dat file of 1) correct-ish time, 2) correct-ish size
     datetime_correct = None
@@ -334,13 +334,13 @@ def copy_fictrac(destination_region, printlog):
         # Year/month/day must be exact
         if true_ymd != test_ymd:
             continue
-        printlog('Found file from same day: {}'.format(file))
+        #printlog('Found file from same day: {}'.format(file))
 
         # Time must be within 10min
         time_difference = np.abs(true_total_seconds - test_total_seconds)
         if time_difference > 10 * 60:
             continue
-        printlog('Found fictrac file that matches time.')
+        #printlog('Found fictrac file that matches time.')
 
         # Must be correct size
         fp = os.path.join(fictrac_folder, file)
