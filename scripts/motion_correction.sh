@@ -17,7 +17,7 @@ echo $directory
 echo $brain_master
 echo $brain_mirror
 
-args="{\"directory\":\"$directory\",\"brain_master\":\"$brain_master\",\"brain_mirror\":\"$brain_mirror\"}"
+args="{\"directory\":\"$directory\",\"brain_master\":\"$brain_master\",\"brain_mirror\":\"$brain_mirror\",\"stepsize\":\"100\"}"
 
 ml python/3.6 antspy/0.2.2
 

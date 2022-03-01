@@ -17,6 +17,7 @@ def main(args):
 	dataset_path = args['directory']
 	brain_master = args['brain_master']
 	brain_mirror = args['brain_mirror']
+	stepsize = args['stepsize']
 
 	try:
 		logfile = args['logfile']
@@ -101,7 +102,7 @@ def main(args):
 	transform_matrix = []
 	
 	### prepare chunks to loop over ###
-	# the stepsize defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
+	# the chunks defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
 	stepsize = 100 # if this is too high if may crash from memory error. If too low it will be slow.
 	steps = list(range(0,brain_dims[-1],stepsize))
 	# add the last few volumes that are not divisible by stepsize

@@ -3,7 +3,7 @@ import sys
 import json
 from time import sleep
 import datetime
-import brainsss
+import bransss
 import numpy as np
 import nibabel as nib
 
@@ -15,15 +15,14 @@ def main(args):
     width = 120
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
-    #files = ['functional_channel_1', 'functional_channel_2', 'anatomy_channel_1', 'anatomy_channel_2']
     for file in files:
         try:
             ### make mean ###
-            brain = np.asarray(nib.load(os.path.join(directory, file + '.nii')).get_data(), dtype='uint16')
+            brain = np.asarray(nib.load(os.path.join(directory, file)).get_data(), dtype='uint16')
             meanbrain = np.mean(brain, axis=-1)
 
             ### Save ###
-            save_file = os.path.join(directory, file + '_mean.nii')
+            save_file = os.path.join(directory, file[:-4] + '_mean.nii')
             aff = np.eye(4)
             img = nib.Nifti1Image(meanbrain, aff)
             img.to_filename(save_file)
