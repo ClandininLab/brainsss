@@ -72,7 +72,6 @@ def main(args):
 	if os.path.exists(existing_meanbrain):
 		meanbrain = np.asarray(nib.load(existing_meanbrain).get_data(), dtype='uint16')
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
-		ch1_shape = fixed.shape
 		printlog('Found and loaded.')
 
 	### Create if can't load
@@ -199,6 +198,7 @@ def main(args):
 
 	### SAVE TRANSFORMS ###
 	printlog("saving transforms")
+	printlog(F"savefile_master: {savefile_master}")
 	transform_matrix = np.array(transform_matrix)
 	save_file = os.path.join(os.path.dirname(savefile_master), 'motcorr_params')
 	np.save(save_file,transform_matrix)
@@ -206,8 +206,14 @@ def main(args):
 	### MAKE MOCO PLOT ###
 	try:
 		printlog("making moco plot")
+
 		moco_dir = os.path.dirname(savefile_master)
 		xml_dir = os.path.join(os.path.dirname(moco_dir), 'imaging')
+
+		printlog(F"moco_dir: {moco_dir}")
+		printlog(F"savefile_master: {savefile_master}")
+		printlog(F"xml_dir: {xml_dir}")
+
 		save_motion_figure(transform_matrix, xml_dir, moco_dir, scantype)
 	except:
 		printlog("Could not make moco plot, probably can't find xml file to grab image resolution.")
