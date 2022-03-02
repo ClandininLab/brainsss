@@ -59,7 +59,14 @@ def main(args):
 	########################################
 	### Calculate Meanbrain of Channel 1 ###
 	########################################
-	# This will be fixed in moco
+
+	### Get Brain Shape ###
+	img_ch1 = nib.load(filepath_ch1) # this loads a proxy
+	ch1_shape = img_ch1.header.get_data_shape()
+	brain_dims = ch1_shape
+	printlog("Channel 1 shape is {}".format(brain_dims))
+
+	### Try to load meanbrain
 	existing_meanbrain = filepath_ch1[:-4] + '_mean.nii'
 	printlog(F'Looking for meanbrain {existing_meanbrain}')
 	if os.path.exists(existing_meanbrain):
@@ -67,13 +74,10 @@ def main(args):
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
 		ch1_shape = fixed.shape
 		printlog('Found and loaded.')
+
+	### Create if can't load
 	else:
 		printlog('No existing meanbrain found; Creating...')
-		### Get Brain Shape ###
-		img_ch1 = nib.load(filepath_ch1) # this loads a proxy
-		ch1_shape = img_ch1.header.get_data_shape()
-		brain_dims = ch1_shape
-		printlog("Channel 1 shape is {}".format(brain_dims))
 
 		### Make meanbrain ###
 		t0 = time()
