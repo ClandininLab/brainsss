@@ -3,7 +3,7 @@ import sys
 import json
 from time import sleep
 import datetime
-import bransss
+import brainsss
 import numpy as np
 import nibabel as nib
 
