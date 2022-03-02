@@ -47,7 +47,7 @@ def main(args):
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
         build_flies = False # If false, you must provide a list of fly_dirs in dataset_path to process
-        fly_dirs = ['fly_121'] # Set to None, or a list of fly dirs in dataset_path
+        fly_dirs = ['fly_111'] # Set to None, or a list of fly dirs in dataset_path
 
 
     ###################
@@ -112,64 +112,64 @@ def main(args):
     funcanats = funcs + anats
     dirtypes = ['func']*len(funcs) + ['anat']*len(anats)
 
-    # ##################
-    # ### Fictrac QC ###
-    # ##################
+    ##################
+    ### Fictrac QC ###
+    ##################
 
-    # printlog(f"\n{'   FICTRAC QC   ':=^{width}}")
-    # job_ids = []
-    # for func in funcs:
-    #     directory = os.path.join(func, 'fictrac')
-    #     if os.path.exists(directory):
-    #         args = {'logfile': logfile, 'directory': directory, 'fps': 100}
-    #         script = 'fictrac_qc.py'
-    #         job_id = brainsss.sbatch(jobname='fictracqc',
-    #                              script=os.path.join(scripts_path, script),
-    #                              modules=modules,
-    #                              args=args,
-    #                              logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
-    #         job_ids.append(job_id)
-    # for job_id in job_ids:
-    #     brainsss.wait_for_job(job_id, logfile, com_path)
+    printlog(f"\n{'   FICTRAC QC   ':=^{width}}")
+    job_ids = []
+    for func in funcs:
+        directory = os.path.join(func, 'fictrac')
+        if os.path.exists(directory):
+            args = {'logfile': logfile, 'directory': directory, 'fps': 100}
+            script = 'fictrac_qc.py'
+            job_id = brainsss.sbatch(jobname='fictracqc',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+            job_ids.append(job_id)
+    for job_id in job_ids:
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
-    # ####################
-    # ### Bleaching QC ###
-    # ####################
+    ####################
+    ### Bleaching QC ###
+    ####################
 
-    # printlog(f"\n{'   BLEACHING QC   ':=^{width}}")
-    # #job_ids = []
-    # for funcanat, dirtype in zip(funcanats, dirtypes):
-    #     directory = os.path.join(funcanat, 'imaging')
-    #     args = {'logfile': logfile, 'directory': directory, 'dirtype': dirtype}
-    #     script = 'bleaching_qc.py'
-    #     job_id = brainsss.sbatch(jobname='bleachqc',
-    #                          script=os.path.join(scripts_path, script),
-    #                          modules=modules,
-    #                          args=args,
-    #                          logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
-    #     brainsss.wait_for_job(job_id, logfile, com_path)
+    printlog(f"\n{'   BLEACHING QC   ':=^{width}}")
+    #job_ids = []
+    for funcanat, dirtype in zip(funcanats, dirtypes):
+        directory = os.path.join(funcanat, 'imaging')
+        args = {'logfile': logfile, 'directory': directory, 'dirtype': dirtype}
+        script = 'bleaching_qc.py'
+        job_id = brainsss.sbatch(jobname='bleachqc',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
-    # ###################################
-    # ### Create temporal mean brains ###
-    # ###################################
+    ###################################
+    ### Create temporal mean brains ###
+    ###################################
 
-    # printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
-    # for funcanat, dirtype in zip(funcanats, dirtypes):
-    #     directory = os.path.join(funcanat, 'imaging')
+    printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
+    for funcanat, dirtype in zip(funcanats, dirtypes):
+        directory = os.path.join(funcanat, 'imaging')
 
-    #     if dirtype == 'func':
-    #         files = ['functional_channel_1.nii', 'functional_channel_2.nii']
-    #     if dirtype == 'anat':
-    #         files = ['anatomy_channel_1.nii', 'anatomy_channel_2.nii']
+        if dirtype == 'func':
+            files = ['functional_channel_1.nii', 'functional_channel_2.nii']
+        if dirtype == 'anat':
+            files = ['anatomy_channel_1.nii', 'anatomy_channel_2.nii']
 
-    #     args = {'logfile': logfile, 'directory': directory, 'files': files}
-    #     script = 'make_mean_brain.py'
-    #     job_id = brainsss.sbatch(jobname='meanbrn',
-    #                          script=os.path.join(scripts_path, script),
-    #                          modules=modules,
-    #                          args=args,
-    #                          logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
-    #     brainsss.wait_for_job(job_id, logfile, com_path)
+        args = {'logfile': logfile, 'directory': directory, 'files': files}
+        script = 'make_mean_brain.py'
+        job_id = brainsss.sbatch(jobname='meanbrn',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     #########################
     ### Motion Correction ###
@@ -199,6 +199,72 @@ def main(args):
                              args=args,
                              logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
         brainsss.wait_for_job(job_id, logfile, com_path)
+
+    # ####################################
+    # ### Motion Correction Turbo Mode ###
+    # ####################################
+    # ### remove this, just confirming both ways are equivalent
+
+    # timepoints = 3384 #number of volumes
+    # step = 100 #how many volumes one job will handle
+    # mem = 4
+    # time_moco = 4
+    # nodes = 1
+
+    # printlog(f"\n{'   MOTION CORRECTION   ':=^{width}}")
+    # # This will immediately launch all partial mocos and their corresponding dependent moco stitchers
+    # stitcher_job_ids = []
+    # progress_tracker = {}
+    # for fly in flies:
+    #     directory = os.path.join(dataset_path, fly)
+    #     fly_print = directory.split('/')[-1]
+
+    #     moco_dir = os.path.join(directory, 'moco')
+    #     if not os.path.exists(moco_dir):
+    #         os.makedirs(moco_dir)
+
+    #     starts = list(range(0,timepoints,step))
+    #     stops = starts[1:] + [timepoints]
+
+    #     #######################
+    #     ### Launch partials ###
+    #     #######################
+    #     job_ids = []
+    #     for start, stop in zip (starts, stops):
+    #         args = {'logfile': logfile, 'directory': directory, 'start': start, 'stop': stop}
+    #         script = 'moco_partial.py'
+    #         job_id = brainsss.sbatch(jobname='moco',
+    #                              script=os.path.join(scripts_path, script),
+    #                              modules=modules,
+    #                              args=args,
+    #                              logfile=logfile, time=time_moco, mem=mem, nice=nice, silence_print=True, nodes=nodes)
+    #         job_ids.append(job_id)
+
+    #     printlog(F"| moco_partials | SUBMITTED | {fly_print} | {len(job_ids)} jobs, {step} vols each |")
+    #     job_ids_colons = ':'.join(job_ids)
+    #     for_tracker = '/'.join(directory.split('/')[-2:])
+    #     progress_tracker[for_tracker] = {'job_ids': job_ids, 'total_vol': timepoints}
+
+    #     #################################
+    #     ### Create dependent stitcher ###
+    #     #################################
+
+    #     args = {'logfile': logfile, 'directory': moco_dir}
+    #     script = 'moco_stitcher.py'
+    #     job_id = brainsss.sbatch(jobname='stitch',
+    #                          script=os.path.join(scripts_path, script),
+    #                          modules=modules,
+    #                          args=args,
+    #                          logfile=logfile, time=2, mem=4, dep=job_ids_colons, nice=nice, nodes=nodes)
+    #     stitcher_job_ids.append(job_id)
+
+    # if bool(progress_tracker): #if not empty
+    #     brainsss.moco_progress(progress_tracker, logfile, com_path)
+
+    # for job_id in stitcher_job_ids:
+    #     brainsss.wait_for_job(job_id, logfile, com_path)
+
+
 
     ############
     ### Done ###
