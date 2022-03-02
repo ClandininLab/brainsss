@@ -39,6 +39,7 @@ def main(args):
 		printlog(F'Scantype is {scantype}. Stepsize is {stepsize}')
 	except:
 		scantype = 'func'
+		stepsize = 100 
 		printlog('scantype not specified. Using default chunksize of 100')
 
 	printlog(F'\nArguments:\ndataset_path: {dataset_path}\nbrain_master: {brain_master}\nbrain_mirror: {brain_mirror}\n')
@@ -262,5 +263,5 @@ def save_motion_figure(transform_matrix, directory, motcorr_directory, scantype)
 	plt.savefig(save_file, bbox_inches='tight', dpi=300)
 
 if __name__ == '__main__':
-	print(sys.argv[1])
+	# print(sys.argv[1])
 	main(json.loads(sys.argv[1]))
