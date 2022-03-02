@@ -53,11 +53,13 @@ printlog("")
 ### toy practice###
 printlog(f"\n{'   hi this is a toy   ':=^{width}}")
 job_ids = []
-a = 5
-b = 10
+a = 'Yandan'
+b = 'Loves'
+c = 'Linear Algebra!'
+d = '(crying face...)'
 
-args = {'logfile': logfile, 'a': a, 'b': b}
-script = 'toy_model.py'
+args = {'logfile': logfile, 'a': a, 'b': b, 'c':c, 'd':d}
+script = 'hw_toy_model.py'
 job_id = brainsss.sbatch(jobname='toy',
                      script=os.path.join(scripts_path, script),
                      modules=modules,
@@ -67,27 +69,27 @@ job_ids.append(job_id)
 
 for job_id in job_ids:
     brainsss.wait_for_job(job_id, logfile, com_path)
-    
-######################
-### Test vol moco ####
-#######################
-printlog(f"\n{'   vol by vol test   ':=^{width}}")
-job_ids = []
-for fly in flies:
-    directory = os.path.join(dataset_path, fly)
-    save_path = directory  #could have it save in a different folder in the future
-    file_names = ['ch1_stitched.nii', 'ch2_stitched.nii']  ##note: this works for Ashley's data organization, but change for other data to indicate ch1 and ch2 raw nii
-    args = {'logfile': logfile, 'directory': directory, 'smooth': False, 'colors': ['green'], 'file_names': file_names, 'save_path': save_path}
-    script = 'vol_moco.py'
-    job_id = brainsss.sbatch(jobname='voltest',
-                         script=os.path.join(scripts_path, script),
-                         modules=modules,
-                         args=args,
-                         logfile=logfile, time=96, mem=mem, nice=nice, nodes=nodes)
-    job_ids.append(job_id)
 
-for job_id in job_ids:
-    brainsss.wait_for_job(job_id, logfile, com_path)
+# ######################
+# ### Test vol moco ####
+# #######################
+# printlog(f"\n{'   vol by vol test   ':=^{width}}")
+# job_ids = []
+# for fly in flies:
+#     directory = os.path.join(dataset_path, fly)
+#     save_path = directory  #could have it save in a different folder in the future
+#     file_names = ['ch1_stitched.nii', 'ch2_stitched.nii']  ##note: this works for Ashley's data organization, but change for other data to indicate ch1 and ch2 raw nii
+#     args = {'logfile': logfile, 'directory': directory, 'smooth': False, 'colors': ['green'], 'file_names': file_names, 'save_path': save_path}
+#     script = 'vol_moco.py'
+#     job_id = brainsss.sbatch(jobname='voltest',
+#                          script=os.path.join(scripts_path, script),
+#                          modules=modules,
+#                          args=args,
+#                          logfile=logfile, time=96, mem=mem, nice=nice, nodes=nodes)
+#     job_ids.append(job_id)
+#
+# for job_id in job_ids:
+#     brainsss.wait_for_job(job_id, logfile, com_path)
 
 ### quick vol by vol test ###
 # printlog(f"\n{'   vol by vol test   ':=^{width}}")
