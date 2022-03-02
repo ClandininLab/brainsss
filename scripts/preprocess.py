@@ -149,27 +149,27 @@ def main(args):
     #                          logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
     #     brainsss.wait_for_job(job_id, logfile, com_path)
 
-    ###################################
-    ### Create temporal mean brains ###
-    ###################################
+    # ###################################
+    # ### Create temporal mean brains ###
+    # ###################################
 
-    printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
-    for funcanat, dirtype in zip(funcanats, dirtypes):
-        directory = os.path.join(funcanat, 'imaging')
+    # printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
+    # for funcanat, dirtype in zip(funcanats, dirtypes):
+    #     directory = os.path.join(funcanat, 'imaging')
 
-        if dirtype == 'func':
-            files = ['functional_channel_1.nii', 'functional_channel_2.nii']
-        if dirtype == 'anat':
-            files = ['anatomy_channel_1.nii', 'anatomy_channel_2.nii']
+    #     if dirtype == 'func':
+    #         files = ['functional_channel_1.nii', 'functional_channel_2.nii']
+    #     if dirtype == 'anat':
+    #         files = ['anatomy_channel_1.nii', 'anatomy_channel_2.nii']
 
-        args = {'logfile': logfile, 'directory': directory, 'files': files}
-        script = 'make_mean_brain.py'
-        job_id = brainsss.sbatch(jobname='meanbrn',
-                             script=os.path.join(scripts_path, script),
-                             modules=modules,
-                             args=args,
-                             logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
-        brainsss.wait_for_job(job_id, logfile, com_path)
+    #     args = {'logfile': logfile, 'directory': directory, 'files': files}
+    #     script = 'make_mean_brain.py'
+    #     job_id = brainsss.sbatch(jobname='meanbrn',
+    #                          script=os.path.join(scripts_path, script),
+    #                          modules=modules,
+    #                          args=args,
+    #                          logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+    #     brainsss.wait_for_job(job_id, logfile, com_path)
 
     #########################
     ### Motion Correction ###
