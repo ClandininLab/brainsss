@@ -4,20 +4,19 @@ import numpy as np
 import argparse
 import subprocess
 import json
+import nibabel as nib
+import brainsss
+import h5py
+import ants
 from time import time
 from time import strftime
 from time import sleep
-import nibabel as nib
-import brainsss.utils as brainsss
-import h5py
-import ants
 
 def main(args):
 	
 	dataset_path = args['directory']
 	brain_master = args['brain_master']
 	brain_mirror = args['brain_mirror']
-	stepsize = args['stepsize']
 
 	try:
 		logfile = args['logfile']
@@ -29,9 +28,15 @@ def main(args):
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
 		save_type = 'curr_dir'
+	printlog(f'save_type: {save_type}')
 
 	try:
 		scantype = args['scantype']
+		if scantype == 'func':
+			stepsize = 100 # if this is too high if may crash from memory error. If too low it will be slow.
+		if scantype == 'anat':
+			stepsize = 10
+		printlog(F'Scantype is {scantype}. Stepsize is {stepsize}')
 	except:
 		scantype = 'func'
 		printlog('scantype not specified. Using default chunksize of 100')
@@ -103,7 +108,6 @@ def main(args):
 	
 	### prepare chunks to loop over ###
 	# the chunks defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
-	stepsize = 100 # if this is too high if may crash from memory error. If too low it will be slow.
 	steps = list(range(0,brain_dims[-1],stepsize))
 	# add the last few volumes that are not divisible by stepsize
 	if brain_dims[-1] > steps[-1]:
@@ -198,7 +202,8 @@ def main(args):
 		printlog("Could not make moco plot, probably can't find xml file to grab image resolution.")
 
 def make_empty_h5(directory, file, brain_dims, save_type):
-
+	printlog(f'here {directory}')
+	printlog(f'here {file}')
 	if save_type == 'curr_dir':
 		moco_dir = os.path.join(directory,'moco')
 		if not os.path.exists(moco_dir):

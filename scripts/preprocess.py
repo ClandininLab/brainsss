@@ -18,7 +18,6 @@ def main(args):
     #########################
 
     width = 120 # width of print log
-    fly_dirs = ['fly_121'] #None #['fly_001'] # set to None, or a list of fly dirs in dataset_path
     nodes = 2 # 1 or 2
     nice = True # true to lower priority of jobs. ie, other users jobs go first
 
@@ -47,6 +46,9 @@ def main(args):
     if user == "brezovec":
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
+        build_flies = True # If false, you must provide a list of fly_dirs in dataset_path to process
+        fly_dirs = ['fly_121'] # Set to None, or a list of fly dirs in dataset_path
+
 
     ###################
     ### Print Title ###
@@ -64,36 +66,38 @@ def main(args):
     printlog("Scripts path: {}".format(scripts_path))
     printlog("User: {}".format(user))
 
-    # ######################
-    # ### CHECK FOR FLAG ###
-    # ######################
+    if build_flies:
 
-    # printlog(f"\n{'   CHECK FOR FLAG   ':=^{width}}")
-    # args = {'logfile': logfile, 'imports_path': imports_path}
-    # script = 'check_for_flag.py'
-    # job_id = brainsss.sbatch(jobname='flagchk',
-    #                      script=os.path.join(scripts_path, script),
-    #                      modules=modules,
-    #                      args=args,
-    #                      logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
-    # flagged_dir = brainsss.wait_for_job(job_id, logfile, com_path)
+        ######################
+        ### CHECK FOR FLAG ###
+        ######################
 
-    # ###################
-    # ### Build flies ###
-    # ###################
+        printlog(f"\n{'   CHECK FOR FLAG   ':=^{width}}")
+        args = {'logfile': logfile, 'imports_path': imports_path}
+        script = 'check_for_flag.py'
+        job_id = brainsss.sbatch(jobname='flagchk',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+        flagged_dir = brainsss.wait_for_job(job_id, logfile, com_path)
 
-    # printlog(f"\n{'   BUILD FLIES   ':=^{width}}")
-    # args = {'logfile': logfile, 'flagged_dir': flagged_dir.strip('\n'), 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
-    # script = 'fly_builder.py'
-    # job_id = brainsss.sbatch(jobname='bldfly',
-    #                      script=os.path.join(scripts_path, script),
-    #                      modules=modules,
-    #                      args=args,
-    #                      logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
-    # func_and_anats = brainsss.wait_for_job(job_id, logfile, com_path)
-    # func_and_anats = func_and_anats.split('\n')[:-1]
-    # funcs = [x.split(':')[1] for x in func_and_anats if 'func:' in x] # will be full paths to fly/expt
-    # anats = [x.split(':')[1] for x in func_and_anats if 'anat:' in x]
+        ###################
+        ### Build flies ###
+        ###################
+
+        printlog(f"\n{'   BUILD FLIES   ':=^{width}}")
+        args = {'logfile': logfile, 'flagged_dir': flagged_dir.strip('\n'), 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
+        script = 'fly_builder.py'
+        job_id = brainsss.sbatch(jobname='bldfly',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+        func_and_anats = brainsss.wait_for_job(job_id, logfile, com_path)
+        func_and_anats = func_and_anats.split('\n')[:-1]
+        funcs = [x.split(':')[1] for x in func_and_anats if 'func:' in x] # will be full paths to fly/expt
+        anats = [x.split(':')[1] for x in func_and_anats if 'anat:' in x]
 
     fly_directory = os.path.join(dataset_path, fly_dirs[0])
     funcs = [os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'func' in x]
@@ -175,17 +179,15 @@ def main(args):
         if dirtype == 'func':
             brain_master = os.path.join(directory, 'functional_channel_1.nii')
             brain_mirror = os.path.join(directory, 'functional_channel_2.nii')
-            stepsize = 100
         if dirtype == 'anat':
             brain_master = os.path.join(directory, 'anatomy_channel_1.nii')
             brain_mirror = os.path.join(directory, 'anatomy_channel_2.nii')
-            stepsize = 10
 
         args = {'logfile': logfile,
                 'directory': directory,
                 'brain_master': brain_master,
                 'brain_mirror': brain_mirror,
-                'stepsize': stepsize}
+                'scantype': dirtype}
 
         script = 'motion_correction.py'
         job_id = brainsss.sbatch(jobname='moco',
