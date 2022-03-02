@@ -8,6 +8,7 @@ import nibabel as nib
 import brainsss
 import h5py
 import ants
+import matplotlib.pyplot as plt
 from time import time
 from time import strftime
 from time import sleep
