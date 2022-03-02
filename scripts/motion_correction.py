@@ -60,24 +60,30 @@ def main(args):
 	### Calculate Meanbrain of Channel 1 ###
 	########################################
 	# This will be fixed in moco
+	existing_meanbrain = filepath_ch1[:-4] + '_mean.nii'
+	printlog(F'Looking for meanbrain {existing_meanbrain}')
+	if os.path.exists(existing_meanbrain):
+		meanbrain = np.asarray(nib.load(existing_meanbrain).get_data(), dtype='uint16')
+		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
+		printlog('Found and loaded.')
+	except:
+		printlog('No existing meanbrain found; Creating...')
+		### Get Brain Shape ###
+		img_ch1 = nib.load(filepath_ch1) # this loads a proxy
+		ch1_shape = img_ch1.header.get_data_shape()
+		brain_dims = ch1_shape
+		printlog("Channel 1 shape is {}".format(brain_dims))
 
-	### Get Brain Shape ###
-	img_ch1 = nib.load(filepath_ch1) # this loads a proxy
-	ch1_shape = img_ch1.header.get_data_shape()
-	brain_dims = ch1_shape
-	printlog("Channel 1 shape is {}".format(brain_dims))
-
-	### Make meanbrain ###
-	t0 = time()
-	printlog('Creating temporal meanbrain...')
-	meanbrain = np.zeros(brain_dims[:3]) # create empty meanbrain from the first 3 axes, x/y/z
-	for i in range(brain_dims[-1]):
-		if i%1000 == 0:
-			printlog(brainsss.progress_bar(i, brain_dims[-1], 120))
-		meanbrain += img_ch1.dataobj[...,i]
-	meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
-	fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
-	printlog('meanbrain DONE. Duration: {}'.format(time()-t0))
+		### Make meanbrain ###
+		t0 = time()
+		meanbrain = np.zeros(brain_dims[:3]) # create empty meanbrain from the first 3 axes, x/y/z
+		for i in range(brain_dims[-1]):
+			if i%1000 == 0:
+				printlog(brainsss.progress_bar(i, brain_dims[-1], 120))
+			meanbrain += img_ch1.dataobj[...,i]
+		meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
+		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
+		printlog('meanbrain DONE. Duration: {}'.format(time()-t0))
 
 	### Load channel 2 proxy here ###
 	if filepath_ch2 is not None:
@@ -202,8 +208,6 @@ def main(args):
 		printlog("Could not make moco plot, probably can't find xml file to grab image resolution.")
 
 def make_empty_h5(directory, file, brain_dims, save_type):
-	printlog(f'here {directory}')
-	printlog(f'here {file}')
 	if save_type == 'curr_dir':
 		moco_dir = os.path.join(directory,'moco')
 		if not os.path.exists(moco_dir):
