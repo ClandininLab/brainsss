@@ -65,6 +65,7 @@ def main(args):
 	if os.path.exists(existing_meanbrain):
 		meanbrain = np.asarray(nib.load(existing_meanbrain).get_data(), dtype='uint16')
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
+		ch1_shape = fixed.shape
 		printlog('Found and loaded.')
 	else:
 		printlog('No existing meanbrain found; Creating...')
