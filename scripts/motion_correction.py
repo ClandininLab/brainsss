@@ -278,7 +278,7 @@ def save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, print
 	plt.plot(transform_matrix[:,11]*z_res, label = 'z')
 	plt.ylabel('Motion Correction, um')
 	plt.xlabel('Time')
-	plt.title(directory)
+	plt.title(moco_dir)
 	plt.legend()
 	plt.savefig(save_file, bbox_inches='tight', dpi=300)
 
