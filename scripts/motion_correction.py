@@ -66,7 +66,7 @@ def main(args):
 		meanbrain = np.asarray(nib.load(existing_meanbrain).get_data(), dtype='uint16')
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
 		printlog('Found and loaded.')
-	except:
+	else:
 		printlog('No existing meanbrain found; Creating...')
 		### Get Brain Shape ###
 		img_ch1 = nib.load(filepath_ch1) # this loads a proxy
