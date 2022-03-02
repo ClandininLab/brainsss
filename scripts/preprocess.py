@@ -46,7 +46,7 @@ def main(args):
     if user == "brezovec":
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
-        build_flies = True # If false, you must provide a list of fly_dirs in dataset_path to process
+        build_flies = False # If false, you must provide a list of fly_dirs in dataset_path to process
         fly_dirs = ['fly_121'] # Set to None, or a list of fly dirs in dataset_path
 
 
@@ -99,10 +99,13 @@ def main(args):
         funcs = [x.split(':')[1] for x in func_and_anats if 'func:' in x] # will be full paths to fly/expt
         anats = [x.split(':')[1] for x in func_and_anats if 'anat:' in x]
 
-    fly_directory = os.path.join(dataset_path, fly_dirs[0])
-    funcs = [os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'func' in x]
-    anats = [os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'anat' in x]
-
+    else:
+        funcs = []
+        anats = []
+        for fly_dir in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly_dir)
+            funcs.extend([os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'func' in x])
+            anats.extend([os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'anat' in x])
 
     brainsss.sort_nicely(funcs)
     brainsss.sort_nicely(anats)
