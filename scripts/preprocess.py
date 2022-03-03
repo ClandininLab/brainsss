@@ -3,8 +3,6 @@ import sys
 import os
 import re
 import json
-import datetime
-import pyfiglet
 import textwrap
 import brainsss
 import argparse
@@ -28,6 +26,7 @@ def main(args):
     logfile = './logs/' + time.strftime("%Y%m%d-%H%M%S") + '.txt'
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
     sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
+    brainsss.print_title(logfile, width)
 
     ###################
     ### Setup paths ###
@@ -49,19 +48,6 @@ def main(args):
         build_flies = True # If false, you must provide a list of fly_dirs in dataset_path to process
         fly_dirs = None#['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
 
-
-    ###################
-    ### Print Title ###
-    ###################
-
-    title = pyfiglet.figlet_format("Brainsss", font="doom" )
-    title_shifted = ('\n').join([' '*28+line for line in title.split('\n')][:-2])
-    printlog(title_shifted)
-    day_now = datetime.datetime.now().strftime("%B %d, %Y")
-    time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
-    printlog(F"{day_now+' | '+time_now:^{width}}")
-    printlog("")
-
     #printlog("Dataset path: {}".format(dataset_path))
     #printlog("Scripts path: {}".format(scripts_path))
     #printlog("User: {}".format(user))
@@ -72,7 +58,6 @@ def main(args):
         ### CHECK FOR FLAG ###
         ######################
 
-        #brainsss.big_header(printlog, 'CHECK FOR FLAG', width)
         args = {'logfile': logfile, 'imports_path': imports_path}
         script = 'check_for_flag.py'
         job_id = brainsss.sbatch(jobname='flagchk',
@@ -86,7 +71,6 @@ def main(args):
         ### Build flies ###
         ###################
 
-        #brainsss.big_header(printlog, 'BUILD FLIES', width)
         args = {'logfile': logfile, 'flagged_dir': flagged_dir.strip('\n'), 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
         script = 'fly_builder.py'
         job_id = brainsss.sbatch(jobname='bldfly',
@@ -116,7 +100,6 @@ def main(args):
     ### Fictrac QC ###
     ##################
 
-    printlog(f"\n{'   FICTRAC QC   ':=^{width}}")
     job_ids = []
     for func in funcs:
         directory = os.path.join(func, 'fictrac')
@@ -136,7 +119,6 @@ def main(args):
     ### Bleaching QC ###
     ####################
 
-    printlog(f"\n{'   BLEACHING QC   ':=^{width}}")
     #job_ids = []
     for funcanat, dirtype in zip(funcanats, dirtypes):
         directory = os.path.join(funcanat, 'imaging')
@@ -153,7 +135,6 @@ def main(args):
     ### Create temporal mean brains ###
     ###################################
 
-    printlog(f"\n{'   MEAN BRAINS   ':=^{width}}")
     for funcanat, dirtype in zip(funcanats, dirtypes):
         directory = os.path.join(funcanat, 'imaging')
 
@@ -175,7 +156,6 @@ def main(args):
     ### Motion Correction ###
     #########################
 
-    printlog(f"\n{'   MOTION CORRECT   ':=^{width}}")
     for funcanat, dirtype in zip(funcanats, dirtypes):
 
         directory = os.path.join(funcanat, 'imaging')
@@ -204,30 +184,10 @@ def main(args):
     ### Done ###
     ############
 
-    time.sleep(3) # to allow any final printing
-    day_now = datetime.datetime.now().strftime("%B %d, %Y")
-    time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
-    printlog("="*width)
-    printlog(F"{day_now+' | '+time_now:^{width}}")
+    brainsss.print_footer(logfile, width)
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
-
-    # this is the present working directory where the script was run
     parser.add_argument("PWD") 
-
-    # you must provide the dataset path on the command line
-    # If you do not, throw an exception
-    # parser.add_argument("dataset_path", default="MISSING", nargs='?') 
     args = parser.parse_args()
-    # try:
-    #     message = "{}\n{}\n{}\n{}".format("Aborted! You probably forgot to provide a fly directory.",
-    #     "This argument is required and must be listed on the command line directly after the name of the shell file.",
-    #     "It must be a full path to the directory.",
-    #     "See readme for how to structure your fly directory.")
-    #     assert (args.dataset_path != "MISSING"), message
-    # except Exception as e:
-    #     print (e)
-
     main(args)
