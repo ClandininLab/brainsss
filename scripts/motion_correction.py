@@ -61,105 +61,101 @@ def main(args):
 		else:
 			scantype = 'func'
 			stepsize = 100 
-			printlog('*** Could not determine scantype. Using default stepsize of 100 ***')
-	printlog(F"Scantype{brain_master:.>{width-8}}")
+			printlog(F"{'   Could not determine scantype. Using default stepsize of 100   ':*^{width}}")
+	printlog(F"Scantype{scantype:.>{width-8}}")
 	printlog(F"Stepsize{stepsize:.>{width-8}}")
-
-
 
 	##############################
 	### Check that files exist ###
 	##############################
 
-	filepath_ch1 = os.path.join(dataset_path, brain_master)
-	filepath_ch2 = os.path.join(dataset_path, brain_mirror)
-	if not os.path.exists(filepath_ch1):
-		printlog("Could not find {}".format(filepath_ch1))
+
+	filepath_brain_master = os.path.join(dataset_path, brain_master)
+	filepath_brain_mirror = os.path.join(dataset_path, brain_mirror)
+
+	### Quit if no master brain
+	if not brain_master.endswith('.nii'):
+		printlog("Brain master does not end with .nii")
 		printlog(F"{'   Aborting Moco   ':*^{width}}")
 		return
-	if not os.path.exists(filepath_ch2):
-		printlog("Could not find {}".format(filepath_ch2))
+	if not os.path.exists(filepath_brain_master):
+		printlog("Could not find {}".format(filepath_brain_master))
+		printlog(F"{'   Aborting Moco   ':*^{width}}")
+		return
+
+	### Brain mirror is optional
+	if not brain_mirror.endswith('.nii'):
+		printlog("Brain mirror does not end with .nii. Continuing without a mirror brain.")
+		filepath_brain_mirror = None
+	if not os.path.exists(filepath_brain_mirror):
+		printlog(F"Could not find{filepath_brain_mirror:.>{width-8}}")
 		printlog("Will continue without a mirror brain.")
-		filepath_ch2 = None
-
-	printlog("filepath_ch2 is {}".format(filepath_ch2))
-	return
-
-
-
-
-
-	filepath_ch1 = check_for_file(brain_master, dataset_path)
-	filepath_ch2 = check_for_file(brain_mirror, dataset_path)
-	# Abort if no channel 1
-	if filepath_ch1 is None:
-		printlog("Could not find {}".format(filepath_ch1))
-		printlog(F"{'   Aborting Moco   ':*^{width}}")
-		return
-	else:
-		printlog("Channel 1 is: {}".format(filepath_ch1))
-	printlog("Channel 2 is: {}".format(filepath_ch2))
+		filepath_brain_mirror = None
 
 	########################################
 	### Calculate Meanbrain of Channel 1 ###
 	########################################
 
 	### Get Brain Shape ###
-	img_ch1 = nib.load(filepath_ch1) # this loads a proxy
+	img_ch1 = nib.load(filepath_brain_master) # this loads a proxy
 	ch1_shape = img_ch1.header.get_data_shape()
 	brain_dims = ch1_shape
-	printlog("Channel 1 shape is {}".format(brain_dims))
+	printlog(F"Master brain shape{brain_dims:.>{width-15}}")
+
 
 	### Try to load meanbrain
-	existing_meanbrain = filepath_ch1[:-4] + '_mean.nii'
-	printlog(F'Looking for meanbrain {existing_meanbrain}')
-	if os.path.exists(existing_meanbrain):
-		meanbrain = np.asarray(nib.load(existing_meanbrain).get_data(), dtype='uint16')
+	existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
+	existing_meanbrain_path = os.path.join(dataset_path, existing_meanbrain_file)
+	if os.path.exists(existing_meanbrain_path):
+		meanbrain = np.asarray(nib.load(existing_meanbrain_path).get_data(), dtype='uint16')
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
-		printlog('Found and loaded.')
+		printlog(F"Loaded meanbrain{existing_meanbrain_file:.>{width-16}}")
 
 	### Create if can't load
 	else:
-		printlog('No existing meanbrain found; Creating...')
+		printlog(F"Could not find{existing_meanbrain_file:.>{width-14}}")
+		printlog(F"Creating meanbrain{'':.>{width-18}}")
 
 		### Make meanbrain ###
 		t0 = time()
 		meanbrain = np.zeros(brain_dims[:3]) # create empty meanbrain from the first 3 axes, x/y/z
 		for i in range(brain_dims[-1]):
 			if i%1000 == 0:
-				printlog(brainsss.progress_bar(i, brain_dims[-1], 120))
+				printlog(brainsss.progress_bar(i, brain_dims[-1], width))
 			meanbrain += img_ch1.dataobj[...,i]
 		meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
-		printlog('meanbrain DONE. Duration: {}'.format(time()-t0))
+		printlog(F"Meanbrain created. Duration{str(int(time()-t0))+'s':.>{width-27}}")
 
-	### Load channel 2 proxy here ###
-	if filepath_ch2 is not None:
-		img_ch2 = nib.load(filepath_ch2) # this loads a proxy
+	#########################
+	### Load Mirror Brain ###
+	#########################
+
+	if filepath_brain_mirror is not None:
+		img_ch2 = nib.load(filepath_brain_mirror) # this loads a proxy
 		# make sure channel 1 and 2 have same shape
 		ch2_shape = img_ch2.header.get_data_shape()
 		if ch1_shape != ch2_shape:
-			printlog("Channel 1 and 2 do not have the same shape! {} and {}".format(ch1_shape, ch2_shape))
-			#printlog("Aborting.")
-			#return
+			printlog(F"{'   WARNING Channel 1 and 2 do not have the same shape!   ':*^{width}}")
+			printlog("{} and {}".format(ch1_shape, ch2_shape))
 
 	############################################################
 	### Make Empty MOCO files that will be filled vol by vol ###
 	############################################################
-	brain_dims = (256, 128, 49, 5) ### ------------------------------------------------------------------<<<< REMOVE!!!!!!!!!!!!!!!!!
 
-	moco_dir, savefile_master = make_empty_h5(dataset_path, f"{brain_master.split('.')[0]}_moco.h5", 
-		brain_dims, save_type)
-	printlog(f'created empty hdf5 file: {savefile_master}')
+	h5_file_name = f"{brain_master.split('.')[0]}_moco.h5"
+	moco_dir, savefile_master = make_empty_h5(dataset_path, h5_file_name, brain_dims, save_type)
+	printlog(F"Created empty hdf5 file{h5_file_name:.>{width-23}}")
 
-	if filepath_ch2 is not None:
-		_ ,savefile_mirror = make_empty_h5(dataset_path, f"{brain_mirror.split('.')[0]}_moco.h5", brain_dims, save_type)
-		printlog(f'created empty hdf5 file: {savefile_mirror}')
+	if filepath_brain_mirror is not None:
+		h5_file_name = f"{brain_mirror.split('.')[0]}_moco.h5"
+		_ ,savefile_mirror = make_empty_h5(dataset_path, h5_file_name, brain_dims, save_type)
+		printlog(F"Created empty hdf5 file{h5_file_name:.>{width-23}}")
 
 	#################################
 	### Perform Motion Correction ###
 	#################################
-	printlog("Starting MOCO")
+	printlog(F"{'   STARTING MOCO   ':~^{width}}")
 	transform_matrix = []
 	
 	### prepare chunks to loop over ###
@@ -171,8 +167,9 @@ def main(args):
 
 	# loop over all brain vols, motion correcting each and insert into hdf5 file on disk
 	#for i in range(brain_dims[-1]):
+	start_time = time()
 	for j in range(len(steps)-1):
-		printlog(F"j: {j}")
+		#printlog(F"j: {j}")
 
 		### LOAD A SINGLE BRAIN VOL ###
 		moco_ch1_chunk = []
@@ -196,13 +193,13 @@ def main(args):
 			
 			### APPLY TRANSFORMS TO CHANNEL 2 ###
 			#t0 = time()
-			if filepath_ch2 is not None: 
+			if filepath_brain_mirror is not None: 
 				vol = img_ch2.dataobj[...,index]
 				ch2_moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 				moco_ch2 = ants.apply_transforms(fixed, ch2_moving, transformlist)
 				moco_ch2 = moco_ch2.numpy()
 				moco_ch2_chunk.append(moco_ch2)
-				printlog(F'moco vol done: {index}, time: {time()-t0}')
+				#printlog(F'moco vol done: {index}, time: {time()-t0}')
 
 			### SAVE AFFINE TRANSFORM PARAMETERS FOR PLOTTING MOTION ###
 			transformlist = moco['fwdtransforms']
@@ -224,7 +221,7 @@ def main(args):
 					os.remove(x)
 
 		moco_ch1_chunk = np.moveaxis(np.asarray(moco_ch1_chunk),0,-1)
-		if filepath_ch2 is not None:
+		if filepath_brain_mirror is not None:
 			moco_ch2_chunk = np.moveaxis(np.asarray(moco_ch2_chunk),0,-1)
 		#printlog("chunk shape: {}. Time: {}".format(moco_ch1_chunk.shape, time()-t0))
 
@@ -232,15 +229,18 @@ def main(args):
 		t0 = time()
 		with h5py.File(savefile_master, 'a') as f:
 			f['data'][...,steps[j]:steps[j+1]] = moco_ch1_chunk																		
-		printlog(F'Ch_1 append time: {time()-t0}')
+		#printlog(F'Ch_1 append time: {time()-t0}')
 																						
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 2 ###
 		t0 = time()
-		if filepath_ch2 is not None:
+		if filepath_brain_mirror is not None:
 			with h5py.File(savefile_mirror, 'a') as f:
 				#f['data'][...,i] = moco_ch2
 				f['data'][...,steps[j]:steps[j+1]] = moco_ch2_chunk
-			printlog(F'Ch_2 append time: {time()-t0}')
+			#printlog(F'Ch_2 append time: {time()-t0}')
+
+		### Print progress ###
+		print_progress_table(total_vol=brain_dims[-1], complete_vol=index, printlog=printlog, start_time=start_time, width=width)
 
 	### SAVE TRANSFORMS ###
 	printlog("saving transforms")
@@ -306,6 +306,35 @@ def save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, print
 	plt.title(moco_dir)
 	plt.legend()
 	plt.savefig(save_file, bbox_inches='tight', dpi=300)
+
+def print_progress_table(total_vol, complete_vol, printlog, start_time, width):
+    fraction_complete = complete_vol/total_vol
+    
+    ### Get elapsed time ###
+    elapsed = time()-start_time
+    elapsed_hms = sec_to_hms(elapsed)
+
+    ### Get estimate of remaining time ###
+    try:
+        remaining = elapsed/fraction_complete - elapsed
+    except ZeroDivisionError:
+        remaining = 0
+    remaining_hms = sec_to_hms(remaining)
+    
+    ### Get progress bar ###
+    complete_vol_str = f"{complete_vol:04d}"
+    total_vol_str = f"{total_vol:04d}"
+    length = len(elapsed_hms) + len(remaining_hms) + len(complete_vol_str) + len(total_vol_str)
+    bar_string = brainsss.progress_bar(complete_vol, total_vol, width-length-10)
+
+    full_line = '| ' + elapsed_hms + '/' + remaining_hms + ' | ' + complete_vol_str + '/' + total_vol_str + ' |' + bar_string + '|'
+    printlog(full_line)
+
+def sec_to_hms(t):
+	secs=F"{np.floor(t%60):02.0f}"
+	mins=F"{np.floor((t/60)%60):02.0f}"
+	hrs=F"{np.floor((t/3600)%60):02.0f}"
+	return ':'.join([hrs, mins, secs])
 
 if __name__ == '__main__':
 	main(json.loads(sys.argv[1]))
