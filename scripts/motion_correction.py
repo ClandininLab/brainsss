@@ -8,6 +8,8 @@ import nibabel as nib
 import brainsss
 import h5py
 import ants
+import datetime
+import pyfiglet
 import matplotlib.pyplot as plt
 from time import time
 from time import strftime
@@ -36,6 +38,15 @@ def main(args):
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
 		save_type = 'curr_dir'
+
+		title = pyfiglet.figlet_format("Brainsss", font="cyberlarge" ) #28 #shimrod
+		title_shifted = ('\n').join([' '*28+line for line in title.split('\n')][:-2])
+		printlog(title_shifted)
+		day_now = datetime.datetime.now().strftime("%B %d, %Y")
+		time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
+		printlog(F"{day_now+' | '+time_now:^{width}}")
+		printlog("")
+		
 	printlog(F"Dataset path{dataset_path:.>{width-12}}")
 	printlog(F"Brain master{brain_master:.>{width-12}}")
 	printlog(F"Brain mirror{brain_mirror:.>{width-12}}")
@@ -219,6 +230,9 @@ def main(args):
 				if '.mat' not in x:
 					os.remove(x)
 
+			### Print progress ###
+			print_progress_table(total_vol=brain_dims[-1], complete_vol=index, printlog=printlog, start_time=start_time, width=width)
+
 		moco_ch1_chunk = np.moveaxis(np.asarray(moco_ch1_chunk),0,-1)
 		if filepath_brain_mirror is not None:
 			moco_ch2_chunk = np.moveaxis(np.asarray(moco_ch2_chunk),0,-1)
@@ -237,9 +251,6 @@ def main(args):
 				#f['data'][...,i] = moco_ch2
 				f['data'][...,steps[j]:steps[j+1]] = moco_ch2_chunk
 			#printlog(F'Ch_2 append time: {time()-t0}')
-
-		### Print progress ###
-		print_progress_table(total_vol=brain_dims[-1], complete_vol=index, printlog=printlog, start_time=start_time, width=width)
 
 	### SAVE TRANSFORMS ###
 	printlog("saving transforms")
@@ -307,27 +318,27 @@ def save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, print
 	plt.savefig(save_file, bbox_inches='tight', dpi=300)
 
 def print_progress_table(total_vol, complete_vol, printlog, start_time, width):
-    fraction_complete = complete_vol/total_vol
-    
-    ### Get elapsed time ###
-    elapsed = time()-start_time
-    elapsed_hms = sec_to_hms(elapsed)
+	fraction_complete = complete_vol/total_vol
+	
+	### Get elapsed time ###
+	elapsed = time()-start_time
+	elapsed_hms = sec_to_hms(elapsed)
 
-    ### Get estimate of remaining time ###
-    try:
-        remaining = elapsed/fraction_complete - elapsed
-    except ZeroDivisionError:
-        remaining = 0
-    remaining_hms = sec_to_hms(remaining)
-    
-    ### Get progress bar ###
-    complete_vol_str = f"{complete_vol:04d}"
-    total_vol_str = f"{total_vol:04d}"
-    length = len(elapsed_hms) + len(remaining_hms) + len(complete_vol_str) + len(total_vol_str)
-    bar_string = brainsss.progress_bar(complete_vol, total_vol, width-length-10)
+	### Get estimate of remaining time ###
+	try:
+		remaining = elapsed/fraction_complete - elapsed
+	except ZeroDivisionError:
+		remaining = 0
+	remaining_hms = sec_to_hms(remaining)
+	
+	### Get progress bar ###
+	complete_vol_str = f"{complete_vol:04d}"
+	total_vol_str = f"{total_vol:04d}"
+	length = len(elapsed_hms) + len(remaining_hms) + len(complete_vol_str) + len(total_vol_str)
+	bar_string = brainsss.progress_bar(complete_vol, total_vol, width-length-10)
 
-    full_line = '| ' + elapsed_hms + '/' + remaining_hms + ' | ' + complete_vol_str + '/' + total_vol_str + ' |' + bar_string + '|'
-    printlog(full_line)
+	full_line = '| ' + elapsed_hms + '/' + remaining_hms + ' | ' + complete_vol_str + '/' + total_vol_str + ' |' + bar_string + '|'
+	printlog(full_line)
 
 def sec_to_hms(t):
 	secs=F"{np.floor(t%60):02.0f}"
