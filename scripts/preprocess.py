@@ -54,7 +54,7 @@ def main(args):
     ### Print Title ###
     ###################
 
-    title = pyfiglet.figlet_format("Brainsss", font="cyberlarge" ) #28 #shimrod
+    title = pyfiglet.figlet_format("Brainsss", font="starwars" ) #28 #shimrod
     title_shifted = ('\n').join([' '*28+line for line in title.split('\n')][:-2])
     printlog(title_shifted)
     day_now = datetime.datetime.now().strftime("%B %d, %Y")
@@ -72,7 +72,7 @@ def main(args):
         ### CHECK FOR FLAG ###
         ######################
 
-        printlog(f"\n{'   CHECK FOR FLAG   ':=^{width}}")
+        #brainsss.big_header(printlog, 'CHECK FOR FLAG', width)
         args = {'logfile': logfile, 'imports_path': imports_path}
         script = 'check_for_flag.py'
         job_id = brainsss.sbatch(jobname='flagchk',
@@ -86,7 +86,7 @@ def main(args):
         ### Build flies ###
         ###################
 
-        printlog(f"\n{'   BUILD FLIES   ':=^{width}}")
+        #brainsss.big_header(printlog, 'BUILD FLIES', width)
         args = {'logfile': logfile, 'flagged_dir': flagged_dir.strip('\n'), 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
         script = 'fly_builder.py'
         job_id = brainsss.sbatch(jobname='bldfly',
