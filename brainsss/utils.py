@@ -5,11 +5,13 @@ import os
 import h5py
 import math
 import json
-from email.mime.text import MIMEText
+import datetime
+import pyfiglet
 from time import time
 from time import strftime
 from time import sleep
 from functools import wraps
+from email.mime.text import MIMEText
 import numpy as np
 import nibabel as nib
 from xml.etree import ElementTree as ET
@@ -304,5 +306,20 @@ def print_big_header(printlog, message, width):
     printlog(f"{message_and_space:=^{width}}")
     printlog('='*width)
 
+def print_title(logfile, width):
+    printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
+    title = pyfiglet.figlet_format("Brainsss", font="doom" )
+    title_shifted = ('\n').join([' '*43+line for line in title.split('\n')][:-2])
+    printlog(title_shifted)
+    day_now = datetime.datetime.now().strftime("%B %d, %Y")
+    time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
+    printlog(F"{day_now+' | '+time_now:^{width}}")
+    printlog("")
 
-
+def print_footer(logfile,  width):
+    printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
+    sleep(3) # to allow any final printing
+    day_now = datetime.datetime.now().strftime("%B %d, %Y")
+    time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
+    printlog("="*width)
+    printlog(F"{day_now+' | '+time_now:^{width}}")
