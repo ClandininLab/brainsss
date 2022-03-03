@@ -60,9 +60,7 @@ def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=
     if dep != '':
         dep = '--dependency=afterok:{} --kill-on-invalid-dep=yes '.format(dep)
  
-    #command = f'ml {modules}; python3 {script} {json.dumps(json.dumps(args))}'
     command = f'ml {modules}; python3 {script} {json.dumps(json.dumps(args))}'
-
 
     if nice: # For lowering the priority of the job
         nice = 1000000
@@ -72,11 +70,16 @@ def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=
     else:
         node_cmd = ''
 
+    width = 120
+    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+    script_name = os.path.basename(os.path.normpath(script))
+    print_big_header(printlog, script_name, width)
+
     sbatch_command = "sbatch -J {} -o ./com/%j.out -e {} -t {}:00:00 --nice={} --partition=trc {}--open-mode=append --cpus-per-task={} --begin={} --wrap='{}' {}".format(jobname, logfile, time, nice, node_cmd, mem, begin, command, dep)
     sbatch_response = subprocess.getoutput(sbatch_command)
-    width = 120
+    
     if not silence_print:
-        Printlog(logfile=logfile).print_to_log(f"{sbatch_response}{jobname:.>{width-28}}")
+        printlog(f"{sbatch_response}{jobname:.>{width-28}}")
     job_id = sbatch_response.split(' ')[-1].strip()
     return job_id
 
@@ -294,7 +297,12 @@ def get_resolution(xml_file):
                     print('Error')
     return x, y, z
 
-
+def print_big_header(printlog, message, width):
+    message_and_space = '   ' + message.upper() + '   '
+    printlog('\n')
+    printlog('='*width)
+    printlog(f"{message_and_space:=^{width}}")
+    printlog('='*width)
 
 
 
