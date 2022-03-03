@@ -36,7 +36,7 @@ def main(args):
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
 		save_type = 'curr_dir'
-	printlog(F'Dataset_path: {dataset_path}')
+	printlog(F"Dataset path{dataset_path:.>{width-12}}")
 	printlog(F"Brain master{brain_master:.>{width-12}}")
 	printlog(F"Brain mirror{brain_mirror:.>{width-12}}")
 
@@ -69,7 +69,6 @@ def main(args):
 	### Check that files exist ###
 	##############################
 
-
 	filepath_brain_master = os.path.join(dataset_path, brain_master)
 	filepath_brain_mirror = os.path.join(dataset_path, brain_mirror)
 
@@ -100,7 +99,7 @@ def main(args):
 	img_ch1 = nib.load(filepath_brain_master) # this loads a proxy
 	ch1_shape = img_ch1.header.get_data_shape()
 	brain_dims = ch1_shape
-	printlog(F"Master brain shape{brain_dims:.>{width-15}}")
+	printlog(F"Master brain shape{str(brain_dims):.>{width-15}}")
 
 
 	### Try to load meanbrain
