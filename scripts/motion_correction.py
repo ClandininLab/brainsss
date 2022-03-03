@@ -23,6 +23,8 @@ def main(args):
 	### SETUP LOGGING ###
 	#####################
 
+	width = 120
+
 	try:
 		logfile = args['logfile']
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
@@ -34,8 +36,9 @@ def main(args):
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
 		save_type = 'curr_dir'
-	printlog(f'save_type: {save_type}')
-	printlog(F'\nArguments:\ndataset_path: {dataset_path}\nbrain_master: {brain_master}\nbrain_mirror: {brain_mirror}\n')
+	printlog(F'Dataset_path: {dataset_path}')
+	printlog(F"Brain master{brain_master:.>{width-12}}")
+	printlog(F"Brain mirror{brain_mirror:.>{width-12}}")
 
 	######################
 	### PARSE SCANTYPE ###
@@ -58,18 +61,40 @@ def main(args):
 		else:
 			scantype = 'func'
 			stepsize = 100 
-			printlog('scantype not specified. Assuming functional scan and using default stepsize of 100')
-	printlog(F'Scantype is {scantype}. Stepsize is {stepsize}')
+			printlog('*** Could not determine scantype. Using default stepsize of 100 ***')
+	printlog(F"Scantype{brain_master:.>{width-8}}")
+	printlog(F"Stepsize{stepsize:.>{width-8}}")
+
+
 
 	##############################
 	### Check that files exist ###
 	##############################
 
+	filepath_ch1 = os.path.join(dataset_path, brain_master)
+	filepath_ch2 = os.path.join(dataset_path, brain_mirror)
+	if not os.path.exists(filepath_ch1):
+		printlog("Could not find {}".format(filepath_ch1))
+		printlog(F"{'   Aborting Moco   ':*^{width}}")
+		return
+	if not os.path.exists(filepath_ch2):
+		printlog("Could not find {}".format(filepath_ch2))
+		printlog("Will continue without a mirror brain.")
+		filepath_ch2 = None
+
+	printlog("filepath_ch2 is {}".format(filepath_ch2))
+	return
+
+
+
+
+
 	filepath_ch1 = check_for_file(brain_master, dataset_path)
 	filepath_ch2 = check_for_file(brain_mirror, dataset_path)
 	# Abort if no channel 1
 	if filepath_ch1 is None:
-		printlog("Aborting moco - could not find {}".format(brain_master))
+		printlog("Could not find {}".format(filepath_ch1))
+		printlog(F"{'   Aborting Moco   ':*^{width}}")
 		return
 	else:
 		printlog("Channel 1 is: {}".format(filepath_ch1))
