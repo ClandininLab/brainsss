@@ -71,7 +71,7 @@ def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=
         node_cmd = ''
 
     width = 120
-    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+    printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
     script_name = os.path.basename(os.path.normpath(script))
     print_big_header(printlog, script_name, width)
 

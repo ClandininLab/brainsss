@@ -54,7 +54,7 @@ def main(args):
     ### Print Title ###
     ###################
 
-    title = pyfiglet.figlet_format("Brainsss", font="starwars" ) #28 #shimrod
+    title = pyfiglet.figlet_format("Brainsss", font="doom" )
     title_shifted = ('\n').join([' '*28+line for line in title.split('\n')][:-2])
     printlog(title_shifted)
     day_now = datetime.datetime.now().strftime("%B %d, %Y")
@@ -63,8 +63,8 @@ def main(args):
     printlog("")
 
     #printlog("Dataset path: {}".format(dataset_path))
-    printlog("Scripts path: {}".format(scripts_path))
-    printlog("User: {}".format(user))
+    #printlog("Scripts path: {}".format(scripts_path))
+    #printlog("User: {}".format(user))
 
     if build_flies:
 
