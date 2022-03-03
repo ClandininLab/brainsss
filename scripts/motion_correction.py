@@ -110,8 +110,7 @@ def main(args):
 	img_ch1 = nib.load(filepath_brain_master) # this loads a proxy
 	ch1_shape = img_ch1.header.get_data_shape()
 	brain_dims = ch1_shape
-	printlog(F"Master brain shape{str(brain_dims):.>{width-15}}")
-
+	printlog(F"Master brain shape{str(brain_dims):.>{width-18}}")
 
 	### Try to load meanbrain
 	existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
@@ -178,6 +177,7 @@ def main(args):
 	# loop over all brain vols, motion correcting each and insert into hdf5 file on disk
 	#for i in range(brain_dims[-1]):
 	start_time = time()
+	print_timer = time()
 	for j in range(len(steps)-1):
 		#printlog(F"j: {j}")
 
@@ -231,7 +231,10 @@ def main(args):
 					os.remove(x)
 
 			### Print progress ###
-			print_progress_table(total_vol=brain_dims[-1], complete_vol=index, printlog=printlog, start_time=start_time, width=width)
+			print_frequency = 60 # in sec
+			if time()-print_timer > print_frequency:
+				print_timer = time()
+				print_progress_table(total_vol=brain_dims[-1], complete_vol=index, printlog=printlog, start_time=start_time, width=width)
 
 		moco_ch1_chunk = np.moveaxis(np.asarray(moco_ch1_chunk),0,-1)
 		if filepath_brain_mirror is not None:
@@ -248,7 +251,6 @@ def main(args):
 		t0 = time()
 		if filepath_brain_mirror is not None:
 			with h5py.File(savefile_mirror, 'a') as f:
-				#f['data'][...,i] = moco_ch2
 				f['data'][...,steps[j]:steps[j+1]] = moco_ch2_chunk
 			#printlog(F'Ch_2 append time: {time()-t0}')
 
@@ -263,7 +265,6 @@ def main(args):
 	printlog("making moco plot")
 	printlog(F"moco_dir: {moco_dir}")
 	save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, printlog)
-	#printlog("Could not make moco plot, probably can't find xml file to grab image resolution.")
 
 def make_empty_h5(directory, file, brain_dims, save_type):
 	if save_type == 'curr_dir':
