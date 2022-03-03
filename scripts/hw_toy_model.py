@@ -13,7 +13,7 @@ def main(args):
     b = args ['b']
     c = args ['c']
     d = args['d']
-    printlog("{} plus {} is {}".format(a,b,c))
+    printlog("{} {} {} {}".format(a,b,c,d))
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
