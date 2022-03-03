@@ -164,7 +164,7 @@ def main(args):
 	#################################
 	### Perform Motion Correction ###
 	#################################
-	printlog(F"{'   STARTING MOCO   ':~^{width}}")
+	printlog(F"{'   STARTING MOCO   ':-^{width}}")
 	transform_matrix = []
 	
 	### prepare chunks to loop over ###
