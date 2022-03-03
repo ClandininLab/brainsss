@@ -3,7 +3,7 @@
 #SBATCH --partition=trc
 #SBATCH --time=4-00:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=2
 #SBATCH --output=./logs/mainlog.out
 #SBATCH --open-mode=append
 
