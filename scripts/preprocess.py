@@ -46,7 +46,7 @@ def main(args):
     if user == "brezovec":
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
-        build_flies = False # If false, you must provide a list of fly_dirs in dataset_path to process
+        build_flies = True # If false, you must provide a list of fly_dirs in dataset_path to process
         fly_dirs = None#['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
 
 
