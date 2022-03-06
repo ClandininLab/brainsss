@@ -37,7 +37,7 @@ def main(args):
     user = scripts_path.split('/')[3]
 
     '''
-    is user == "example":
+    if user == "example":
         imports_path: directory where brukerbridge dumps data. This path is only used if build_flies = True
         dataset_path: directory where files to be processed are
         ... in progress
@@ -47,10 +47,6 @@ def main(args):
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
         build_flies = True # If false, you must provide a list of fly_dirs in dataset_path to process
         fly_dirs = None#['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
-
-    #printlog("Dataset path: {}".format(dataset_path))
-    #printlog("Scripts path: {}".format(scripts_path))
-    #printlog("User: {}".format(user))
 
     if build_flies:
 
