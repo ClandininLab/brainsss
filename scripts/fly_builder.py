@@ -634,6 +634,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
         fly_data = load_json(fly_file)
     except:
         printlog("FYI no *expt.json* found; this will not be logged in your excel sheet.")
+        fly_data = {}
         fly_data['circadian_on'] = None
         fly_data['circadian_off'] = None
         fly_data['gender'] = None
@@ -654,6 +655,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
             expt_data = load_json(expt_file)
         except:
             printlog("FYI no *expt.json* found; this will not be logged in your excel sheet.")
+            expt_data = {}
             expt_data['brain_area'] = None
             expt_data['notes'] = None
             expt_data['time'] = None
@@ -666,6 +668,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
             scan_data['y_voxel_size'] = '{:.1f}'.format(scan_data['y_voxel_size'])
             scan_data['z_voxel_size'] = '{:.1f}'.format(scan_data['z_voxel_size'])
         except:
+            scan_data = {}
             scan_data['laser_power'] = None
             scan_data['PMT_green'] = None
             scan_data['PMT_red'] = None
