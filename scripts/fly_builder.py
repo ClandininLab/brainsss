@@ -68,7 +68,7 @@ def main(args):
             add_date_to_fly(destination_fly)
 
             # Add json metadata to master dataset
-            add_fly_to_xlsx(destination_fly)
+            add_fly_to_xlsx(destination_fly, printlog)
 
 def add_date_to_fly(destination_fly):
     ''' get date from xml file and add to fly.json'''
@@ -617,7 +617,7 @@ def add_times_to_jsons(destination_fly):
     for func_folder in func_folders:
         pass
 
-def add_fly_to_xlsx(fly_folder):
+def add_fly_to_xlsx(fly_folder, printlog):
 
     ### TRY TO LOAD ELSX ###
     try:

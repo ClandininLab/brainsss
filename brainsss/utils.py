@@ -310,6 +310,7 @@ def print_title(logfile, width):
     printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
     title = pyfiglet.figlet_format("Brainsss", font="doom" )
     title_shifted = ('\n').join([' '*42+line for line in title.split('\n')][:-2])
+    printlog("\n")
     printlog(title_shifted)
     day_now = datetime.datetime.now().strftime("%B %d, %Y")
     time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
