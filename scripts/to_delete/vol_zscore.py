@@ -62,7 +62,6 @@ def main(args):
             total = s + total
         final_std = np.sqrt(total/len(data_ch2[-1]))
 
-
         #calculate zscore
         for i in range(dims[-1]):
             each_zscore = (data_ch2[:,:,:,i] - meanbrain)/final_std

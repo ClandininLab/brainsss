@@ -66,7 +66,7 @@ def main(args):
 		if 'func' in brain_master:
 			scantype = 'func'
 			stepsize = 100 
-		if 'anat' in brain_master:
+		elif 'anat' in brain_master:
 			scantype = 'anat'
 			stepsize = 10
 		else:
