@@ -3,7 +3,33 @@ Preprocessing of volumetric neural data on sherlock (motion correction, zscoring
 
 At its core, brainsss is a wrapper to interface with Slurm via python. It can handle complex submission of batches of jobs with job dependencies and makes it easy to pass variables between jobs. It also has full logging of job progress, output, and errors.
 
-For clarity, this package currently only contains a few functions to demonstrate its usage (and includes some demo data). One function that may be particularly useful is motion correction.
+There are currently two main ways to use this package:
+1) Adopt a specific fly directory structure so you can take advantage of the entire pipeline automation
+
+Your imaging data should be saved like:
+    
+```
+/experiment_folder
+    /fly_num
+        /func_num
+             functional imaging data
+        /anat_num
+             anatomical imaging data
+```
+
+So for me an imaging day might look like:
+    
+```
+/20220307
+    /fly_0
+         /func_0
+         /anat_0
+    /fly_1
+        /func_0
+        /anat_0
+```
+
+-This should be uploaded to your imports folder on Oak (probably via BrukerBridge)
 
 Installing the package:
 Log onto sherlock (ssh sunetid@login.sherlock.stanford.edu)  
@@ -20,16 +46,18 @@ Navigate to where you would like to install this package, then:
 > ml python/3.6.1
 > pip3 install -e . --user
 ```
-change the paths:  
-  - in scripts/main.sh, line 13 must point to scripts/main.py
-  - in scripts/main.py, scripts_path, com_path, and dataset_path must be set
+Add yourself as a user:  
+- See top of preprocess.py script. Add your details under a username that matches your stanford ID
+- Imports path is where flies will be built from
 
 Install required python packages:
-  - ```ml python/3.6.1```
-  - ```pip3 install pyfiglet```
-  - ```pip3 install psutil```
+```shell
+  > ml python/3.6.1
+  > pip3 install pyfiglet
+  > pip3 install psutil
+```
 
-Running the demo:  
+Running the demo (Broken in current version. Will fix at some point.):  
 ```shell
 cd scripts
 sbatch main.sh
@@ -48,15 +76,6 @@ Upon completion, the demo_data directory should contain some new files:
 - /fly_001/fictrac will contain a velocity trace and a 2D histogram
 - /fly_001 will contain a "bleaching" figure, the meanbrains for each channel, as well as the z-scored motion-corrected green-channel brain
 - /fly_001/moco will contain each channel motion corrected, as well as a figure of x/y/z translations involved in the motion correction.
-
-A few notes on parameters:  
-- this toy data set only contains 10 timepoints, giving arrays of [256,128,49,10] (x,y,z,t).
-- A more standard functional array will be [256,128,49,3384], for which I recommend during moco:
-  - partials: step=100, mem=4, time_moco=4
-  - stitcher: mem=12, time=2
-- For an anatomical volume, of roughly [1024,512,200,100], I recommend:
-  - step=10, mem=7, time_moco=6
-- for z-scoring these large functional volumes, I recommend mem=18
 
 A note that should be mentioned: to achieve creation of a common log file, I have stolen the print() function. So, for anything you want to print, you must use the printlog() function, but otherwise it is the same.
 
