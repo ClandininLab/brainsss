@@ -314,7 +314,6 @@ def print_title(logfile, width):
     day_now = datetime.datetime.now().strftime("%B %d, %Y")
     time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
     printlog(F"{day_now+' | '+time_now:^{width}}")
-    printlog("")
 
 def print_footer(logfile,  width):
     printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
