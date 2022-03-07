@@ -305,7 +305,8 @@ def copy_visual(destination_region, printlog):
         json.dump(unique_stimuli, f, indent=4)
 
 def copy_fictrac(destination_region, printlog):
-    fictrac_folder = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/fictrac'
+    #fictrac_folder = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/fictrac'
+    fictrac_folder = "/oak/stanford/groups/trc/data/fictrac"
     fictrac_destination = os.path.join(destination_region, 'fictrac')
 
     # Find time of experiment based on functional.xml
@@ -618,27 +619,46 @@ def add_times_to_jsons(destination_fly):
 
 def add_fly_to_xlsx(fly_folder):
 
-    # Load xlsx
-    xlsx_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset/master_2P.xlsx'
-    wb = load_workbook(filename=xlsx_path, read_only=False)
-    ws = wb.active
+    ### TRY TO LOAD ELSX ###
+    try:
+        xlsx_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset/master_2P.xlsx'
+        wb = load_workbook(filename=xlsx_path, read_only=False)
+        ws = wb.active
+    except:
+        printlog("FYI you have no excel metadata sheet found, so unable to append metadata for this fly.")
+        return
 
-    # If no fly.json, just skip (atleast one fly in empty for some reason)
+    ### TRY TO LOAD FLY METADATA ###
     try:
         fly_file = os.path.join(fly_folder, 'fly.json')
         fly_data = load_json(fly_file)
     except:
-        return
+        printlog("FYI no *expt.json* found; this will not be logged in your excel sheet.")
+        fly_data['circadian_on'] = None
+        fly_data['circadian_off'] = None
+        fly_data['gender'] = None
+        fly_data['age'] = None
+        fly_data['temp'] = None
+        fly_data['notes'] = None
+        fly_data['date'] = None
+        fly_data['genotype'] = None
 
     expt_folders = []
     expt_folders = [os.path.join(fly_folder,x) for x in os.listdir(fly_folder) if 'func' in x]
     brainsss.sort_nicely(expt_folders)
     for expt_folder in expt_folders:
 
-        expt_file = os.path.join(expt_folder, 'expt.json')
-        expt_data = load_json(expt_file)
+        ### TRY TO LOAD EXPT METADATA ###
+        try:
+            expt_file = os.path.join(expt_folder, 'expt.json')
+            expt_data = load_json(expt_file)
+        except:
+            printlog("FYI no *expt.json* found; this will not be logged in your excel sheet.")
+            expt_data['brain_area'] = None
+            expt_data['notes'] = None
+            expt_data['time'] = None
 
-        # Occasionally a fly may not have an imaging folder (if only fictrac was recorded for example)
+        ### TRY TO LOAD SCAN DATA ###
         try:
             scan_file = os.path.join(expt_folder, 'imaging', 'scan.json')
             scan_data = load_json(scan_file)
