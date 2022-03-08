@@ -234,9 +234,9 @@ def main(args):
 			elapsed_time = time() - start_time
 			if elapsed_time < 1*60: # if less than 1 min has elapsed
 				print_frequency = 1 # print every sec if possible, but will be every vol
-			elif elapsed_time < 5*60
+			elif elapsed_time < 5*60:
 				print_frequency = 1*60
-			elif elapsed_time < 30*60
+			elif elapsed_time < 30*60:
 				print_frequency = 5*60
 			else:
 				print_frequency = 60*60
