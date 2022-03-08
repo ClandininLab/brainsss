@@ -60,7 +60,7 @@ def main(args):
 		if scantype == 'func':
 			stepsize = 100 # if this is too high if may crash from memory error. If too low it will be slow.
 		if scantype == 'anat':
-			stepsize = 10
+			stepsize = 5
 	except:
 		# try to extract from file name
 		if 'func' in brain_master:
@@ -68,7 +68,7 @@ def main(args):
 			stepsize = 100 
 		elif 'anat' in brain_master:
 			scantype = 'anat'
-			stepsize = 10
+			stepsize = 5
 		else:
 			scantype = 'func'
 			stepsize = 100 
