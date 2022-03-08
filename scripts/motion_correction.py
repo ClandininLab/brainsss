@@ -231,8 +231,16 @@ def main(args):
 					os.remove(x)
 
 			### Print progress ###
-			print_frequency = 5*60 # every 5min
-			if time()-print_timer > print_frequency:
+			elapsed_time = time() - start_time
+			if elapsed_time < 1*60: # if less than 1 min has elapsed
+				print_frequency = 1 # print every sec if possible, but will be every vol
+			elif elapsed_time < 5*60
+				print_frequency = 1*60
+			elif elapsed_time < 30*60
+				print_frequency = 5*60
+			else:
+				print_frequency = 60*60
+			if time() - print_timer > print_frequency:
 				print_timer = time()
 				print_progress_table(total_vol=brain_dims[-1], complete_vol=index, printlog=printlog, start_time=start_time, width=width)
 
