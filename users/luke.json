@@ -1,4 +1,6 @@
 {
-    "repo_path": "/home/users/brezovec/projects/brainsss",
-    "data_path": "/home/users/brezovec/projects/brainsss/demo_data"
+    "imports_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue",
+    "dataset_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset",
+    "build_flies": "True",
+
 }

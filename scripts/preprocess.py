@@ -44,6 +44,14 @@ def main(args):
     motion_correction = False
 
 
+    # if user + '.json' in [x.lower() for x in os.listdir(users_directory)]:
+    #     json_file = os.path.join(users_directory, user + '.json')
+    #     with open(json_file) as file:
+    #         settings = json.load(file)
+    # print(settings) # remove
+    # oak_target = settings['oak_target']
+    # convert_to = settings['convert_to']
+
     '''
     if user == "example":
         imports_path: directory where brukerbridge dumps data. This path is only used if build_flies = True
