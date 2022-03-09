@@ -130,7 +130,7 @@ def main(args):
         ##########################
 
         for func in funcs:
-            args = {'logfile': logfile, 'func_path': func_path}
+            args = {'logfile': logfile, 'func_path': func}
             script = 'stim_triggered_avg_beh.py'
             job_id = brainsss.sbatch(jobname='stim',
                                  script=os.path.join(scripts_path, script),
