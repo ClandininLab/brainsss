@@ -26,11 +26,12 @@ def main(args):
 	fname = [x for x in os.listdir(vision_path) if '.hdf5' in x][0]
 	visprotocol_file = os.path.join(vision_path, fname)
 
-	try:
-		stim_ids, angles = brainsss.get_metadata_from_visprotocol(visprotocol_file, 'series_001')
-	#printlog(F"Found {len(stim_ids)} presented stimuli.")
-	except:
-		printlog("series_001 failed, trying series_002")
+	#try:
+	stim_ids, angles = brainsss.get_metadata_from_visprotocol(visprotocol_file, 'series_001')
+	printlog(F"Found {len(stim_ids)} presented stimuli.")
+
+	if len(stim_ids) < 100:
+		printlog("series_001 is wrong, trying series_002")
 		# this is wrong series, for now just try grabbing series 2
 		stim_ids, angles = brainsss.get_metadata_from_visprotocol(visprotocol_file, 'series_002')
 		printlog(F"Found {len(stim_ids)} presented stimuli.")
