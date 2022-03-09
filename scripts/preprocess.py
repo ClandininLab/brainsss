@@ -46,8 +46,8 @@ def main(args):
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
         build_flies = False # If false, you must provide a list of fly_dirs in dataset_path to process
-        fly_dirs = ['fly_132', 'fly_133'] #['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
-        
+        fly_dirs = ['fly_132', 'fly_133', 'fly_134'] #['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
+
 
     if build_flies:
 
@@ -112,6 +112,20 @@ def main(args):
     # for job_id in job_ids:
     #     brainsss.wait_for_job(job_id, logfile, com_path)
 
+    ##########################
+    ### Stim Triggered Beh ###
+    ##########################
+
+    for func in funcs:
+        args = {'logfile': logfile, 'func_path': func_path}
+        script = 'stim_triggered_avg_beh.py'
+        job_id = brainsss.sbatch(jobname='stim',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+        brainsss.wait_for_job(job_id, logfile, com_path)
+
     # ####################
     # ### Bleaching QC ###
     # ####################
@@ -153,29 +167,29 @@ def main(args):
     ### Motion Correction ###
     #########################
 
-    for funcanat, dirtype in zip(funcanats, dirtypes):
+    # for funcanat, dirtype in zip(funcanats, dirtypes):
 
-        directory = os.path.join(funcanat, 'imaging')
-        if dirtype == 'func':
-            brain_master = 'functional_channel_1.nii'
-            brain_mirror = 'functional_channel_2.nii'
-        if dirtype == 'anat':
-            brain_master = 'anatomy_channel_1.nii'
-            brain_mirror = 'anatomy_channel_2.nii'
+    #     directory = os.path.join(funcanat, 'imaging')
+    #     if dirtype == 'func':
+    #         brain_master = 'functional_channel_1.nii'
+    #         brain_mirror = 'functional_channel_2.nii'
+    #     if dirtype == 'anat':
+    #         brain_master = 'anatomy_channel_1.nii'
+    #         brain_mirror = 'anatomy_channel_2.nii'
 
-        args = {'logfile': logfile,
-                'directory': directory,
-                'brain_master': brain_master,
-                'brain_mirror': brain_mirror,
-                'scantype': dirtype}
+    #     args = {'logfile': logfile,
+    #             'directory': directory,
+    #             'brain_master': brain_master,
+    #             'brain_mirror': brain_mirror,
+    #             'scantype': dirtype}
 
-        script = 'motion_correction.py'
-        job_id = brainsss.sbatch(jobname='moco',
-                             script=os.path.join(scripts_path, script),
-                             modules=modules,
-                             args=args,
-                             logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
-        brainsss.wait_for_job(job_id, logfile, com_path)
+    #     script = 'motion_correction.py'
+    #     job_id = brainsss.sbatch(jobname='moco',
+    #                          script=os.path.join(scripts_path, script),
+    #                          modules=modules,
+    #                          args=args,
+    #                          logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
+    #     brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###
