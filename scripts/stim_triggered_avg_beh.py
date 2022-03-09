@@ -56,7 +56,7 @@ def main(args):
 	for behavior in behaviors:
 		if behavior == 'dRotLabY': short = 'Y'
 		elif behavior == 'dRotLabZ': short = 'Z'
-		fictrac[short] = smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, behavior)
+		fictrac[short] = brainsss.smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, behavior)
 	xnew = np.arange(0,expt_len,resolution)
 
 	##################
