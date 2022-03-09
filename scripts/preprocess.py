@@ -60,7 +60,7 @@ def main(args):
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
         build_flies = False # If false, you must provide a list of fly_dirs in dataset_path to process
-        fly_dirs = ['fly_132']#, 'fly_133', 'fly_134'] #['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
+        fly_dirs = ['fly_132'] #, 'fly_133', 'fly_134'] #['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
         stim_triggered_beh = True
 
 
