@@ -1,6 +1,10 @@
 {
     "imports_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue",
     "dataset_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset",
-    "build_flies": "True",
-
+    "build_flies": "False",
+    "fictrac_qc": "False",
+    "stim_triggered_beh": "False",
+    "bleaching_qc": "False",
+    "temporal_mean_brain": "False",
+    "motion_correction": "False"
 }

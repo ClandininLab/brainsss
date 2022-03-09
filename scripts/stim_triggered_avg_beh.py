@@ -20,7 +20,7 @@ def main(args):
 	### Load Photodiode ###
 	t, ft_triggers, pd1, pd2 = brainsss.load_photodiode(vision_path)
 
-	stimulus_start_times = brainsss.extract_stim_times_from_pd(photodiode_trace, time_vector)
+	stimulus_start_times = brainsss.extract_stim_times_from_pd(pd2, time_vector)
 
 	### Get Metadata ###
 	fname = [x for x in os.listdir(vision_path) if '.hdf5' in x][0]

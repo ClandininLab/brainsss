@@ -43,15 +43,13 @@ def main(args):
     temporal_mean_brain = False
     motion_correction = False
 
-    # def load_user_settings(user, scripts_path):
-    #     users_directory = os.path.join(os.path.dirname(scripts_path), 'users')
-    #     if user + '.json' in [x.lower() for x in os.listdir(users_directory)]:
-    #         json_file = os.path.join(users_directory, user + '.json')
-    #         with open(json_file) as file:
-    #             settings = json.load(file)
-    #     print(settings) # remove
-    #     oak_target = settings['oak_target']
-    #     convert_to = settings['convert_to']
+    def load_user_settings(user, scripts_path):
+        user_file = os.path.join(os.path.dirname(scripts_path), 'users', user + '.json')
+        with open(json_file) as file:
+            settings = json.load(file)
+        imports_path = settings['imports_path']
+        dataset_path = settings['dataset_path']
+        
 
     '''
     if user == "example":
