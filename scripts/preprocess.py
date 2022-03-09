@@ -49,7 +49,6 @@ def main(args):
             settings = json.load(file)
         imports_path = settings['imports_path']
         dataset_path = settings['dataset_path']
-        
 
     '''
     if user == "example":
@@ -143,7 +142,7 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+                                 logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if bleaching_qc:
