@@ -87,7 +87,7 @@ def get_metadata_from_visprotocol(file, series):
 	stim_ids = []
 	angles = []
 	with h5py.File(file, 'r') as f:
-		series = list(f['Flies']['0']['epoch_runs'].keys())
+		#series = list(f['Flies']['0']['epoch_runs'].keys())
 		epoch_ids = f['Flies']['0']['epoch_runs'][series].get('epochs').keys()
 		print(len(epoch_ids))
 		for i, epoch_id in enumerate(epoch_ids):
