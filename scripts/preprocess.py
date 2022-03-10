@@ -28,9 +28,9 @@ def main(args):
     sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
     brainsss.print_title(logfile, width)
 
-    ###################
-    ### Setup paths ###
-    ###################
+    #############################
+    ### Parse input arguments ###
+    #############################
 
     printlog(str(args))
     printlog("PWD: {}".format(args['PWD']))
