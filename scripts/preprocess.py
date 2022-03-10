@@ -51,7 +51,7 @@ def main(args):
 
     def load_user_settings(user, scripts_path):
         user_file = os.path.join(os.path.dirname(scripts_path), 'users', user + '.json')
-        with open(json_file) as file:
+        with open(user_file) as file:
             settings = json.load(file)
         return settings
         #imports_path = settings['imports_path']
