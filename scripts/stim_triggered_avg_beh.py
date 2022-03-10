@@ -93,7 +93,7 @@ def plot_avg_trace(fictrac, starts_angle_0, starts_angle_180, vision_path):
 	plt.ylabel('Angular Velocity')
 
 	name = 'stim_triggered_turning.png'
-	fname = os.path.join(fictrac_folder, name)
+	fname = os.path.join(vision_path, name)
 	plt.savefig(fname,dpi=100,bbox_inches='tight')
 
 if __name__ == '__main__':
