@@ -34,3 +34,4 @@ set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 echo "FILE EXTENSION  = ${EXTENSION}"
 echo "SEARCH PATH     = ${SEARCHPATH}"
 echo "DEFAULT         = ${DEFAULT}"
+echo "POSITIONAL_ARGS = ${POSITIONAL_ARGS"
