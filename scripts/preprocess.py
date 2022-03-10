@@ -32,9 +32,14 @@ def main(args):
     ### Setup paths ###
     ###################
 
-    scripts_path = args.PWD
-    com_path = os.path.join(scripts_path, 'com')
-    user = scripts_path.split('/')[3]
+    printlog(args)
+
+    printlog("PWD: {}".format(args['PWD']))
+    printlog("FLIES: {}".format(args['FLIES']))
+
+    # scripts_path = args.PWD
+    # com_path = os.path.join(scripts_path, 'com')
+    # user = scripts_path.split('/')[3]
 
     build_flies = False
     fictrac_qc = False
@@ -56,7 +61,7 @@ def main(args):
         dataset_path: directory where files to be processed are
         ... in progress
     '''
-    
+
     if user == "brezovec":
         imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
         dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
@@ -224,7 +229,8 @@ def main(args):
     brainsss.print_footer(logfile, width)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("PWD") 
-    args = parser.parse_args()
-    main(args)
+    main(json.loads(sys.argv[1]))
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("PWD") 
+    # args = parser.parse_args()
+    # main(args)
