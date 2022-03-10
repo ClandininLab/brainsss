@@ -83,19 +83,19 @@ def load_photodiode(vision_path):
 		t, ft_triggers, pd1, pd2 = load_h5py_pd_data(vision_path)
 	return t, ft_triggers, pd1, pd2
 
-def get_metadata_from_visprotocol(file, series):
+def get_metadata_from_visprotocol(file, series, printlog):
 	stim_ids = []
 	angles = []
 	with h5py.File(file, 'r') as f:
 
 		fly_ids = list(f['Flies'].keys())
-		print("Found fly ids: {}".format(fly_ids))
+		printlog("Found fly ids: {}".format(fly_ids))
 		if len(fly_ids) > 1:
-			print("More than one fly in hdf5, taking last fly.")
+			printlog("More than one fly in hdf5, taking last fly.")
 		fly_id = fly_ids[-1]
 
 		epoch_ids = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').keys()
-		print(len(epoch_ids))
+		printlog(len(epoch_ids))
 		for i, epoch_id in enumerate(epoch_ids):
 			stim_id = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').get(epoch_id).attrs['component_stim_type']
 			stim_ids.append(stim_id)
