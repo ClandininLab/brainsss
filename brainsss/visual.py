@@ -87,14 +87,20 @@ def get_metadata_from_visprotocol(file, series):
 	stim_ids = []
 	angles = []
 	with h5py.File(file, 'r') as f:
-		#series = list(f['Flies']['0']['epoch_runs'].keys())
-		epoch_ids = f['Flies']['0']['epoch_runs'][series].get('epochs').keys()
+
+	    fly_ids = list(f['Flies'].keys())
+	    print("Found fly ids: {}".format(fly_ids))
+	    if len(fly_ids) > 1:
+	        print("More than one fly in hdf5, taking last fly.")
+	    fly_id = fly_ids[-1]
+
+		epoch_ids = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').keys()
 		print(len(epoch_ids))
 		for i, epoch_id in enumerate(epoch_ids):
-			stim_id = f['Flies']['0']['epoch_runs'][series].get('epochs').get(epoch_id).attrs['component_stim_type']
+			stim_id = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').get(epoch_id).attrs['component_stim_type']
 			stim_ids.append(stim_id)
 			if stim_id == 'DriftingSquareGrating':
-				angle = f['Flies']['0']['epoch_runs'][series].get('epochs').get(epoch_id).attrs['angle']
+				angle = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').get(epoch_id).attrs['angle']
 				angles.append(angle)
 				#starts.append(stimulus_start_times[i])
 			else:
