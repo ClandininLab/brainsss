@@ -24,8 +24,24 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
-    -d|--default)
-      DEFAULT=YES
+    -m|--moco)
+      MOCO=True
+      shift # past argument
+      ;;
+    --fictrac_qc)
+      FICTRAC_QC=True
+      shift # past argument
+      ;;
+    --STB) # stimulus triggered behavior
+      STB=True
+      shift # past argument
+      ;;
+    --bleaching_qc) # stimulus triggered behavior
+      BLEACHING_QC=True
+      shift # past argument
+      ;;
+    --temporal_mean_brain) # stimulus triggered behavior
+      TEMPORAL_MEAN_BRAIN=True
       shift # past argument
       ;;
     -*|--*)
@@ -40,7 +56,7 @@ echo "FLIES       = ${FLIES}"
 echo "DIRTYPE     = ${DIRTYPE}"
 echo "DEFAULT     = ${DEFAULT}"
 
-ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\"}"
+ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\"MOCO\":\"$MOCO\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN\":\"$TEMPORAL_MEAN_BRAIN\"}"
 
 ml python/3.6
 date
