@@ -42,62 +42,50 @@ def main(args):
 
     ### Parse user settings ###
 
+    imports_path = settings['imports_path']
+    dataset_path = settings['dataset_path']
     fictrac_qc = brainsss.parse_true_false(settings['fictrac_qc'])
     stim_triggered_beh = brainsss.parse_true_false(settings['stim_triggered_beh'])
     bleaching_qc = brainsss.parse_true_false(settings['bleaching_qc'])
     temporal_mean_brain = brainsss.parse_true_false(settings['temporal_mean_brain'])
     motion_correction = brainsss.parse_true_false(settings['motion_correction'])
 
-    printlog(F"{fictrac_qc} {stim_triggered_beh}")
-
     ### Parse command line arguments ###
 
     if args['BUILDFLIES'] == '':
         printlog('not building flies')
+        build_flies = False
     else:
-        build_flies = True
         printlog('building flies')
+        build_flies = True
+        dir_to_build = args['BUILDFLIES']
+        
     
     if args['FLIES'] == '':
         printlog('no flies specified')
+        fly_dirs = None
     else:
-        printlog('flies are {}'.format(args['FLIES']))
+        fly_dirs = args['FLIES'].split('.')
+        printlog('flies are {}'.format(fly_dirs))
+        printlog('fly 1 is {}'.format(fly_dirs[0]))
+
 
     if args['DIRTYPE'] == '':
         printlog('no dirtype specified')
     else:
         printlog('dirtype is {}'.format(args['DIRTYPE']))
 
+
+    printlog(os.path.join(imports_path, dir_to_build))
     # printlog(str(args))
     # printlog("PWD: {}".format(args['PWD']))
     # printlog("FLIES: {}".format(args['FLIES']))
     # printlog("FLIES single: {}".format(args['FLIES'][0]))
     # printlog("DIRTYPE: {}".format(args['DIRTYPE']))
 
-
-
-
-
-
-        #imports_path = settings['imports_path']
-        #dataset_path = settings['dataset_path']
-
-    #printlog(str(settings))
-
-    '''
-    if user == "example":
-        imports_path: directory where brukerbridge dumps data. This path is only used if build_flies = True
-        dataset_path: directory where files to be processed are
-        ... in progress
-    '''
-
-    # if user == "brezovec":
-    #     imports_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/build_queue"
-    #     dataset_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset"
-    #     build_flies = False # If false, you must provide a list of fly_dirs in dataset_path to process
-    #     fly_dirs = ['fly_133', 'fly_134'] #, 'fly_133', 'fly_134'] #['fly_123']#None#['fly_111'] # Set to None, or a list of fly dirs in dataset_path
-    #     stim_triggered_beh = False
-
+    #################################
+    ############# BEGIN #############
+    #################################
 
     # if build_flies:
 
@@ -105,20 +93,21 @@ def main(args):
     #     ### CHECK FOR FLAG ###
     #     ######################
 
-    #     args = {'logfile': logfile, 'imports_path': imports_path}
-    #     script = 'check_for_flag.py'
-    #     job_id = brainsss.sbatch(jobname='flagchk',
-    #                          script=os.path.join(scripts_path, script),
-    #                          modules=modules,
-    #                          args=args,
-    #                          logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
-    #     flagged_dir = brainsss.wait_for_job(job_id, logfile, com_path)
+    #     # args = {'logfile': logfile, 'imports_path': imports_path}
+    #     # script = 'check_for_flag.py'
+    #     # job_id = brainsss.sbatch(jobname='flagchk',
+    #     #                      script=os.path.join(scripts_path, script),
+    #     #                      modules=modules,
+    #     #                      args=args,
+    #     #                      logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+    #     # flagged_dir = brainsss.wait_for_job(job_id, logfile, com_path)
 
     #     ###################
     #     ### Build flies ###
     #     ###################
 
-    #     args = {'logfile': logfile, 'flagged_dir': flagged_dir.strip('\n'), 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
+    #     flagged_dir = os.path.join(imports_path, dir_to_build)
+    #     args = {'logfile': logfile, 'flagged_dir': flagged_dir, 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
     #     script = 'fly_builder.py'
     #     job_id = brainsss.sbatch(jobname='bldfly',
     #                          script=os.path.join(scripts_path, script),
