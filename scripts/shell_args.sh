@@ -1,14 +1,26 @@
 #!/bin/bash
+#SBATCH --job-name=prepro
+#SBATCH --partition=trc
+#SBATCH --time=4-00:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --output=./logs/mainlog.out
+#SBATCH --open-mode=append
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    -e|--extension)
-      EXTENSION="$2"
+    -b|--build_flies)
+      BUILDFLIES="$2"
       shift # past argument
       shift # past value
       ;;
-    -s|--searchpath)
-      SEARCHPATH="$2"
+    -f|--flies)
+      FLIES="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -d|--dirtype)
+      DIRTYPE="$2"
       shift # past argument
       shift # past value
       ;;
@@ -23,6 +35,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "FILE EXTENSION  = ${EXTENSION}"
-echo "SEARCH PATH     = ${SEARCHPATH}"
-echo "DEFAULT         = ${DEFAULT}"
+echo "BUILDFLIES  = ${BUILDFLIES}"
+echo "FLIES       = ${FLIES}"
+echo "DIRTYPE     = ${DIRTYPE}"
+echo "DEFAULT     = ${DEFAULT}"
+
+ml python/3.6
+date
+python3 -u ./preprocess.py $PWD
