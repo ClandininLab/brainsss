@@ -32,7 +32,7 @@ def main(args):
     ### Setup paths ###
     ###################
 
-    printlog(args)
+    printlog(str(args))
 
     printlog("PWD: {}".format(args['PWD']))
     printlog("FLIES: {}".format(args['FLIES']))
