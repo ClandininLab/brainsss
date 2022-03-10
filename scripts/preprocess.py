@@ -33,9 +33,10 @@ def main(args):
     ###################
 
     printlog(str(args))
-
     printlog("PWD: {}".format(args['PWD']))
     printlog("FLIES: {}".format(args['FLIES']))
+    printlog("FLIES single: {}".format(args['FLIES'][0]))
+    printlog("DIRTYPE: {}".format(args['DIRTYPE']))
 
     # scripts_path = args.PWD
     # com_path = os.path.join(scripts_path, 'com')
