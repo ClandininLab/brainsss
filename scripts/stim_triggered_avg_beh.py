@@ -27,6 +27,7 @@ def main(args):
 	visprotocol_file = os.path.join(vision_path, fname)
 
 	#try:
+	printlog(F"Looking for {visprotocol_file}")
 	stim_ids, angles = brainsss.get_metadata_from_visprotocol(visprotocol_file, 'series_001')
 	printlog(F"Found {len(stim_ids)} presented stimuli.")
 
@@ -62,10 +63,10 @@ def main(args):
 	##################
 	### MAKE PLOTS ###
 	##################
-	plot_avg_trace(fictrac, starts_angle_0, starts_angle_180, vision_path)
+	plot_avg_trace(fictrac, starts_angle_0, starts_angle_180, vision_path, printlog)
 
 
-def plot_avg_trace(fictrac, starts_angle_0, starts_angle_180, vision_path):
+def plot_avg_trace(fictrac, starts_angle_0, starts_angle_180, vision_path, printlog):
 	pre_window = 200 # in units of 10ms
 	post_window = 300
 
@@ -95,6 +96,7 @@ def plot_avg_trace(fictrac, starts_angle_0, starts_angle_180, vision_path):
 	name = 'stim_triggered_turning.png'
 	fname = os.path.join(vision_path, name)
 	plt.savefig(fname,dpi=100,bbox_inches='tight')
+	printlog(F"saved {fname}")
 
 if __name__ == '__main__':
 	main(json.loads(sys.argv[1]))
