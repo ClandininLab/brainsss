@@ -38,9 +38,9 @@ def main(args):
     printlog("FLIES single: {}".format(args['FLIES'][0]))
     printlog("DIRTYPE: {}".format(args['DIRTYPE']))
 
-    # scripts_path = args.PWD
-    # com_path = os.path.join(scripts_path, 'com')
-    # user = scripts_path.split('/')[3]
+    scripts_path = args['PWD']
+    com_path = os.path.join(scripts_path, 'com')
+    user = scripts_path.split('/')[3]
 
     build_flies = False
     fictrac_qc = False
@@ -53,8 +53,12 @@ def main(args):
         user_file = os.path.join(os.path.dirname(scripts_path), 'users', user + '.json')
         with open(json_file) as file:
             settings = json.load(file)
-        imports_path = settings['imports_path']
-        dataset_path = settings['dataset_path']
+        return settings
+        #imports_path = settings['imports_path']
+        #dataset_path = settings['dataset_path']
+
+    settings = load_user_settings(user, scripts_path)
+    printlog(settings)
 
     '''
     if user == "example":
