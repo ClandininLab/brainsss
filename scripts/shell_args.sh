@@ -40,6 +40,8 @@ echo "FLIES       = ${FLIES}"
 echo "DIRTYPE     = ${DIRTYPE}"
 echo "DEFAULT     = ${DEFAULT}"
 
-# ml python/3.6
-# date
-# python3 -u ./preprocess.py $PWD
+ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\"}"
+
+ml python/3.6
+date
+python3 -u ./preprocess.py $ARGS
