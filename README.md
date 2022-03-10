@@ -1,7 +1,35 @@
 # brainsss
-Preprocessing of volumetric neural data on sherlock (motion correction, zscoring, etc)
+This package performs preprocessing and analysis of volumetric neural data on sherlock. At its core, brainsss is a wrapper to interface with Slurm via python. It can handle complex submission of batches of jobs with job dependencies and makes it easy to pass variables between jobs. It also has full logging of job progress, output, and errors.
 
-At its core, brainsss is a wrapper to interface with Slurm via python. It can handle complex submission of batches of jobs with job dependencies and makes it easy to pass variables between jobs. It also has full logging of job progress, output, and errors.
+## Installing:
+
+Log onto sherlock (ssh sunetid@login.sherlock.stanford.edu)  
+Add our lab's custom modules to you modulepath (allows access to ANTs, a brain-warping tool) by adding  
+```export MODULEPATH=/home/groups/trc/modules:$MODULEPATH``` to your
+```~/.bashrc```  
+you will need to source to load the changes:  
+```source ~/.bashrc```
+
+Navigate to where you would like to install this package, then:  
+```shell
+> git clone https://github.com/ClandininLab/brainsss.git
+> cd brainsss
+> ml python/3.6.1
+> pip3 install -e . --user
+```
+
+Install required python packages:
+```shell
+  > pip3 install pyfiglet
+  > pip3 install psutil
+```
+
+Create your user preferences:  
+- Navigate to /brainsss/users
+- Copy existing brezovec.json file
+- rename with your sunetid and adjust preferences as you desire (more info about variables below)
+
+## Usage:
 
 There are currently two main ways to use this package:
 1) Adopt a specific fly directory structure so you can take advantage of the entire pipeline automation
@@ -30,32 +58,6 @@ So for me an imaging day might look like:
 ```
 
 -This should be uploaded to your imports folder on Oak (probably via BrukerBridge)
-
-Installing the package:
-Log onto sherlock (ssh sunetid@login.sherlock.stanford.edu)  
-Add our lab's custom modules to you modulepath (allows access to ANTs, a brain-warping tool) by adding:  
-```export MODULEPATH=/home/groups/trc/modules:$MODULEPATH``` to your
-```~/.bashrc```  
-you will need to source to load the changes:  
-```source ~/.bashrc```
-
-Navigate to where you would like to install this package, then:  
-```shell
-> git clone https://github.com/ClandininLab/brainsss.git
-> cd brainsss
-> ml python/3.6.1
-> pip3 install -e . --user
-```
-Add yourself as a user:  
-- See top of preprocess.py script. Add your details under a username that matches your stanford ID
-- Imports path is where flies will be built from
-
-Install required python packages:
-```shell
-  > ml python/3.6.1
-  > pip3 install pyfiglet
-  > pip3 install psutil
-```
 
 Running the demo (Broken in current version. Will fix at some point.):  
 ```shell
