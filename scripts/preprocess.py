@@ -91,7 +91,7 @@ def main(args):
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
-    if not fly_builder and fly_dirs is None:
+    if not build_flies and fly_dirs is None:
         printlog("ERROR: you did not provide a directory to build flies from, nor a fly directory to process.")
         printlog("Aborting.")
         return
