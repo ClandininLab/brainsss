@@ -33,7 +33,7 @@ def main(args):
     #############################
 
     ### Get user settings
-    printlog("PWD: {}".format(args['PWD']))
+    #printlog("PWD: {}".format(args['PWD']))
     scripts_path = args['PWD']
     com_path = os.path.join(scripts_path, 'com')
     user = scripts_path.split('/')[3]
@@ -41,10 +41,10 @@ def main(args):
 
     ### Grab buildflies from command line args first since it will impact parsing
     if args['BUILDFLIES'] == '':
-        printlog('not building flies')
+        #printlog('not building flies')
         build_flies = False
     else:
-        printlog('building flies')
+        #printlog('building flies')
         build_flies = True
         dir_to_build = args['BUILDFLIES']
 
@@ -66,16 +66,18 @@ def main(args):
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
-        printlog('no flies specified')
+        #printlog('no flies specified')
         fly_dirs = None
     else:
         fly_dirs = args['FLIES'].split(',')
-        printlog('flies are {}'.format(fly_dirs))
+        #printlog('flies are {}'.format(fly_dirs))
 
     if args['DIRTYPE'] == '':
         printlog('no dirtype specified')
+        dirtype = None
     else:
-        printlog('dirtype is {}'.format(args['DIRTYPE']))
+        dirtype = args['DIRTYPE'].lower()
+        printlog('dirtype is {}'.format(dirtype))
 
     # These command line arguments will be empty unless the flag is called from the command line
     if args['FICTRAC_QC'] != '':
@@ -137,8 +139,10 @@ def main(args):
         anats = []
         for fly_dir in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly_dir)
-            funcs.extend([os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'func' in x])
-            anats.extend([os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'anat' in x])
+            if dirtype == 'func' or dirtype == None:
+                funcs.extend([os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'func' in x])
+            if dirtype == 'anat'or dirtype == None:
+                anats.extend([os.path.join(fly_directory, x) for x in os.listdir(fly_directory) if 'anat' in x])
 
     brainsss.sort_nicely(funcs)
     brainsss.sort_nicely(anats)
