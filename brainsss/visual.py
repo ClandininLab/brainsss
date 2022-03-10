@@ -88,11 +88,11 @@ def get_metadata_from_visprotocol(file, series):
 	angles = []
 	with h5py.File(file, 'r') as f:
 
-	    fly_ids = list(f['Flies'].keys())
-	    print("Found fly ids: {}".format(fly_ids))
-	    if len(fly_ids) > 1:
-	        print("More than one fly in hdf5, taking last fly.")
-	    fly_id = fly_ids[-1]
+		fly_ids = list(f['Flies'].keys())
+		print("Found fly ids: {}".format(fly_ids))
+		if len(fly_ids) > 1:
+			print("More than one fly in hdf5, taking last fly.")
+		fly_id = fly_ids[-1]
 
 		epoch_ids = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').keys()
 		print(len(epoch_ids))
