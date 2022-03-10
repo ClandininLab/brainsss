@@ -23,6 +23,20 @@ try:
 except ImportError:
     pass
 
+def parse_true_false(true_false_string):
+    if true_false_string in ['True', 'true']:
+        return True
+    elif true_false_string in ['False', 'false']:
+        return False
+    else:
+        return False
+
+def load_user_settings(user, scripts_path):
+    user_file = os.path.join(os.path.dirname(scripts_path), 'users', user + '.json')
+    with open(user_file) as file:
+        settings = json.load(file)
+    return settings
+
 def get_json_data(file_path):
     with open(file_path) as f:  
         data = json.load(f)
