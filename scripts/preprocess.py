@@ -65,7 +65,7 @@ def main(args):
         printlog('no flies specified')
         fly_dirs = None
     else:
-        fly_dirs = args['FLIES'].split('.')
+        fly_dirs = args['FLIES'].split(',')
         printlog('flies are {}'.format(fly_dirs))
         printlog('fly 1 is {}'.format(fly_dirs[0]))
 
