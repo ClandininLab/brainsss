@@ -95,7 +95,7 @@ def get_metadata_from_visprotocol(file, series, printlog):
 		fly_id = fly_ids[-1]
 
 		epoch_ids = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').keys()
-		printlog(len(epoch_ids))
+		printlog(str(len(epoch_ids)))
 		for i, epoch_id in enumerate(epoch_ids):
 			stim_id = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').get(epoch_id).attrs['component_stim_type']
 			stim_ids.append(stim_id)
