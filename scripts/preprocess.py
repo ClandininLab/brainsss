@@ -98,6 +98,10 @@ def main(args):
         printlog("Aborting.")
         return
 
+    # quickly testing using global sherlock resources
+    if user == 'brezovec':
+        global_resources = True
+
     #################################
     ############# BEGIN #############
     #################################
@@ -254,7 +258,7 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes)
+                                 logfile=logfile, time=96, mem=4, nice=nice, nodes=nodes, global_resources=global_resources)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
