@@ -257,16 +257,16 @@ def main(args):
 
             script = 'motion_correction.py'
             if global_resources:
-                time = 48
+                dur = 48
                 mem = 8
             else:
-                time = 96
+                dur = 96
                 mem = 4
             job_id = brainsss.sbatch(jobname='moco',
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=time, mem=mem, nice=nice, nodes=nodes, global_resources=global_resources)
+                                 logfile=logfile, time=dur, mem=mem, nice=nice, nodes=nodes, global_resources=global_resources)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
