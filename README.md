@@ -88,3 +88,10 @@ preprocessing.sh will always be called via sbatch to start the program. This wil
 These are in the utils.py file if you want to check them out.
 Essentially, you can tell brainsss.sbatch what python script you would like to run, as well as which modules to load, memory and time, etc.
 The function will return the job_id that was assigned to it via slurm. Then, you can use brainsss.wait_for_job to wait until this job is complete before continuing through main.py
+
+To Implement:
+- get excel sheet working for other users
+- create zscore and highpass filter
+- create convert from .h5 to .nii
+- automatically calculate stepsize for moco based on num_cpus and brain dimensions
+- clarify parsing of photodiode recording (currently I use the 4th column of the voltage recording which corresponds to photodiode_2 for me, however we should consider standardizing this or making it more robust.)
