@@ -75,7 +75,11 @@ There are currently two main ways to use this package:
       - If a functional_channel_2.nii exists, the registration parameters from channel 1 will be applied to channel 2.
       - the --flies flag accepts a comma separated list (or one fly)
       - if you want to moco only func or only anat, add the flag --dirtype func (or --dirtype anat).
-      - Other preprocessing steps currently implemented are --fictrac_qc, --STB (stimulus triggered behavior), --bleaching_qc, and --temporal_mean_brain.
+      - Other preprocessing steps currently implemented are:
+        -  --fictrac_qc will create some figures summarizing your fictrac data 
+        -  --STB (stimulus triggered behavior) probably only works for luke right now 
+        -  --bleaching_qc will create figure of bleaching over time
+        -  --temporal_mean_brain will create a meanbrain averaged over time
 
 Final comments:
 
