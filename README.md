@@ -76,10 +76,11 @@ There are currently two main ways to use this package:
       - the --flies flag accepts a comma separated list (or one fly)
       - if you want to moco only func or only anat, add the flag --dirtype func (or --dirtype anat).
       - Other preprocessing steps currently implemented are:
-        -  --fictrac_qc will create some figures summarizing your fictrac data 
-        -  --STB (stimulus triggered behavior) probably only works for luke right now 
-        -  --bleaching_qc will create figure of bleaching over time
-        -  --temporal_mean_brain will create a meanbrain averaged over time
+        -  --fictrac_qc: will create some figures summarizing your fictrac data 
+        -  --STB (stimulus triggered behavior): probably only works for luke right now 
+        -  --bleaching_qc: will create figure of bleaching over time
+        -  --temporal_mean_brain: will create a meanbrain averaged over time
+        -  you own custom code! lmk and i can help.
 
 Final comments:
 
