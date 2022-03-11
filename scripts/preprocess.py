@@ -73,11 +73,11 @@ def main(args):
         #printlog('flies are {}'.format(fly_dirs))
 
     if args['DIRTYPE'] == '':
-        printlog('no dirtype specified')
+        #printlog('no dirtype specified')
         dirtype = None
     else:
         dirtype = args['DIRTYPE'].lower()
-        printlog('dirtype is {}'.format(dirtype))
+        #printlog('dirtype is {}'.format(dirtype))
 
     # These command line arguments will be empty unless the flag is called from the command line
     if args['FICTRAC_QC'] != '':
@@ -99,10 +99,10 @@ def main(args):
         return
 
     # quickly testing using global sherlock resources
-    if user == 'brezovec':
-        global_resources = True
-    else:
-        global_resources = False
+    # if user == 'brezovec':
+    #     global_resources = True
+    # else:
+    #     global_resources = False
 
     #################################
     ############# BEGIN #############
@@ -256,12 +256,15 @@ def main(args):
                     'scantype': dirtype}
 
             script = 'motion_correction.py'
-            if global_resources:
-                dur = 48
-                mem = 8
-            else:
-                dur = 96
-                mem = 4
+            # if global_resources:
+            #     dur = 48
+            #     mem = 8
+            # else:
+            #     dur = 96
+            #     mem = 4
+            global_resources = True
+            dur = 48
+            mem = 8
             job_id = brainsss.sbatch(jobname='moco',
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
