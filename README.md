@@ -77,6 +77,8 @@ There are currently two main ways to use this package:
       - if you want to moco only func or only anat, add the flag --dirtype func (or --dirtype anat).
       - Other preprocessing steps currently implemented are --fictrac_qc, --STB (stimulus triggered behavior), --bleaching_qc, and --temporal_mean_brain.
 
+Final comments:
+
 A note that should be mentioned: to achieve creation of a common log file, I have stolen the print() function. So, for anything you want to print, you must use the printlog() function, but otherwise it is the same.
 
 Here is a little detail on the guts:
