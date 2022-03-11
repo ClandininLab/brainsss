@@ -101,6 +101,8 @@ def main(args):
     # quickly testing using global sherlock resources
     if user == 'brezovec':
         global_resources = True
+    else:
+        global_resources = False
 
     #################################
     ############# BEGIN #############
