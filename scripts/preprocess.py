@@ -90,6 +90,8 @@ def main(args):
         temporal_mean_brain = True
     if args['MOCO'] != '':
         motion_correction = True
+    if args['ZSCORE'] != '':
+        zscore = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -270,6 +272,26 @@ def main(args):
                                  modules=modules,
                                  args=args,
                                  logfile=logfile, time=dur, mem=mem, nice=nice, nodes=nodes, global_resources=global_resources)
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if zscore:
+
+        ##############
+        ### ZSCORE ###
+        ##############
+
+        for func in funcs:
+            load_directory = os.path.join(func, 'moco')
+            save_directory = os.path.join(func)
+            brain_file = 'functional_channel_2_moco.h5'
+
+            args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
+            script = 'zscore.py'
+            job_id = brainsss.sbatch(jobname='zscore',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
