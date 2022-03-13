@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 import subprocess
 import json
+import h5py
 import time
 from scipy.ndimage import gaussian_filter1d
 import nibabel as nib
