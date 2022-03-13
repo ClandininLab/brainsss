@@ -20,7 +20,7 @@ def main(args):
     behavior = args['behavior']
 
     logfile = args['logfile']
-    printlog = getattr(flow.Printlog(logfile=logfile), 'print_to_log')
+    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
     fps = 100 # of fictrac camera
 
