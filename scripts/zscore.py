@@ -20,7 +20,7 @@ def main(args):
     brain_file = args['brain_file']
     stepsize = 100
 
-    full_load_path = os.path.join(load_directory, save_directory)
+    full_load_path = os.path.join(load_directory, brain_file)
     save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_zscore.h5')
 
     #####################
