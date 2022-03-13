@@ -127,7 +127,7 @@ def interpolate_fictrac(fictrac, timestamps, fps, dur, behavior='speed',sigma=3,
     
     return fictrac_interp
 
-def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, timestamps=None, smoothing=25):
+def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, timestamps=None, smoothing=25, z=None):
     camera_rate = 1/fps * 1000 # camera frame rate in ms
     
     x_original = np.arange(0,expt_len,camera_rate)
@@ -138,7 +138,7 @@ def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, time
     if timestamps is None:
       fictrac_interp = fictrac_interp_temp(xnew)
     else:
-      fictrac_interp = fictrac_interp_temp(timestamps[:,25])
+      fictrac_interp = fictrac_interp_temp(timestamps[:,z])
 
     # convert units for common cases
     sphere_radius = 4.5e-3 # in m
