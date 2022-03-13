@@ -39,10 +39,7 @@ def main(args):
     with h5py.File(full_load_path, 'r') as hf:
         data = hf['data'] # this doesn't actually LOAD the data - it is just a proxy
         dims = np.shape(data)
-
         printlog("Data shape is {}".format(dims))
-
-        running_sum = np.zeros(dims[:3])
         
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])

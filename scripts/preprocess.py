@@ -63,6 +63,8 @@ def main(args):
         bleaching_qc = False
         temporal_mean_brain = False
         motion_correction = False
+        zscore = False
+        highpass = False
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
