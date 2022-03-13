@@ -92,6 +92,8 @@ def main(args):
         motion_correction = True
     if args['ZSCORE'] != '':
         zscore = True
+    if args['HIGHPASS'] != '':
+        highpass = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -292,6 +294,27 @@ def main(args):
                                  modules=modules,
                                  args=args,
                                  logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+
+    if highpass:
+
+        ################
+        ### HIGHPASS ###
+        ################
+
+        for func in funcs:
+            load_directory = os.path.join(func)
+            save_directory = os.path.join(func)
+            brain_file = 'functional_channel_2_moco_zscore.h5'
+
+            args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
+            script = 'temporal_high_pass_filter.py'
+            job_id = brainsss.sbatch(jobname='highpass',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=4, mem=2, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
