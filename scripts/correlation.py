@@ -25,6 +25,15 @@ def main(args):
 
     fps = 100 # of fictrac camera
 
+    ### load brain timestamps ###
+    timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
+
+    ### Load fictrac ###
+    fictrac_raw = brainsss.load_fictrac(os.path.join(load_directory, 'fictrac'))
+    resolution = 10 #desired resolution in ms
+    expt_len = fictrac_raw.shape[0]/fps*1000    
+    if behavior == 'dRotLabY': short = 'Y'
+    elif behavior == 'dRotLabZ': short = 'Z'
 
     ### Load brain ###
     printlog('loading brain')
@@ -32,16 +41,6 @@ def main(args):
     with h5py.File(full_load_path, 'r') as hf:
         brain = hf['data']
     printlog('done')
-
-    ### load brain timestamps ###
-    timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
-
-    ### Load fictrac ###
-    fictrac_raw = brainsss.load_fictrac(load_directory)
-    resolution = 10 #desired resolution in ms
-    expt_len = fictrac_raw.shape[0]/fps*1000    
-    if behavior == 'dRotLabY': short = 'Y'
-    elif behavior == 'dRotLabZ': short = 'Z'
     
     ### Correlate ###
     printlog("Performing Correlation on {}; behavior: {}".format(brain_file, behavior))
