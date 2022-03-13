@@ -316,6 +316,55 @@ def get_resolution(xml_file):
                     print('Error')
     return x, y, z
 
+def load_timestamps(directory, file='functional.xml'):
+    """ Parses a Bruker xml file to get the times of each frame, or loads h5py file if it exists.
+
+    First tries to load from 'timestamps.h5' (h5py file). If this file doesn't exist
+    it will load and parse the Bruker xml file, and save the h5py file for quick loading in the future.
+
+    Parameters
+    ----------
+    directory: full directory that contains xml file (str).
+    file: Defaults to 'functional.xml'
+
+    Returns
+    -------
+    timestamps: [t,z] numpy array of times (in ms) of Bruker imaging frames.
+
+    """
+    try:
+        print('Trying to load timestamp data from hdf5 file.')
+        with h5py.File(os.path.join(directory, 'timestamps.h5'), 'r') as hf:
+            timestamps = hf['timestamps'][:]
+
+    except:
+        print('Failed. Extracting frame timestamps from bruker xml file.')
+        xml_file = os.path.join(directory, file)
+        tree = ET.parse(xml_file)
+        root = tree.getroot()
+        timestamps = []
+        
+        sequences = root.findall('Sequence')
+        for sequence in sequences:
+            frames = sequence.findall('Frame')
+            for frame in frames:
+                filename = frame.findall('File')[0].get('filename')
+                time = float(frame.get('relativeTime'))
+                timestamps.append(time)
+        timestamps = np.multiply(timestamps, 1000)
+
+        if len(sequences) > 1:
+            timestamps = np.reshape(timestamps, (len(sequences), len(frames)))
+        else:
+            timestamps = np.reshape(timestamps, (len(frames), len(sequences)))
+
+        ### Save h5py file ###
+        with h5py.File(os.path.join(directory, 'timestamps.h5'), 'w') as hf:
+            hf.create_dataset("timestamps", data=timestamps)
+    
+    print('Success.')
+    return timestamps
+
 def print_big_header(printlog, message, width):
     message_and_space = '   ' + message.upper() + '   '
     printlog('\n')
