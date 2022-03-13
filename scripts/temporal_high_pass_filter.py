@@ -59,17 +59,17 @@ def main(args):
 
                     ### SMOOTH ###
                     printlog('smoothing')
-                    t0 = time.time()
+                    t0 = time()
                     smoothed_chunk = gaussian_filter1d(chunk,sigma=200,axis=-1,truncate=1)
-                    printlog("brain smoothed duration: ({})".format(time.time()-t0))
+                    printlog("brain smoothed duration: ({})".format(time()-t0))
 
                     ### Apply Smooth Correction ###
-                    t0 = time.time()
+                    t0 = time()
                     chunk_high_pass = chunk - smoothed_chunk + chunk_mean[:,:,:,None] #need to add back in mean to preserve offset
-                    printlog("brain corrected duration: ({})".format(time.time()-t0))
+                    printlog("brain corrected duration: ({})".format(time()-t0))
 
                     ### Save ###
-                    t0 = time.time()
+                    t0 = time()
                     f['data'][:,:,chunkstart:chunkend,:] = chunk_high_pass
                     printlog(F"Saved vol: {chunkstart} to {chunkend} time: {time()-t0}")
 
