@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       MOCO=True
       shift # past argument
       ;;
+    -z|--zscore)
+      ZSCORE=True
+      shift # past argument
+      ;;
     --fictrac_qc)
       FICTRAC_QC=True
       shift # past argument
@@ -51,7 +55,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\"MOCO\":\"$MOCO\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN\":\"$TEMPORAL_MEAN_BRAIN\"}"
+ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\"MOCO\":\"$MOCO\",\"ZSCORE\":\"$ZSCORE\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN\":\"$TEMPORAL_MEAN_BRAIN\"}"
 
 ml python/3.6
 date
