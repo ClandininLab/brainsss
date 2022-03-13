@@ -49,7 +49,7 @@ def main(args):
         printlog(F"{z}")
 
         ### interpolate fictrac to match the timestamps of this slice
-        fictrac_interp = brainsss.smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, timestamps, behavior, z)
+        fictrac_interp = brainsss.smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, behavior, timestamps=timestamps, z=z)
 
         for i in range(256):
             for j in range(128):
