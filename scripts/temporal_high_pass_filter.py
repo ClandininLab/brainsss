@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from time import time
 from time import strftime
 from time import sleep
+from scipy.ndimage import gaussian_filter1d
 
 def main(args):
     
