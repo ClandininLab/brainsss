@@ -332,8 +332,9 @@ def main(args):
             load_directory = os.path.join(func)
             save_directory = os.path.join(func, 'corr')
             brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
+            behavior = 'dRotLabY'
 
-            args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
+            args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file, 'behavior': behavior}
             script = 'correlation.py'
             job_id = brainsss.sbatch(jobname='corr',
                                  script=os.path.join(scripts_path, script),
