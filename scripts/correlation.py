@@ -46,17 +46,14 @@ def main(args):
     printlog("Performing Correlation on {}; behavior: {}".format(brain_file, behavior))
     corr_brain = np.zeros((256,128,49))
     for z in range(49):
-        printlog(F"{z}")
-
+        
         ### interpolate fictrac to match the timestamps of this slice
+        printlog(F"{z}")
         fictrac_interp = brainsss.smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, behavior, timestamps=timestamps, z=z)
 
         for i in range(256):
             for j in range(128):
                 corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, brain[i,j,z,:])[0]
-
-    ### save ###
-    corr_directory = os.path.join(directory, 'corr')
 
     if not os.path.exists(save_directory):
         os.mkdir(save_directory)
@@ -64,7 +61,6 @@ def main(args):
     save_file = os.path.join(save_directory, 'corr_{}.nii'.format(behavior))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
     printlog("Saved {}".format(save_file))
-
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
