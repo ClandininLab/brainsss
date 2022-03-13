@@ -39,7 +39,7 @@ def main(args):
     printlog('loading brain')
     full_load_path = os.path.join(load_directory, brain_file)
     with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data']
+        brain = hf['data'][:]
     printlog('done')
     
     ### Correlate ###
