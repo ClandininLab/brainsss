@@ -282,7 +282,8 @@ def main(args):
                                  modules=modules,
                                  args=args,
                                  logfile=logfile, time=dur, mem=mem, nice=nice, nodes=nodes, global_resources=global_resources)
-            brainsss.wait_for_job(job_id, logfile, com_path)
+        ### currently submitting these jobs simultaneously since using global resources
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     if zscore:
 

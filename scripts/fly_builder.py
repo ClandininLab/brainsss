@@ -205,6 +205,16 @@ def copy_bruker_data(source, destination, folder_type, printlog):
                 target_item = os.path.join(os.path.split(destination)[0], 'visual', item)
                 copyfile(source_item, target_item)
                 continue
+            # Special copy for visprotocol metadata since it goes in visual folder
+            if '.hdf5' in item:
+                try:
+                    visual_folder = os.path.join(os.path.split(destination)[0], 'visual')
+                    os.mkdir(visual_folder)
+                except:
+                    pass
+                target_item = os.path.join(os.path.split(destination)[0], 'visual', item)
+                copyfile(source_item, target_item)
+                continue
             # Rename to anatomy.xml if appropriate
             if '.xml' in item and folder_type == 'anat' and 'Voltage' not in item:
                 item = 'anatomy.xml'
