@@ -2,6 +2,7 @@ import os
 import h5py
 import numpy as np
 import pandas as pd
+import pickle
 
 
 def pd_csv_to_h5py(directory, file):
