@@ -57,6 +57,9 @@ def main(args):
         bleaching_qc = brainsss.parse_true_false(settings['bleaching_qc'])
         temporal_mean_brain = brainsss.parse_true_false(settings['temporal_mean_brain'])
         motion_correction = brainsss.parse_true_false(settings['motion_correction'])
+        zscore = brainsss.parse_true_false(settings['zscore'])
+        highpass = brainsss.parse_true_false(settings['highpass'])
+        correlation = brainsss.parse_true_false(settings['correlation'])
     else:
         fictrac_qc = False
         stim_triggered_beh = False
@@ -273,7 +276,7 @@ def main(args):
             #     mem = 4
             global_resources = True
             dur = 48
-            mem = 8
+            mem = 12
             job_id = brainsss.sbatch(jobname='moco',
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
