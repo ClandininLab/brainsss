@@ -5,5 +5,8 @@
     "stim_triggered_beh": "True",
     "bleaching_qc": "True",
     "temporal_mean_brain": "True",
-    "motion_correction": "True"
+    "motion_correction": "True",
+    "zscore": "True",
+    "highpass": "True",
+    "correlation": "True"
 }

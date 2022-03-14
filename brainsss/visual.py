@@ -83,29 +83,57 @@ def load_photodiode(vision_path):
 		t, ft_triggers, pd1, pd2 = load_h5py_pd_data(vision_path)
 	return t, ft_triggers, pd1, pd2
 
-def get_metadata_from_visprotocol(file, series, printlog):
+def get_stimulus_metadata(vision_path, printlog):
+	
+	### try to get from pickle ###
+	pickle_path = os.path.join(vision_path, 'stimulus_metadata.pkl')
+	if os.path.exists(pickle_path):
+		printlog("Loaded from Pickle.")
+		with open(load_file, 'rb') as f:
+			metadata = pickle.load(f)
+		return metadata['stim_ids'], metadata['angles']
+	
+	### if no pickle, load from .h5 and save pickle for future ###
+	printlog("No pickle; parsing visprotocol .h5")
+	fname = [x for x in os.listdir(vision_path) if '.hdf5' in x][0]
+	visprotocol_file = os.path.join(vision_path, fname)
+
 	stim_ids = []
 	angles = []
-	with h5py.File(file, 'r') as f:
+	with h5py.File(visprotocol_file, 'r') as f:
 
+		### loop over flies and series to find the one that has many stim presentations (others were aborted)
+		# note it is critical each fly has their own .h5 file saved
 		fly_ids = list(f['Flies'].keys())
 		printlog("Found fly ids: {}".format(fly_ids))
-		if len(fly_ids) > 1:
-			printlog("More than one fly in hdf5, taking last fly.")
-		fly_id = fly_ids[-1]
+		for fly_id in fly_ids:
+			
+			series = list(f['Flies'][fly_id]['epoch_runs'].keys())
+			printlog("Found series: {}".format(series))
+			for serie in series:
 
-		epoch_ids = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').keys()
-		printlog(str(len(epoch_ids)))
-		for i, epoch_id in enumerate(epoch_ids):
-			stim_id = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').get(epoch_id).attrs['component_stim_type']
-			stim_ids.append(stim_id)
-			if stim_id == 'DriftingSquareGrating':
-				angle = f['Flies'][fly_id]['epoch_runs'][series].get('epochs').get(epoch_id).attrs['angle']
-				angles.append(angle)
-				#starts.append(stimulus_start_times[i])
-			else:
-				angles.append(None)
-	return stim_ids, angles
+				epoch_ids = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').keys()
+				printlog(str(len(epoch_ids)))
+				for i, epoch_id in enumerate(epoch_ids):
+					stim_id = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').get(epoch_id).attrs['component_stim_type']
+					stim_ids.append(stim_id)
+					if stim_id == 'DriftingSquareGrating':
+						angle = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').get(epoch_id).attrs['angle']
+						angles.append(angle)
+					else:
+						angles.append(None)
+						
+				if len(stim_ids) > 100:
+					
+					### save pickle for next time
+					save_file = os.path.join(vision_path, 'stimulus_metadata.pkl')
+					with open(save_file, 'wb') as f:
+						pickle.dump(metadata, f)
+					printlog("created {}".format(save_file))
+					
+					return stim_ids, angles
+		printlog('Could not get visual metadata.')
+	
 
 def extract_stim_times_from_pd(photodiode_trace, time_vector):
 	threshold=0.8,
