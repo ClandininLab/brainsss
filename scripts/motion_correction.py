@@ -46,7 +46,8 @@ def main(args):
 		time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
 		printlog(F"{day_now+' | '+time_now:^{width}}")
 		printlog("")
-		
+	
+	brainsss.print_datetime(logfile, width)	
 	printlog(F"Dataset path{dataset_path:.>{width-12}}")
 	printlog(F"Brain master{brain_master:.>{width-12}}")
 	printlog(F"Brain mirror{brain_mirror:.>{width-12}}")
