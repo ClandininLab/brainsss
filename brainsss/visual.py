@@ -90,7 +90,7 @@ def get_stimulus_metadata(vision_path, printlog):
 	pickle_path = os.path.join(vision_path, 'stimulus_metadata.pkl')
 	if os.path.exists(pickle_path):
 		printlog("Loaded from Pickle.")
-		with open(load_file, 'rb') as f:
+		with open(pickle_path, 'rb') as f:
 			metadata = pickle.load(f)
 		return metadata['stim_ids'], metadata['angles']
 	
@@ -127,6 +127,7 @@ def get_stimulus_metadata(vision_path, printlog):
 				if len(stim_ids) > 100:
 					
 					### save pickle for next time
+					metadata = {'stim_ids': stim_ids, 'angles': angles}
 					save_file = os.path.join(vision_path, 'stimulus_metadata.pkl')
 					with open(save_file, 'wb') as f:
 						pickle.dump(metadata, f)
