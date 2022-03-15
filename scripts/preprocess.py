@@ -276,7 +276,7 @@ def main(args):
             #     mem = 4
             global_resources = True
             dur = 48
-            mem = 12
+            mem = 8
             job_id = brainsss.sbatch(jobname='moco',
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,

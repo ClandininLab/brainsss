@@ -371,6 +371,7 @@ def print_big_header(printlog, message, width):
     printlog('='*width)
     printlog(f"{message_and_space:=^{width}}")
     printlog('='*width)
+    print_datetime(logfile, width)
 
 def print_title(logfile, width):
     printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
@@ -378,8 +379,12 @@ def print_title(logfile, width):
     title_shifted = ('\n').join([' '*42+line for line in title.split('\n')][:-2])
     printlog("\n")
     printlog(title_shifted)
+    print_datetime(logfile, width)
+
+def print_datetime(logfile, width):
     day_now = datetime.datetime.now().strftime("%B %d, %Y")
     time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
+    printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
     printlog(F"{day_now+' | '+time_now:^{width}}")
 
 def print_footer(logfile,  width):
