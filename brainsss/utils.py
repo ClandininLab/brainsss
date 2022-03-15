@@ -89,7 +89,7 @@ def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=
     width = 120
     printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
     script_name = os.path.basename(os.path.normpath(script))
-    print_big_header(printlog, script_name, width)
+    print_big_header(logfile, script_name, width)
 
     if global_resources:
         sbatch_command = "sbatch -J {} -o ./com/%j.out -e {} -t {}:00:00 --nice={} {}--open-mode=append --cpus-per-task={} --begin={} --wrap='{}' {}".format(jobname, logfile, time, nice, node_cmd, mem, begin, command, dep)
@@ -365,7 +365,8 @@ def load_timestamps(directory, file='functional.xml'):
     print('Success.')
     return timestamps
 
-def print_big_header(printlog, message, width):
+def print_big_header(logfile, message, width):
+    printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
     message_and_space = '   ' + message.upper() + '   '
     printlog('\n')
     printlog('='*width)
@@ -382,9 +383,9 @@ def print_title(logfile, width):
     print_datetime(logfile, width)
 
 def print_datetime(logfile, width):
+    printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
     day_now = datetime.datetime.now().strftime("%B %d, %Y")
     time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
-    printlog = getattr(Printlog(logfile=logfile), 'print_to_log')
     printlog(F"{day_now+' | '+time_now:^{width}}")
 
 def print_footer(logfile,  width):
