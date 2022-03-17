@@ -65,7 +65,9 @@ def main(args):
             copy_fly(source_fly, destination_fly, printlog)
 
             # Add date to fly.json file
-            add_date_to_fly(destination_fly)
+            try:
+                add_date_to_fly(destination_fly)
+            except Exception as e: printlog(e)
 
             # Add json metadata to master dataset
             add_fly_to_xlsx(destination_fly, printlog)
@@ -643,7 +645,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
         fly_file = os.path.join(fly_folder, 'fly.json')
         fly_data = load_json(fly_file)
     except:
-        printlog("FYI no *expt.json* found; this will not be logged in your excel sheet.")
+        printlog("FYI no *fly.json* found; this will not be logged in your excel sheet.")
         fly_data = {}
         fly_data['circadian_on'] = None
         fly_data['circadian_off'] = None
