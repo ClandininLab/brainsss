@@ -101,6 +101,7 @@ def get_stimulus_metadata(vision_path, printlog):
 
 	stim_ids = []
 	angles = []
+	found_a_full_series = False
 	with h5py.File(visprotocol_file, 'r') as f:
 
 		### loop over flies and series to find the one that has many stim presentations (others were aborted)
@@ -125,15 +126,21 @@ def get_stimulus_metadata(vision_path, printlog):
 						angles.append(None)
 						
 				if len(stim_ids) > 100:
-					
-					### save pickle for next time
+					if found_a_full_series:
+						printlog('WARNING - FOUND 2 FULL SERIES IN THIS VISPROTOCOL HDF5 FILE. YOU NEED TO RESOLVE WHICH TO CHOOSE')
+						printlog('QUITING')
+						return
+					found_a_full_series = True
+					### save dic for final save below
 					metadata = {'stim_ids': stim_ids, 'angles': angles}
-					save_file = os.path.join(vision_path, 'stimulus_metadata.pkl')
-					with open(save_file, 'wb') as f:
-						pickle.dump(metadata, f)
-					printlog("created {}".format(save_file))
-					
-					return stim_ids, angles
+
+		### SAVE ###
+		save_file = os.path.join(vision_path, 'stimulus_metadata.pkl')
+		with open(save_file, 'wb') as f:
+			pickle.dump(metadata, f)
+		printlog("created {}".format(save_file))
+		
+		return stim_ids, angles
 		printlog('Could not get visual metadata.')
 	
 
