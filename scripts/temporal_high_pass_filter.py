@@ -54,25 +54,19 @@ def main(args):
                     chunkstart = steps[chunk_num]
                     chunkend = steps[chunk_num + 1]
                     chunk = data[:,:,chunkstart:chunkend,:]
-                    printlog("Chunk shape: {}".format(np.shape(chunk)))
                     chunk_mean = np.mean(chunk,axis=-1)
-                    printlog("Chunk_mean shape: {}".format(np.shape(chunk_mean)))
 
                     ### SMOOTH ###
-                    printlog('smoothing')
                     t0 = time()
                     smoothed_chunk = gaussian_filter1d(chunk,sigma=200,axis=-1,truncate=1)
-                    printlog("brain smoothed duration: ({})".format(time()-t0))
 
                     ### Apply Smooth Correction ###
                     t0 = time()
                     chunk_high_pass = chunk - smoothed_chunk + chunk_mean[:,:,:,None] #need to add back in mean to preserve offset
-                    printlog("brain corrected duration: ({})".format(time()-t0))
 
                     ### Save ###
                     t0 = time()
                     f['data'][:,:,chunkstart:chunkend,:] = chunk_high_pass
-                    printlog(F"Saved vol: {chunkstart} to {chunkend} time: {time()-t0}")
 
     printlog("high pass done")
 
