@@ -67,7 +67,7 @@ def main(args):
             # Add date to fly.json file
             try:
                 add_date_to_fly(destination_fly)
-            except Exception as e: printlog(e)
+            except Exception as e: printlog(str(e))
 
             # Add json metadata to master dataset
             add_fly_to_xlsx(destination_fly, printlog)
