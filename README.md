@@ -31,7 +31,7 @@ Create your user preferences:
 
 ## Usage:
 
-There are currently two main ways to use this package:
+There are currently three main ways to use this package:
 1) Adopt a specific fly directory structure so you can take advantage of the entire pipeline automation.
       - Your imaging data should be saved like:
 
@@ -81,6 +81,11 @@ There are currently two main ways to use this package:
         -  --bleaching_qc: will create figure of bleaching over time
         -  --temporal_mean_brain: will create a meanbrain averaged over time
         -  you own custom code! lmk and i can help.
+
+3) Run motion correction on a brain without following any imposed naming or directory scheme.
+      - Launch the job `motion_correction.sh` and pass it a directory name, brain_master, and optionally a brain_mirror
+      - For example `sbatch motion_correction.sh /oak/stanford/groups/trc/data/Ashley2/imports/20210806/fly1_20s-011 ch1_stitched.nii ch2_stitched.nii`
+      - First argument is path, then brain master, then brain mirror (warp parameters will be calulated from brain_master and applied to brain_mirror. So, your structural channel (for example tdtomato) will be brain_master and functional neural data (for example gcamp) will be brain_mirror.
 
 Final comments:
 
