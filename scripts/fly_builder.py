@@ -34,6 +34,7 @@ def main(args):
     # Need to move into fly_X folder that reflects it's date
 
     # get fly folders in flagged directory and sort to ensure correct fly order
+    printlog("Building flies from {}".format(flagged_dir))
     likely_fly_folders = os.listdir(flagged_dir)
     brainsss.sort_nicely(likely_fly_folders)
     likely_fly_folders = [i for i in likely_fly_folders if 'fly' in i]
