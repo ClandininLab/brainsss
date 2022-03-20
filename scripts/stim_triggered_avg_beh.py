@@ -61,12 +61,15 @@ def plot_avg_trace(fictrac, starts_angle_0, starts_angle_180, vision_path, print
 	traces = []
 	for i in range(len(starts_angle_0)):
 		trace = fictrac['Z'][starts_angle_0[i]-pre_window:starts_angle_0[i]+post_window]
+		#if len(trace) == pre_window + post_window # this handles fictrac that crashed or was aborted or some bullshit
+		printlog(len(trace))
 		traces.append(trace)
 	mean_trace_0 = np.mean(np.asarray(traces),axis=0)
 
 	traces = []
 	for i in range(len(starts_angle_180)):
 		trace = fictrac['Z'][starts_angle_180[i]-pre_window:starts_angle_180[i]+post_window]
+		#if len(trace) == pre_window + post_window # this handles fictrac that crashed or was aborted or some bullshit
 		traces.append(trace)
 	mean_trace_180 = np.mean(np.asarray(traces),axis=0)
 
