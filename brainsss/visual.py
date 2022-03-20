@@ -95,7 +95,7 @@ def get_stimulus_metadata(vision_path, printlog):
 		return metadata['stim_ids'], metadata['angles']
 	
 	### if no pickle, load from .h5 and save pickle for future ###
-	printlog("No pickle; parsing visprotocol .h5")
+	printlog("No pickle; parsing visprotocol.h5")
 	fname = [x for x in os.listdir(vision_path) if '.hdf5' in x][0]
 	visprotocol_file = os.path.join(vision_path, fname)
 
@@ -135,10 +135,13 @@ def get_stimulus_metadata(vision_path, printlog):
 					metadata = {'stim_ids': stim_ids, 'angles': angles}
 
 		### SAVE ###
-		save_file = os.path.join(vision_path, 'stimulus_metadata.pkl')
-		with open(save_file, 'wb') as f:
-			pickle.dump(metadata, f)
-		printlog("created {}".format(save_file))
+		if found_a_full_series:
+			save_file = os.path.join(vision_path, 'stimulus_metadata.pkl')
+			with open(save_file, 'wb') as f:
+				pickle.dump(metadata, f)
+			printlog("created {}".format(save_file))
+		else:
+			"did not find any series longer than 100 stimuli. Not saving metadata pickle."
 		
 		return stim_ids, angles
 		printlog('Could not get visual metadata.')
