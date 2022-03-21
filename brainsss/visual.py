@@ -84,8 +84,12 @@ def load_photodiode(vision_path):
 		t, ft_triggers, pd1, pd2 = load_h5py_pd_data(vision_path)
 	return t, ft_triggers, pd1, pd2
 
-def get_stimulus_metadata(vision_path, printlog):
-	
+def get_stimulus_metadata(vision_path, printlog=None):
+	# if this function is not being used with a printlog, redirect printlog to simply print
+	if printlog is None:
+		printlog = print
+
+
 	### try to get from pickle ###
 	pickle_path = os.path.join(vision_path, 'stimulus_metadata.pkl')
 	if os.path.exists(pickle_path):
