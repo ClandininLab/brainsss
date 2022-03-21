@@ -19,11 +19,13 @@ echo $brain_mirror
 # Optional params
 type_of_transform=${4:-"SyN"}
 output_format=${5:-"h5"}
+meanbrain_n_frames=${6:-100}
 echo $type_of_transform
 echo $output_format
+echo $meanbrain_n_frames
 
 args="{\"directory\":\"$directory\",\"brain_master\":\"$brain_master\",\"brain_mirror\":\"$brain_mirror\","\
-"\"type_of_transform\":\"$type_of_transform\",\"output_format\":\"$output_format\"}"
+"\"type_of_transform\":\"$type_of_transform\",\"output_format\":\"$output_format\",\"meanbrain_n_frames\":\"$meanbrain_n_frames\"}"
 
 # ml python/3.6 antspy/0.2.2
 

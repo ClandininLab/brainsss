@@ -22,11 +22,13 @@ def main(args):
 	brain_mirror = args['brain_mirror']
 
 	# OPTIONAL PARAMETERS
-	type_of_transform = args.get('type_of_transform', 'SyN')  # See ANTsPy docs | Default 'SyN'
+	type_of_transform = args.get('type_of_transform', 'SyN')  # For ants.registration(), see ANTsPy docs | Default 'SyN'
 	output_format = args.get('output_format', 'h5')  #  Save format for registered image data | Default h5. Also allowed: 'nii'
 	assert output_format in ['h5', 'nii'], 'OPTIONAL PARAM output_format MUST BE ONE OF: "h5", "nii"'
-	flow_sigma = int(args.get('flow_sigma', 3))  # higher sigma focuses on coarser features | Default 3
-	total_sigma = int(args.get('total_sigma', 0))  # higher values will restrict the amount of deformation allowed | Default 0
+	flow_sigma = int(args.get('flow_sigma', 3))  # For ants.registration(), higher sigma focuses on coarser features | Default 3
+	total_sigma = int(args.get('total_sigma', 0))  # For ants.registration(), higher values will restrict the amount of deformation allowed | Default 0
+	meanbrain_n_frames = args.get('meanbrain_n_frames', None)  # First n frames to average over when computing mean/fixed brain | Default None (average over all frames)
+	meanbrain_smooth = args.get('meanbrain_smooth', None)
 
 	#####################
 	### SETUP LOGGING ###
@@ -59,10 +61,11 @@ def main(args):
 	printlog(F"Brain master{brain_master:.>{width-12}}")
 	printlog(F"Brain mirror{brain_mirror:.>{width-12}}")
 
-	printlog(F"type_of_transform{type_of_transform:.>{width-12}}")
-	printlog(F"output_format{output_format:.>{width-12}}")
-	printlog(F"flow_sigma{flow_sigma:.>{width-12}}")
-	printlog(F"total_sigma{total_sigma:.>{width-12}}")
+	printlog(F"type_of_transform{type_of_transform:.>{width-17}}")
+	printlog(F"output_format{output_format:.>{width-13}}")
+	printlog(F"flow_sigma{flow_sigma:.>{width-10}}")
+	printlog(F"total_sigma{total_sigma:.>{width-11}}")
+	printlog(F"meanbrain_n_frames{str(meanbrain_n_frames):.>{width-18}}")
 
 	######################
 	### PARSE SCANTYPE ###
@@ -140,12 +143,17 @@ def main(args):
 
 		### Make meanbrain ###
 		t0 = time()
+		if meanbrain_n_frames is None:
+			meanbrain_n_frames = brain_dims[-1]  # All frames
+		else:
+			meanbrain_n_frames = int(meanbrain_n_frames)
+
 		meanbrain = np.zeros(brain_dims[:3]) # create empty meanbrain from the first 3 axes, x/y/z
-		for i in range(brain_dims[-1]):
+		for i in range(meanbrain_n_frames):
 			if i%1000 == 0:
-				printlog(brainsss.progress_bar(i, brain_dims[-1], width))
+				printlog(brainsss.progress_bar(i, meanbrain_n_frames, width))
 			meanbrain += img_ch1.dataobj[...,i]
-		meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
+		meanbrain = meanbrain/meanbrain_n_frames # divide by number of volumes
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
 		printlog(F"Meanbrain created. Duration{str(int(time()-t0))+'s':.>{width-27}}")
 
