@@ -16,10 +16,18 @@ from time import strftime
 from time import sleep
 
 def main(args):
-	
+
 	dataset_path = args['directory']
 	brain_master = args['brain_master']
 	brain_mirror = args['brain_mirror']
+
+	# OPTIONAL PARAMETERS
+	type_of_transform = args.get('type_of_transform', 'SyN')  # For ants.registration(), see ANTsPy docs | Default 'SyN'
+	output_format = args.get('output_format', 'h5')  #  Save format for registered image data | Default h5. Also allowed: 'nii'
+	assert output_format in ['h5', 'nii'], 'OPTIONAL PARAM output_format MUST BE ONE OF: "h5", "nii"'
+	flow_sigma = int(args.get('flow_sigma', 3))  # For ants.registration(), higher sigma focuses on coarser features | Default 3
+	total_sigma = int(args.get('total_sigma', 0))  # For ants.registration(), higher values will restrict the amount of deformation allowed | Default 0
+	meanbrain_n_frames = args.get('meanbrain_n_frames', None)  # First n frames to average over when computing mean/fixed brain | Default None (average over all frames)
 
 	#####################
 	### SETUP LOGGING ###
@@ -46,11 +54,17 @@ def main(args):
 		time_now = datetime.datetime.now().strftime("%I:%M:%S %p")
 		printlog(F"{day_now+' | '+time_now:^{width}}")
 		printlog("")
-	
-	brainsss.print_datetime(logfile, width)	
+
+	brainsss.print_datetime(logfile, width)
 	printlog(F"Dataset path{dataset_path:.>{width-12}}")
 	printlog(F"Brain master{brain_master:.>{width-12}}")
 	printlog(F"Brain mirror{brain_mirror:.>{width-12}}")
+
+	printlog(F"type_of_transform{type_of_transform:.>{width-17}}")
+	printlog(F"output_format{output_format:.>{width-13}}")
+	printlog(F"flow_sigma{flow_sigma:.>{width-10}}")
+	printlog(F"total_sigma{total_sigma:.>{width-11}}")
+	printlog(F"meanbrain_n_frames{str(meanbrain_n_frames):.>{width-18}}")
 
 	######################
 	### PARSE SCANTYPE ###
@@ -66,13 +80,13 @@ def main(args):
 		# try to extract from file name
 		if 'func' in brain_master:
 			scantype = 'func'
-			stepsize = 100 
+			stepsize = 100
 		elif 'anat' in brain_master:
 			scantype = 'anat'
 			stepsize = 5
 		else:
 			scantype = 'func'
-			stepsize = 100 
+			stepsize = 100
 			printlog(F"{'   Could not determine scantype. Using default stepsize of 100   ':*^{width}}")
 	printlog(F"Scantype{scantype:.>{width-8}}")
 	printlog(F"Stepsize{stepsize:.>{width-8}}")
@@ -128,12 +142,17 @@ def main(args):
 
 		### Make meanbrain ###
 		t0 = time()
+		if meanbrain_n_frames is None:
+			meanbrain_n_frames = brain_dims[-1]  # All frames
+		else:
+			meanbrain_n_frames = int(meanbrain_n_frames)
+
 		meanbrain = np.zeros(brain_dims[:3]) # create empty meanbrain from the first 3 axes, x/y/z
-		for i in range(brain_dims[-1]):
+		for i in range(meanbrain_n_frames):
 			if i%1000 == 0:
-				printlog(brainsss.progress_bar(i, brain_dims[-1], width))
+				printlog(brainsss.progress_bar(i, meanbrain_n_frames, width))
 			meanbrain += img_ch1.dataobj[...,i]
-		meanbrain = meanbrain/brain_dims[-1] # divide by number of volumes
+		meanbrain = meanbrain/meanbrain_n_frames # divide by number of volumes
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
 		printlog(F"Meanbrain created. Duration{str(int(time()-t0))+'s':.>{width-27}}")
 
@@ -167,7 +186,7 @@ def main(args):
 	#################################
 	printlog(F"{'   STARTING MOCO   ':-^{width}}")
 	transform_matrix = []
-	
+
 	### prepare chunks to loop over ###
 	# the chunks defines how many vols to moco before saving them to h5 (this save is slow, so we want to do it less often)
 	steps = list(range(0,brain_dims[-1],stepsize))
@@ -196,15 +215,18 @@ def main(args):
 			moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 
 			### MOTION CORRECT ###
-			moco = ants.registration(fixed, moving, type_of_transform='SyN')
+			moco = ants.registration(fixed, moving,
+									 type_of_transform=type_of_transform,
+									 flow_sigma=flow_sigma,
+                                	 total_sigma=total_sigma)
 			moco_ch1 = moco['warpedmovout'].numpy()
 			moco_ch1_chunk.append(moco_ch1)
 			transformlist = moco['fwdtransforms']
 			#printlog(F'vol, ch1 moco: {index}, time: {time()-t0}')
-			
+
 			### APPLY TRANSFORMS TO CHANNEL 2 ###
 			#t0 = time()
-			if filepath_brain_mirror is not None: 
+			if filepath_brain_mirror is not None:
 				vol = img_ch2.dataobj[...,index]
 				ch2_moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 				moco_ch2 = ants.apply_transforms(fixed, ch2_moving, transformlist)
@@ -253,9 +275,9 @@ def main(args):
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 1 ###
 		t0 = time()
 		with h5py.File(savefile_master, 'a') as f:
-			f['data'][...,steps[j]:steps[j+1]] = moco_ch1_chunk																		
+			f['data'][...,steps[j]:steps[j+1]] = moco_ch1_chunk
 		#printlog(F'Ch_1 append time: {time()-t0}')
-																						
+
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 2 ###
 		t0 = time()
 		if filepath_brain_mirror is not None:
@@ -274,6 +296,24 @@ def main(args):
 	printlog("making moco plot")
 	printlog(F"moco_dir: {moco_dir}")
 	save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, printlog)
+
+	### OPTIONAL: SAVE REGISTERED IMAGES AS NII ###
+	if output_format == 'nii':
+		printlog('saving .nii images')
+		nii_savefile_master = h5_to_nii(savefile_master)
+		printlog(F"nii_savefile_master: {nii_savefile_master}")
+
+		nii_savefile_mirror = h5_to_nii(savefile_mirror)
+		printlog(F"nii_savefile_mirror: {nii_savefile_mirror}")
+		# If .nii conversion went OK, delete h5 files
+		if nii_savefile_master is not None:
+			printlog('deleting .h5 file at {}'.format(savefile_master))
+			os.remove(savefile_master)
+
+		if nii_savefile_mirror is not None:
+			printlog('deleting .h5 file at {}'.format(savefile_mirror))
+			os.remove(savefile_mirror)
+
 
 def make_empty_h5(directory, file, brain_dims, save_type):
 	if save_type == 'curr_dir':
@@ -299,7 +339,7 @@ def check_for_file(file, directory):
 		return None
 
 def save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, printlog):
-	
+
 	# Get voxel resolution for figure
 	if scantype == 'func':
 		xml_name = 'functional.xml'
@@ -329,7 +369,7 @@ def save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, print
 
 def print_progress_table(total_vol, complete_vol, printlog, start_time, width):
 	fraction_complete = complete_vol/total_vol
-	
+
 	### Get elapsed time ###
 	elapsed = time()-start_time
 	elapsed_hms = sec_to_hms(elapsed)
@@ -340,7 +380,7 @@ def print_progress_table(total_vol, complete_vol, printlog, start_time, width):
 	except ZeroDivisionError:
 		remaining = 0
 	remaining_hms = sec_to_hms(remaining)
-	
+
 	### Get progress bar ###
 	complete_vol_str = f"{complete_vol:04d}"
 	total_vol_str = f"{total_vol:04d}"
@@ -355,6 +395,20 @@ def sec_to_hms(t):
 	mins=F"{np.floor((t/60)%60):02.0f}"
 	hrs=F"{np.floor((t/3600)%60):02.0f}"
 	return ':'.join([hrs, mins, secs])
+
+
+def h5_to_nii(h5_path):
+	nii_savefile = h5_path.split('.')[0] + '.nii'
+	with h5py.File(h5_path, 'r+') as h5_file:
+		image_array = h5_file.get("data")[:].astype('uint16')
+
+	nifti1_limit = (2**16 / 2)
+	if np.any(np.array(image_array.shape) >= nifti1_limit):  # Need to save as nifti2
+		nib.save(nib.Nifti2Image(image_array, np.eye(4)), nii_savefile)
+	else:  # Nifti1 is OK
+		nib.save(nib.Nifti1Image(image_array, np.eye(4)), nii_savefile)
+
+	return nii_savefile
 
 if __name__ == '__main__':
 	main(json.loads(sys.argv[1]))
