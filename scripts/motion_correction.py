@@ -28,7 +28,6 @@ def main(args):
 	flow_sigma = int(args.get('flow_sigma', 3))  # For ants.registration(), higher sigma focuses on coarser features | Default 3
 	total_sigma = int(args.get('total_sigma', 0))  # For ants.registration(), higher values will restrict the amount of deformation allowed | Default 0
 	meanbrain_n_frames = args.get('meanbrain_n_frames', None)  # First n frames to average over when computing mean/fixed brain | Default None (average over all frames)
-	meanbrain_smooth = args.get('meanbrain_smooth', None)
 
 	#####################
 	### SETUP LOGGING ###
