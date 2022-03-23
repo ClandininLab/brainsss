@@ -22,6 +22,8 @@ Install required python packages:
 ```shell
   > pip3 install pyfiglet
   > pip3 install psutil
+  > pip3 install lxml
+  > pip3 install openpyxl
 ```
 
 Create your user preferences:  
