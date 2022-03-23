@@ -56,6 +56,10 @@ while [[ $# -gt 0 ]]; do
       TEMPORAL_MEAN_BRAIN=True
       shift # past argument
       ;;
+    --STA) # stimulus triggered behavior
+      STA=True
+      shift # past argument
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -63,7 +67,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\"MOCO\":\"$MOCO\",\"ZSCORE\":\"$ZSCORE\",\"HIGHPASS\":\"$HIGHPASS\",\"CORRELATION\":\"$CORRELATION\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN\":\"$TEMPORAL_MEAN_BRAIN\"}"
+ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\"MOCO\":\"$MOCO\",\"ZSCORE\":\"$ZSCORE\",\"HIGHPASS\":\"$HIGHPASS\",\"CORRELATION\":\"$CORRELATION\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN\":\"$TEMPORAL_MEAN_BRAIN\",\"STA\":\"$STA\"}"
 
 ml python/3.6
 date

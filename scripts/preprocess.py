@@ -60,6 +60,7 @@ def main(args):
         zscore = brainsss.parse_true_false(settings['zscore'])
         highpass = brainsss.parse_true_false(settings['highpass'])
         correlation = brainsss.parse_true_false(settings['correlation'])
+        STA = brainsss.parse_true_false(settings['STA'])
     else:
         fictrac_qc = False
         stim_triggered_beh = False
@@ -69,6 +70,7 @@ def main(args):
         zscore = False
         highpass = False
         correlation = False
+        STA = False
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
@@ -102,6 +104,8 @@ def main(args):
         highpass = True
     if args['CORRELATION'] != '':
         correlation = True
+    if args ['STA'] != '':
+        STA = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -345,6 +349,22 @@ def main(args):
                                  modules=modules,
                                  args=args,
                                  logfile=logfile, time=2, mem=4, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if STA:
+
+        #########################################
+        ### STIMULUS TRIGGERED NEURAL AVERAGE ###
+        #########################################
+
+        for func in funcs:
+            args = {'logfile': logfile, 'func_path': func}
+            script = 'stim_triggered_avg_neu.py'
+            job_id = brainsss.sbatch(jobname='STA',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=2, mem=1, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
