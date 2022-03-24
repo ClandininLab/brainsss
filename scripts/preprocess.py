@@ -52,15 +52,15 @@ def main(args):
     imports_path = settings['imports_path']
     dataset_path = settings['dataset_path']
     if build_flies:
-        fictrac_qc = brainsss.parse_true_false(settings['fictrac_qc'])
-        stim_triggered_beh = brainsss.parse_true_false(settings['stim_triggered_beh'])
-        bleaching_qc = brainsss.parse_true_false(settings['bleaching_qc'])
-        temporal_mean_brain = brainsss.parse_true_false(settings['temporal_mean_brain'])
-        motion_correction = brainsss.parse_true_false(settings['motion_correction'])
-        zscore = brainsss.parse_true_false(settings['zscore'])
-        highpass = brainsss.parse_true_false(settings['highpass'])
-        correlation = brainsss.parse_true_false(settings['correlation'])
-        STA = brainsss.parse_true_false(settings['STA'])
+        fictrac_qc = brainsss.parse_true_false(settings.get('fictrac_qc',False))
+        stim_triggered_beh = brainsss.parse_true_false(settings.get('stim_triggered_beh',False))
+        bleaching_qc = brainsss.parse_true_false(settings.get('bleaching_qc',False))
+        temporal_mean_brain = brainsss.parse_true_false(settings.get('temporal_mean_brain',False))
+        motion_correction = brainsss.parse_true_false(settings.get('motion_correction',False))
+        zscore = brainsss.parse_true_false(settings.get('zscore',False))
+        highpass = brainsss.parse_true_false(settings.get('highpass',False))
+        correlation = brainsss.parse_true_false(settings.get('correlation', False))
+        STA = brainsss.parse_true_false(settings.get('STA', False))
     else:
         fictrac_qc = False
         stim_triggered_beh = False
