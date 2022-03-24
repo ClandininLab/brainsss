@@ -11,6 +11,7 @@ import nibabel as nib
 import brainsss
 import scipy
 from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
 
 def main(args):
 
@@ -61,6 +62,18 @@ def main(args):
     save_file = os.path.join(save_directory, 'corr_{}.nii'.format(behavior))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
     printlog("Saved {}".format(save_file))
+    save_maxproj_img(save_file)
+
+def save_maxproj_img(file):
+    brain = np.asarray(nib.load(file).get_data().squeeze(), dtype='float32')
+
+    plt.figure(figsize=(10,4))
+    plt.imshow(np.max(brain,axis=-1).T,cmap='gray')
+    plt.axis('off')
+    plt.colorbar()
+    
+    save_file = file[:-3] + 'png'
+    plt.savefig(save_file, bbox_inches='tight', dpi=300)
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
