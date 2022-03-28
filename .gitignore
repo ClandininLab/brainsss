@@ -1,2 +1,2 @@
-# Except this file
 brainsss.egg-info/*
+Brainsss/__pycache__/*
