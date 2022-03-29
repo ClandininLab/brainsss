@@ -19,7 +19,9 @@ def main(args):
 
 	dataset_path = args['directory']
 	brain_master = args['brain_master']
-	brain_mirror = args['brain_mirror']
+
+	# OPTIONAL brain_mirror
+	brain_mirror = args.get('brain_mirror', None)
 
 	# OPTIONAL PARAMETERS
 	type_of_transform = args.get('type_of_transform', 'SyN')  # For ants.registration(), see ANTsPy docs | Default 'SyN'
@@ -58,7 +60,7 @@ def main(args):
 	brainsss.print_datetime(logfile, width)
 	printlog(F"Dataset path{dataset_path:.>{width-12}}")
 	printlog(F"Brain master{brain_master:.>{width-12}}")
-	printlog(F"Brain mirror{brain_mirror:.>{width-12}}")
+	printlog(F"Brain mirror{str(brain_mirror):.>{width-12}}")
 
 	printlog(F"type_of_transform{type_of_transform:.>{width-17}}")
 	printlog(F"output_format{output_format:.>{width-13}}")
@@ -96,7 +98,6 @@ def main(args):
 	##############################
 
 	filepath_brain_master = os.path.join(dataset_path, brain_master)
-	filepath_brain_mirror = os.path.join(dataset_path, brain_mirror)
 
 	### Quit if no master brain
 	if not brain_master.endswith('.nii'):
@@ -109,13 +110,17 @@ def main(args):
 		return
 
 	### Brain mirror is optional
-	if not brain_mirror.endswith('.nii'):
-		printlog("Brain mirror does not end with .nii. Continuing without a mirror brain.")
-		filepath_brain_mirror = None
-	if not os.path.exists(filepath_brain_mirror):
-		printlog(F"Could not find{filepath_brain_mirror:.>{width-8}}")
-		printlog("Will continue without a mirror brain.")
-		filepath_brain_mirror = None
+	if brain_mirror is not None:
+		filepath_brain_mirror = os.path.join(dataset_path, brain_mirror)
+		if not brain_mirror.endswith('.nii'):
+			printlog("Brain mirror does not end with .nii. Continuing without a mirror brain.")
+			# filepath_brain_mirror = None
+			brain_mirror = None
+		if not os.path.exists(filepath_brain_mirror):
+			printlog(F"Could not find{filepath_brain_mirror:.>{width-8}}")
+			printlog("Will continue without a mirror brain.")
+			# filepath_brain_mirror = None
+			brain_mirror = None
 
 	########################################
 	### Calculate Meanbrain of Channel 1 ###
@@ -160,7 +165,7 @@ def main(args):
 	### Load Mirror Brain ###
 	#########################
 
-	if filepath_brain_mirror is not None:
+	if brain_mirror is not None:
 		img_ch2 = nib.load(filepath_brain_mirror) # this loads a proxy
 		# make sure channel 1 and 2 have same shape
 		ch2_shape = img_ch2.header.get_data_shape()
@@ -176,7 +181,7 @@ def main(args):
 	moco_dir, savefile_master = make_empty_h5(dataset_path, h5_file_name, brain_dims, save_type)
 	printlog(F"Created empty hdf5 file{h5_file_name:.>{width-23}}")
 
-	if filepath_brain_mirror is not None:
+	if brain_mirror is not None:
 		h5_file_name = f"{brain_mirror.split('.')[0]}_moco.h5"
 		_ ,savefile_mirror = make_empty_h5(dataset_path, h5_file_name, brain_dims, save_type)
 		printlog(F"Created empty hdf5 file{h5_file_name:.>{width-23}}")
@@ -226,7 +231,7 @@ def main(args):
 
 			### APPLY TRANSFORMS TO CHANNEL 2 ###
 			#t0 = time()
-			if filepath_brain_mirror is not None:
+			if brain_mirror is not None:
 				vol = img_ch2.dataobj[...,index]
 				ch2_moving = ants.from_numpy(np.asarray(vol, dtype='float32'))
 				moco_ch2 = ants.apply_transforms(fixed, ch2_moving, transformlist)
@@ -268,7 +273,7 @@ def main(args):
 				print_progress_table(total_vol=brain_dims[-1], complete_vol=index, printlog=printlog, start_time=start_time, width=width)
 
 		moco_ch1_chunk = np.moveaxis(np.asarray(moco_ch1_chunk),0,-1)
-		if filepath_brain_mirror is not None:
+		if brain_mirror is not None:
 			moco_ch2_chunk = np.moveaxis(np.asarray(moco_ch2_chunk),0,-1)
 		#printlog("chunk shape: {}. Time: {}".format(moco_ch1_chunk.shape, time()-t0))
 
@@ -280,7 +285,7 @@ def main(args):
 
 		### APPEND WARPED VOL TO HD5F FILE - CHANNEL 2 ###
 		t0 = time()
-		if filepath_brain_mirror is not None:
+		if brain_mirror is not None:
 			with h5py.File(savefile_mirror, 'a') as f:
 				f['data'][...,steps[j]:steps[j+1]] = moco_ch2_chunk
 			#printlog(F'Ch_2 append time: {time()-t0}')
@@ -300,19 +305,25 @@ def main(args):
 	### OPTIONAL: SAVE REGISTERED IMAGES AS NII ###
 	if output_format == 'nii':
 		printlog('saving .nii images')
-		nii_savefile_master = h5_to_nii(savefile_master)
-		printlog(F"nii_savefile_master: {nii_savefile_master}")
 
-		nii_savefile_mirror = h5_to_nii(savefile_mirror)
-		printlog(F"nii_savefile_mirror: {nii_savefile_mirror}")
-		# If .nii conversion went OK, delete h5 files
-		if nii_savefile_master is not None:
+		# Save master:
+		nii_savefile_master = h5_to_nii(savefile_master)
+		printlog(F"nii_savefile_master: {str(nii_savefile_master)}")
+		if nii_savefile_master is not None: # If .nii conversion went OK, delete h5 file
 			printlog('deleting .h5 file at {}'.format(savefile_master))
 			os.remove(savefile_master)
+		else:
+			printlog('nii conversion failed for {}'.format(savefile_master))
 
-		if nii_savefile_mirror is not None:
-			printlog('deleting .h5 file at {}'.format(savefile_mirror))
-			os.remove(savefile_mirror)
+		# Save mirror:
+		if brain_mirror is not None:
+			nii_savefile_mirror = h5_to_nii(savefile_mirror)
+			printlog(F"nii_savefile_mirror: {str(nii_savefile_mirror)}")
+			if nii_savefile_mirror is not None: # If .nii conversion went OK, delete h5 file
+				printlog('deleting .h5 file at {}'.format(savefile_mirror))
+				os.remove(savefile_mirror)
+			else:
+				printlog('nii conversion failed for {}'.format(savefile_mirror))
 
 
 def make_empty_h5(directory, file, brain_dims, save_type):
