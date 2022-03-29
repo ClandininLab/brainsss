@@ -155,7 +155,7 @@ def extract_stim_times_from_pd(photodiode_trace, time_vector):
 	threshold=0.8,
 	command_frame_rate=120
 	sample_rate = 10000
-	minimum_epoch_separation = 0.9 * (3 + 0) * sample_rate
+	minimum_epoch_separation = 0.9 * (1 + 0) * sample_rate
 
 	# shift & normalize so frame monitor trace lives on [0 1]
 	photodiode_trace = photodiode_trace - np.min(photodiode_trace)
