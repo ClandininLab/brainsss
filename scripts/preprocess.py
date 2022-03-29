@@ -62,6 +62,18 @@ def main(args):
         correlation = brainsss.parse_true_false(settings.get('correlation', False))
         STA = brainsss.parse_true_false(settings.get('STA', False))
         h5_to_nii = brainsss.parse_true_false(settings.get('h5_to_nii', False))
+    else:
+        fictrac_qc = False
+        stim_triggered_beh = False
+        bleaching_qc = False
+        temporal_mean_brain = False
+        motion_correction = False
+        zscore = False
+        highpass = False
+        correlation = False
+        STA = False
+        h5_to_nii = False
+
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
