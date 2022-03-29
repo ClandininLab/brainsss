@@ -61,16 +61,7 @@ def main(args):
         highpass = brainsss.parse_true_false(settings.get('highpass',False))
         correlation = brainsss.parse_true_false(settings.get('correlation', False))
         STA = brainsss.parse_true_false(settings.get('STA', False))
-    else:
-        fictrac_qc = False
-        stim_triggered_beh = False
-        bleaching_qc = False
-        temporal_mean_brain = False
-        motion_correction = False
-        zscore = False
-        highpass = False
-        correlation = False
-        STA = False
+        h5_to_nii = brainsss.parse_true_false(settings.get('h5_to_nii', False))
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
@@ -106,6 +97,8 @@ def main(args):
         correlation = True
     if args ['STA'] != '':
         STA = True
+    if args ['H5_TO_NII'] != '':
+        h5_to_nii = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -349,6 +342,23 @@ def main(args):
                                  modules=modules,
                                  args=args,
                                  logfile=logfile, time=2, mem=4, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+
+    if h5_to_nii:
+
+        #################
+        ### H5 TO NII ###
+        #################
+
+        for func in funcs:
+            args = {'logfile': logfile, 'h5_path': os.path.join(func, 'functional_channel_2_moco_zscore_highpass.h5')}
+            script = 'h5_to_nii.py'
+            job_id = brainsss.sbatch(jobname='h5tonii',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=2, mem=10, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if STA:

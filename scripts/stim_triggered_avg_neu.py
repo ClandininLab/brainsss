@@ -15,6 +15,7 @@ def main(args):
 	logfile = args['logfile']
 	func_path = args['func_path']
 	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+	printlog(func_path)
 
 	###########################
 	### PREP VISUAL STIMULI ###
@@ -106,7 +107,8 @@ def make_stas(ynew,new_stim_timestamps,chunk_edges,bin_start=20,bin_end=55):
 	running_sum = np.zeros(dims)
 	for elem in chunk_edges:
 		section = ynew[:,:, elem[0]:elem[1]+1]
-		running_sum += section
+		if np.shape(section)[2] == step_size: # to catch any not long enough
+			running_sum += section
 	sta = running_sum / np.size(new_stim_timestamps)
 	return sta
 
