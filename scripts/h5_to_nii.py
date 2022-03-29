@@ -27,7 +27,7 @@ def main(args):
 	with h5py.File(h5_path, 'r+') as h5_file:
 		image_array = h5_file.get("data")[:].astype('float32')
 
-	pringlog('saving')
+	printlog('saving')
 	nib.Nifti1Image(image_array, np.eye(4)).to_filename(nii_savefile)
 
 if __name__ == '__main__':
