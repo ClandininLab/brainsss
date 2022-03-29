@@ -57,7 +57,7 @@ def main(args):
                 chunkend = steps[chunk_num + 1]
                 chunk = data[:,:,:,chunkstart:chunkend]
                 running_sum += np.sum(chunk, axis=3)
-                printlog(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
+                #printlog(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
         meanbrain = running_sum / dims[-1]
 
         ### Calculate std ###
@@ -69,7 +69,7 @@ def main(args):
                 chunkend = steps[chunk_num + 1]
                 chunk = data[:,:,:,chunkstart:chunkend]
                 running_sumofsq += np.sum((chunk-meanbrain[...,None])**2, axis=3)
-                printlog(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
+                #printlog(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
         final_std = np.sqrt(running_sumofsq/dims[-1])
 
         ### Calculate zscore and save ###
@@ -86,7 +86,7 @@ def main(args):
                     running_sumofsq += np.sum((chunk-meanbrain[...,None])**2, axis=3)
                     zscored = (chunk - meanbrain[...,None]) / final_std[...,None]
                     f['data'][:,:,:,chunkstart:chunkend] = zscored
-                    printlog(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
+                    #printlog(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
 
     printlog("zscore done")
 
