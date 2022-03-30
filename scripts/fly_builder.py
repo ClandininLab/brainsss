@@ -64,7 +64,7 @@ def main(args):
             printlog(F'Created fly directory:{destination_fly:.>{width-22}}')
 
             # Copy fly data
-            copy_fly(source_fly, destination_fly, printlog)
+            copy_fly(source_fly, destination_fly, printlog, user)
 
             # Add date to fly.json file
             try:
@@ -108,7 +108,7 @@ def add_date_to_fly(destination_fly):
         json.dump(metadata, f, indent=4)
         f.truncate()
 
-def copy_fly(source_fly, destination_fly, printlog):
+def copy_fly(source_fly, destination_fly, printlog, user):
 
     ''' There will be two types of folders in a fly folder.
     1) func_x folder
