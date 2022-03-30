@@ -20,6 +20,7 @@ def main(args):
     flagged_dir = args['flagged_dir']
     target_path = args['dataset_path']
     fly_dirs = args['fly_dirs']
+    user = args['user']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
     #printlog('\nBuilding flies from directory {}'.format(flagged_dir))
     width = 120
@@ -147,7 +148,7 @@ def copy_fly(source_fly, destination_fly, printlog):
                 os.mkdir(imaging_destination)
                 copy_bruker_data(source_expt_folder, imaging_destination, 'func', printlog)
                 # Copt fictrac data based on timestamps
-                copy_fictrac(expt_folder, printlog)
+                copy_fictrac(expt_folder, printlog, user)
                 # Copy visual data based on timestamps, and create visual.json
                 copy_visual(expt_folder, printlog)
 
@@ -317,9 +318,12 @@ def copy_visual(destination_region, printlog):
     with open(os.path.join(visual_destination, 'visual.json'), 'w') as f:
         json.dump(unique_stimuli, f, indent=4)
 
-def copy_fictrac(destination_region, printlog):
+def copy_fictrac(destination_region, printlog, user):
     #fictrac_folder = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/fictrac'
-    fictrac_folder = "/oak/stanford/groups/trc/data/fictrac"
+
+    if user == 'luke':
+        user = 'brezovec'
+    fictrac_folder = os.path.join("/oak/stanford/groups/trc/data/fictrac",user)
     fictrac_destination = os.path.join(destination_region, 'fictrac')
 
     # Find time of experiment based on functional.xml
