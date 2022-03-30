@@ -149,7 +149,7 @@ def main(args):
         ###################
 
         flagged_dir = os.path.join(imports_path, dir_to_build)
-        args = {'logfile': logfile, 'flagged_dir': flagged_dir, 'dataset_path': dataset_path, 'fly_dirs': fly_dirs}
+        args = {'logfile': logfile, 'flagged_dir': flagged_dir, 'dataset_path': dataset_path, 'fly_dirs': fly_dirs, 'user': user}
         script = 'fly_builder.py'
         job_id = brainsss.sbatch(jobname='bldfly',
                              script=os.path.join(scripts_path, script),
