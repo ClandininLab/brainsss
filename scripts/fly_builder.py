@@ -321,8 +321,8 @@ def copy_visual(destination_region, printlog):
 def copy_fictrac(destination_region, printlog, user):
     #fictrac_folder = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/fictrac'
 
-    if user == 'luke':
-        user = 'brezovec'
+    if user == 'brezovec':
+        user = 'luke'
     fictrac_folder = os.path.join("/oak/stanford/groups/trc/data/fictrac",user)
     fictrac_destination = os.path.join(destination_region, 'fictrac')
 
