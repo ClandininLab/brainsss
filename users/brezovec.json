@@ -8,5 +8,7 @@
     "motion_correction": "True",
     "zscore": "True",
     "highpass": "True",
-    "correlation": "True"
+    "correlation": "True",
+    "STA": "STA",
+    "h5_to_nii": "h5_to_nii"
 }
