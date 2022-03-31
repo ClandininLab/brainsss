@@ -85,7 +85,7 @@ def main(args):
                     chunk = data[:,:,:,chunkstart:chunkend]
                     running_sumofsq += np.sum((chunk-meanbrain[...,None])**2, axis=3)
                     zscored = (chunk - meanbrain[...,None]) / final_std[...,None]
-                    f['data'][:,:,:,chunkstart:chunkend] = zscored
+                    f['data'][:,:,:,chunkstart:chunkend] = np.nan_to_num(zscored) ### Added nan to num because if a pixel is a constant value (over saturated) will divide by 0
                     #printlog(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
 
     printlog("zscore done")
