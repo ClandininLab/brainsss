@@ -24,6 +24,8 @@ def main(args):
     logfile = args['logfile']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
+    printlog(load_directory)
+
     fps = 100 # of fictrac camera
 
     ### load brain timestamps ###
