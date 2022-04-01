@@ -55,8 +55,9 @@ def main(args):
         fictrac_qc = brainsss.parse_true_false(settings.get('fictrac_qc',False))
         stim_triggered_beh = brainsss.parse_true_false(settings.get('stim_triggered_beh',False))
         bleaching_qc = brainsss.parse_true_false(settings.get('bleaching_qc',False))
-        temporal_mean_brain = brainsss.parse_true_false(settings.get('temporal_mean_brain',False))
+        temporal_mean_brain_pre = brainsss.parse_true_false(settings.get('temporal_mean_brain_pre',False))
         motion_correction = brainsss.parse_true_false(settings.get('motion_correction',False))
+        temporal_mean_brain_post = brainsss.parse_true_false(settings.get('temporal_mean_brain_post',False))
         zscore = brainsss.parse_true_false(settings.get('zscore',False))
         highpass = brainsss.parse_true_false(settings.get('highpass',False))
         correlation = brainsss.parse_true_false(settings.get('correlation', False))
@@ -66,8 +67,9 @@ def main(args):
         fictrac_qc = False
         stim_triggered_beh = False
         bleaching_qc = False
-        temporal_mean_brain = False
+        temporal_mean_brain_pre = False
         motion_correction = False
+        temporal_mean_brain_post = False
         zscore = False
         highpass = False
         correlation = False
@@ -81,7 +83,11 @@ def main(args):
         fly_dirs = None
     else:
         fly_dirs = args['FLIES'].split(',')
-        #printlog('flies are {}'.format(fly_dirs))
+
+        ### add 'fly_' to beginning if it isn't there
+        for i in range(len(fly_dirs)):
+            if not fly_dirs[i].startswith('fly_'):
+                fly_dirs[i] = 'fly_' + fly_dirs[i]
 
     if args['DIRTYPE'] == '':
         #printlog('no dirtype specified')
@@ -231,11 +237,11 @@ def main(args):
                                  logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
-    if temporal_mean_brain:
+    if temporal_mean_brain_pre:
 
-        ###################################
-        ### Create temporal mean brains ###
-        ###################################
+        #######################################
+        ### Create temporal mean brains PRE ###
+        #######################################
 
         for funcanat, dirtype in zip(funcanats, dirtypes):
             directory = os.path.join(funcanat, 'imaging')
@@ -293,6 +299,29 @@ def main(args):
                                  logfile=logfile, time=dur, mem=mem, nice=nice, nodes=nodes, global_resources=global_resources)
         ### currently submitting these jobs simultaneously since using global resources
         brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if temporal_mean_brain_post:
+
+        #########################################
+        ### Create temporal mean brains, POST ###
+        #########################################
+
+        for funcanat, dirtype in zip(funcanats, dirtypes):
+            directory = os.path.join(funcanat, 'moco')
+
+            if dirtype == 'func':
+                files = ['functional_channel_1_moco.h5', 'functional_channel_2_moco.h5']
+            if dirtype == 'anat':
+                files = ['anatomy_channel_1_moco.h5', 'anatomy_channel_2_moco.h5']
+
+            args = {'logfile': logfile, 'directory': directory, 'files': files}
+            script = 'make_mean_brain.py'
+            job_id = brainsss.sbatch(jobname='meanbrn',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
 
     if zscore:
 

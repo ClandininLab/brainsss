@@ -18,7 +18,12 @@ def main(args):
     for file in files:
         try:
             ### make mean ###
-            brain = np.asarray(nib.load(os.path.join(directory, file)).get_data(), dtype='uint16')
+            full_path = os.path.join(directory, file)
+            if full_path.endswith('.nii'):
+                brain = np.asarray(nib.load(full_path).get_data(), dtype='uint16')
+            elif full_path.endswith('.h5'):
+                with h5py.File(full_path, 'r') as hf:
+                    brain = np.asarray(hf['data'][:], dtype='uint16')
             meanbrain = np.mean(brain, axis=-1)
 
             ### Save ###
