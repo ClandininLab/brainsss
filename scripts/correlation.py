@@ -42,7 +42,7 @@ def main(args):
     printlog('loading brain')
     full_load_path = os.path.join(load_directory, brain_file)
     with h5py.File(full_load_path, 'r') as hf:
-        brain = np.nan_to_num(hf['data'][:]) # nan to num should be taken care of in zscore, but doing here for some already processed brains
+        brain = hf['data'][:] 
     printlog('done')
     
     ### Correlate ###
@@ -56,7 +56,8 @@ def main(args):
 
         for i in range(256):
             for j in range(128):
-                corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, brain[i,j,z,:])[0]
+                # nan to num should be taken care of in zscore, but doing here for some already processed brains
+                corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, np.nan_to_num(brain[i,j,z,:]))[0]
 
     if not os.path.exists(save_directory):
         os.mkdir(save_directory)
