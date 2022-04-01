@@ -322,7 +322,7 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
+                                 logfile=logfile, time=1, mem=6, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if zscore:
@@ -427,7 +427,6 @@ def main(args):
     brainsss.print_footer(logfile, width)
 
 if __name__ == '__main__':
-    print(sys.argv[1])
     main(json.loads(sys.argv[1]))
     # parser = argparse.ArgumentParser()
     # parser.add_argument("PWD") 
