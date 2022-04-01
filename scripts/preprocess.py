@@ -103,10 +103,12 @@ def main(args):
         stim_triggered_beh = True
     if args['BLEACHING_QC'] != '':
         bleaching_qc = True
-    if args['TEMPORAL_MEAN_BRAIN'] != '':
-        temporal_mean_brain = True
+    if args['TEMPORAL_MEAN_BRAIN_PRE'] != '':
+        temporal_mean_brain_pre = True
     if args['MOCO'] != '':
         motion_correction = True
+    if args['TEMPORAL_MEAN_BRAIN_POST'] != '':
+        temporal_mean_brain_post = True
     if args['ZSCORE'] != '':
         zscore = True
     if args['HIGHPASS'] != '':
