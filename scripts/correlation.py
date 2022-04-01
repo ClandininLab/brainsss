@@ -42,7 +42,7 @@ def main(args):
     printlog('loading brain')
     full_load_path = os.path.join(load_directory, brain_file)
     with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data'][:]
+        brain = np.nan_to_num(hf['data'][:]) # nan to num should be taken care of in zscore, but doing here for some already processed brains
     printlog('done')
     
     ### Correlate ###
