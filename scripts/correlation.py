@@ -60,6 +60,9 @@ def main(args):
                 if np.any(np.isnan(brain[i,j,z,:])):
                     printlog(F'warning found nan at x = {i}; y = {j}; z = {z}')
                     corr_brain[i,j,z] = 0
+                elif len(np.unique(brain[i,j,z,:])) == 1:
+                    printlog(F'warning found constant value at x = {i}; y = {j}; z = {z}')
+                    corr_brain[i,j,z] = 0
                 else:
                     corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, brain[i,j,z,:])[0]
 
