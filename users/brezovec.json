@@ -4,11 +4,12 @@
     "fictrac_qc": "True",
     "stim_triggered_beh": "True",
     "bleaching_qc": "True",
-    "temporal_mean_brain": "True",
+    "temporal_mean_brain_pre": "True",
     "motion_correction": "True",
+    "temporal_mean_brain_post": "True",
     "zscore": "True",
     "highpass": "True",
     "correlation": "True",
-    "STA": "STA",
-    "h5_to_nii": "h5_to_nii"
+    "STA": "True",
+    "h5_to_nii": "True"
 }
