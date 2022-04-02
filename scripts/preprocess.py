@@ -302,29 +302,6 @@ def main(args):
         ### currently submitting these jobs simultaneously since using global resources
         brainsss.wait_for_job(job_id, logfile, com_path)
 
-    if temporal_mean_brain_post:
-
-        #########################################
-        ### Create temporal mean brains, POST ###
-        #########################################
-
-        for funcanat, dirtype in zip(funcanats, dirtypes):
-            directory = os.path.join(funcanat, 'moco')
-
-            if dirtype == 'func':
-                files = ['functional_channel_1_moco.h5', 'functional_channel_2_moco.h5']
-            if dirtype == 'anat':
-                files = ['anatomy_channel_1_moco.h5', 'anatomy_channel_2_moco.h5']
-
-            args = {'logfile': logfile, 'directory': directory, 'files': files}
-            script = 'make_mean_brain.py'
-            job_id = brainsss.sbatch(jobname='meanbrn',
-                                 script=os.path.join(scripts_path, script),
-                                 modules=modules,
-                                 args=args,
-                                 logfile=logfile, time=1, mem=6, nice=nice, nodes=nodes)
-            brainsss.wait_for_job(job_id, logfile, com_path)
-
     if zscore:
 
         ##############
@@ -344,7 +321,6 @@ def main(args):
                                  args=args,
                                  logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
-
 
     if highpass:
 
@@ -387,6 +363,21 @@ def main(args):
                                  logfile=logfile, time=2, mem=4, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
+    if STA:
+
+        #########################################
+        ### STIMULUS TRIGGERED NEURAL AVERAGE ###
+        #########################################
+
+        for func in funcs:
+            args = {'logfile': logfile, 'func_path': func}
+            script = 'stim_triggered_avg_neu.py'
+            job_id = brainsss.sbatch(jobname='STA',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=4, mem=4, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
 
     if h5_to_nii:
 
@@ -404,20 +395,27 @@ def main(args):
                                  logfile=logfile, time=2, mem=10, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
-    if STA:
+    if temporal_mean_brain_post:
 
         #########################################
-        ### STIMULUS TRIGGERED NEURAL AVERAGE ###
+        ### Create temporal mean brains, POST ###
         #########################################
 
-        for func in funcs:
-            args = {'logfile': logfile, 'func_path': func}
-            script = 'stim_triggered_avg_neu.py'
-            job_id = brainsss.sbatch(jobname='STA',
+        for funcanat, dirtype in zip(funcanats, dirtypes):
+            directory = os.path.join(funcanat, 'moco')
+
+            if dirtype == 'func':
+                files = ['functional_channel_1_moco.h5', 'functional_channel_2_moco.h5']
+            if dirtype == 'anat':
+                files = ['anatomy_channel_1_moco.h5', 'anatomy_channel_2_moco.h5']
+
+            args = {'logfile': logfile, 'directory': directory, 'files': files}
+            script = 'make_mean_brain.py'
+            job_id = brainsss.sbatch(jobname='meanbrn',
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=4, mem=4, nice=nice, nodes=nodes)
+                                 logfile=logfile, time=2, mem=10, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
