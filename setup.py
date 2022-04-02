@@ -20,6 +20,8 @@ setup(
         'nibabel',
         'numpy',
         'pandas',
-        'pytest'
+        'pytest',
+        'scipy',
+        'h5py'
     ],
 )
