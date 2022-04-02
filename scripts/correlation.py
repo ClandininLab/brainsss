@@ -56,8 +56,12 @@ def main(args):
 
         for i in range(256):
             for j in range(128):
-                # nan to num should be taken care of in zscore, but doing here for some already processed brains
-                corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, np.nan_to_num(brain[i,j,z,:]))[0]
+                # nan to num should be taken care of in zscore, but checking here for some already processed brains
+                if np.any(np.isnan(brain[i,j,z,:])):
+                    printlog(F'warning found nan at x = {i}; y = {j}; z = {z}')
+                    corr_brain[i,j,z] = 0
+                else:
+                    corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, brain[i,j,z,:])[0]
 
     if not os.path.exists(save_directory):
         os.mkdir(save_directory)
