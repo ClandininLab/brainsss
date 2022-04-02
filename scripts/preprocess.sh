@@ -52,11 +52,11 @@ while [[ $# -gt 0 ]]; do
       BLEACHING_QC=True
       shift
       ;;
-    --temporal_mean_brain_pre)
+    --meanpre|--temporal_mean_brain_pre)
       TEMPORAL_MEAN_BRAIN_PRE=True
       shift
       ;;
-    --temporal_mean_brain_post)
+    --meanpost|--temporal_mean_brain_post)
       TEMPORAL_MEAN_BRAIN_POST=True
       shift
       ;;
@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
       STA=True
       shift
       ;;
-    --H5_TO_NII)
+    --h52nii|--H5_TO_NII)
       H5_TO_NII=True
       shift
       ;;
