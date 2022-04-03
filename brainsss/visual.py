@@ -147,7 +147,7 @@ def get_stimulus_metadata(vision_path, printlog=None):
 		else:
 			printlog("did not find any series longer than 100 stimuli. Not saving metadata pickle.")
 		
-		return stim_ids, angles
+		return metadata['stim_ids'], metadata['angles']
 		printlog('Could not get visual metadata.')
 	
 
