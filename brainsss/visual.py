@@ -103,8 +103,6 @@ def get_stimulus_metadata(vision_path, printlog=None):
 	fname = [x for x in os.listdir(vision_path) if '.hdf5' in x][0]
 	visprotocol_file = os.path.join(vision_path, fname)
 
-	stim_ids = []
-	angles = []
 	found_a_full_series = False
 	with h5py.File(visprotocol_file, 'r') as f:
 
@@ -119,7 +117,9 @@ def get_stimulus_metadata(vision_path, printlog=None):
 			for serie in series:
 
 				epoch_ids = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').keys()
-				printlog(str(len(epoch_ids)))
+				printlog(F"Num epochs in {fly_id} {serie}: {len(epoch_ids)}")
+				stim_ids = []
+				angles = []
 				for i, epoch_id in enumerate(epoch_ids):
 					stim_id = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').get(epoch_id).attrs['component_stim_type']
 					stim_ids.append(stim_id)
@@ -145,7 +145,7 @@ def get_stimulus_metadata(vision_path, printlog=None):
 				pickle.dump(metadata, f)
 			printlog("created {}".format(save_file))
 		else:
-			"did not find any series longer than 100 stimuli. Not saving metadata pickle."
+			printlog("did not find any series longer than 100 stimuli. Not saving metadata pickle.")
 		
 		return stim_ids, angles
 		printlog('Could not get visual metadata.')
