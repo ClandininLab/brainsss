@@ -415,8 +415,8 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=2, mem=12, nice=nice, nodes=nodes)
-            brainsss.wait_for_job(job_id, logfile, com_path)
+                                 logfile=logfile, time=2, mem=12, nice=nice, nodes=nodes, global_resources=True)
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###
