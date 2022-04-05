@@ -636,11 +636,14 @@ def add_times_to_jsons(destination_fly):
 
 def add_fly_to_xlsx(fly_folder, printlog):
 
+    printlog("Adding fly to master_2P excel log")
+
     ### TRY TO LOAD ELSX ###
     try:
         xlsx_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset/master_2P.xlsx'
         wb = load_workbook(filename=xlsx_path, read_only=False)
         ws = wb.active
+        printlog("Sucessfully opened master_2P log")
     except:
         printlog("FYI you have no excel metadata sheet found, so unable to append metadata for this fly.")
         return
@@ -649,6 +652,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
     try:
         fly_file = os.path.join(fly_folder, 'fly.json')
         fly_data = load_json(fly_file)
+        printlog("Sucessfully loaded fly.json")
     except:
         printlog("FYI no *fly.json* found; this will not be logged in your excel sheet.")
         fly_data = {}
@@ -670,6 +674,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
         try:
             expt_file = os.path.join(expt_folder, 'expt.json')
             expt_data = load_json(expt_file)
+            printlog("Sucessfully loaded expt.json")
         except:
             printlog("FYI no *expt.json* found; this will not be logged in your excel sheet.")
             expt_data = {}
@@ -684,7 +689,9 @@ def add_fly_to_xlsx(fly_folder, printlog):
             scan_data['x_voxel_size'] = '{:.1f}'.format(scan_data['x_voxel_size'])
             scan_data['y_voxel_size'] = '{:.1f}'.format(scan_data['y_voxel_size'])
             scan_data['z_voxel_size'] = '{:.1f}'.format(scan_data['z_voxel_size'])
+            printlog("Sucessfully loaded scan.json")
         except:
+            printlog("FYI no *scan.json* found; this will not be logged in your excel sheet.")
             scan_data = {}
             scan_data['laser_power'] = None
             scan_data['PMT_green'] = None
@@ -706,9 +713,11 @@ def add_fly_to_xlsx(fly_folder, printlog):
         # Get fly_id
         fly_folder = os.path.split(os.path.split(expt_folder)[0])[-1]
         fly_id = fly_folder.split('_')[-1]
+        printlog(F"Got fly ID as {fly_id}")
 
         # Get expt_id
         expt_id = expt_folder.split('_')[-1]
+        printlog(F"Got expt ID as {expt_id}")
 
         # Append the new row
         new_row = []
@@ -738,9 +747,11 @@ def add_fly_to_xlsx(fly_folder, printlog):
                    scan_data['z_voxel_size']]
 
         ws.append(new_row)
+        printlog(F"Appended {fly_id} {expt_id}")
 
     # Save the file
     wb.save(xlsx_path)
+    printlog("master_2P successfully updated")
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
