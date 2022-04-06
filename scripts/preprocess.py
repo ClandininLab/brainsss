@@ -352,16 +352,18 @@ def main(args):
             load_directory = os.path.join(func)
             save_directory = os.path.join(func, 'corr')
             brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
-            behavior = 'dRotLabY'
 
-            args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file, 'behavior': behavior}
-            script = 'correlation.py'
-            job_id = brainsss.sbatch(jobname='corr',
-                                 script=os.path.join(scripts_path, script),
-                                 modules=modules,
-                                 args=args,
-                                 logfile=logfile, time=2, mem=4, nice=nice, nodes=nodes)
-            brainsss.wait_for_job(job_id, logfile, com_path)
+            behaviors = ['dRotLabZpos', 'dRotLabZneg', 'dRotLabY']
+            for behavior in behaviors:
+                
+                args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file, 'behavior': behavior}
+                script = 'correlation.py'
+                job_id = brainsss.sbatch(jobname='corr',
+                                     script=os.path.join(scripts_path, script),
+                                     modules=modules,
+                                     args=args,
+                                     logfile=logfile, time=2, mem=4, nice=nice, nodes=nodes)
+                brainsss.wait_for_job(job_id, logfile, com_path)
 
     if STA:
 
