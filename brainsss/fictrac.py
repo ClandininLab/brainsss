@@ -128,19 +128,36 @@ def interpolate_fictrac(fictrac, timestamps, fps, dur, behavior='speed',sigma=3,
     return fictrac_interp
 
 def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, timestamps=None, smoothing=25, z=None):
+
+    if behavior == 'dRotLabZpos':
+      behavior = 'dRotLabZ'
+      clip = 'pos'
+    elif behavior == 'dRotLabZneg':
+      behavior = 'dRotLabZ'
+      clip = 'neg'
+
+    ### get orginal timestamps ###
     camera_rate = 1/fps * 1000 # camera frame rate in ms
-    
     x_original = np.arange(0,expt_len,camera_rate)
+
+    ### smooth ###
     fictrac_smoothed = scipy.signal.savgol_filter(np.asarray(fictrac[behavior]),smoothing,3)
+
+    ### clip if desired ###
+    if clip == 'pos':
+      fictrac_smoothed = np.clip(fictrac_smoothed, a_min=0, a_max=None)
+    elif clip == 'neg':
+      fictrac_smoothed = np.clip(fictrac_smoothed, a_min=None, a_max=0)
+
+    ### interpolate ###
     fictrac_interp_temp = interp1d(x_original, fictrac_smoothed, bounds_error = False)
     xnew = np.arange(0,expt_len,resolution) #0 to last time at subsample res
-
     if timestamps is None:
       fictrac_interp = fictrac_interp_temp(xnew)
     else:
       fictrac_interp = fictrac_interp_temp(timestamps[:,z])
 
-    # convert units for common cases
+    ### convert units for common cases ###
     sphere_radius = 4.5e-3 # in m
     if behavior in ['dRotLabY']:
         ''' starts with units of rad/frame

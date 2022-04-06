@@ -35,8 +35,6 @@ def main(args):
     fictrac_raw = brainsss.load_fictrac(os.path.join(load_directory, 'fictrac'))
     resolution = 10 #desired resolution in ms
     expt_len = fictrac_raw.shape[0]/fps*1000    
-    if behavior == 'dRotLabY': short = 'Y'
-    elif behavior == 'dRotLabZ': short = 'Z'
 
     ### Load brain ###
     printlog('loading brain')
