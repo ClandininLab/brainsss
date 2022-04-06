@@ -147,7 +147,7 @@ def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, time
     if clip == 'pos':
       fictrac_smoothed = np.clip(fictrac_smoothed, a_min=0, a_max=None)
     elif clip == 'neg':
-      fictrac_smoothed = np.clip(fictrac_smoothed, a_min=None, a_max=0)
+      fictrac_smoothed = np.clip(fictrac_smoothed, a_min=None, a_max=0)*-1
 
     ### interpolate ###
     fictrac_interp_temp = interp1d(x_original, fictrac_smoothed, bounds_error = False)
