@@ -135,6 +135,8 @@ def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, time
     elif behavior == 'dRotLabZneg':
       behavior = 'dRotLabZ'
       clip = 'neg'
+    else:
+      clip = None
 
     ### get orginal timestamps ###
     camera_rate = 1/fps * 1000 # camera frame rate in ms
