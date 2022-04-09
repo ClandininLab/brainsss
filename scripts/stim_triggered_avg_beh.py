@@ -23,7 +23,7 @@ def main(args):
 
 	### Get Metadata ###
 	stim_ids, angles = brainsss.get_stimulus_metadata(vision_path, printlog)
-	printlog(F"Found {len(stim_ids)} presented stimuli.")
+	printlog(F"Found {len(angles)} presented stimuli.")
 
 	# *100 puts in units of 10ms, which will match fictrac
 	starts_angle_0 = [int(stimulus_start_times[i]*100) for i in range(len(stimulus_start_times)) if angles[i] == 0]

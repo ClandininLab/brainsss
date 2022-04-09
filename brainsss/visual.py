@@ -89,7 +89,6 @@ def get_stimulus_metadata(vision_path, printlog=None):
 	if printlog is None:
 		printlog = print
 
-
 	### try to get from pickle ###
 	pickle_path = os.path.join(vision_path, 'stimulus_metadata.pkl')
 	if os.path.exists(pickle_path):
@@ -103,43 +102,18 @@ def get_stimulus_metadata(vision_path, printlog=None):
 	fname = [x for x in os.listdir(vision_path) if '.hdf5' in x][0]
 	visprotocol_file = os.path.join(vision_path, fname)
 
-	found_a_full_series = False
-	with h5py.File(visprotocol_file, 'r') as f:
+	with h5py.File(visprotocol_file, 'r') as file:
 
-		### loop over flies and series to find the one that has many stim presentations (others were aborted)
-		# note it is critical each fly has their own .h5 file saved
-		fly_ids = list(f['Flies'].keys())
-		printlog("Found fly ids: {}".format(fly_ids))
-		for fly_id in fly_ids:
-			
-			series = list(f['Flies'][fly_id]['epoch_runs'].keys())
-			printlog("Found series: {}".format(series))
-			for serie in series:
-
-				epoch_ids = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').keys()
-				printlog(F"Num epochs in {fly_id} {serie}: {len(epoch_ids)}")
-				stim_ids = []
-				angles = []
-				for i, epoch_id in enumerate(epoch_ids):
-					stim_id = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').get(epoch_id).attrs['component_stim_type']
-					stim_ids.append(stim_id)
-					if stim_id == 'DriftingSquareGrating':
-						angle = f['Flies'][fly_id]['epoch_runs'][serie].get('epochs').get(epoch_id).attrs['angle']
-						angles.append(angle)
-					else:
-						angles.append(None)
-						
-				if len(stim_ids) > 100:
-					if found_a_full_series:
-						printlog('WARNING - FOUND 2 FULL SERIES IN THIS VISPROTOCOL HDF5 FILE. YOU NEED TO RESOLVE WHICH TO CHOOSE')
-						printlog('QUITING')
-						return
-					found_a_full_series = True
-					### save dic for final save below
-					metadata = {'stim_ids': stim_ids, 'angles': angles}
+		try:
+			## if no key error it must be a visprotocol metadata file ##
+			fly_ids = file['Flies']
+			metadata = parse_visprotocol_metadata(file)
+		except KeyError:
+			## if keyerror it is a visual_stimulation metadata file ##
+			metadata = parse_visual_stimulation_metadata(file)
 
 		### SAVE ###
-		if found_a_full_series:
+		if metadata is not None:
 			save_file = os.path.join(vision_path, 'stimulus_metadata.pkl')
 			with open(save_file, 'wb') as f:
 				pickle.dump(metadata, f)
@@ -149,7 +123,61 @@ def get_stimulus_metadata(vision_path, printlog=None):
 		
 		return metadata['stim_ids'], metadata['angles']
 		printlog('Could not get visual metadata.')
-	
+
+def parse_visprotocol_metadata(file):
+	### loop over flies and series to find the one that has many stim presentations (others were aborted)
+	# note it is critical each fly has their own .h5 file saved
+	found_a_full_series = False
+	fly_ids = list(file['Flies'].keys())
+	printlog("Found fly ids: {}".format(fly_ids))
+	for fly_id in fly_ids:
+		
+		series = list(file['Flies'][fly_id]['epoch_runs'].keys())
+		printlog("Found series: {}".format(series))
+		for serie in series:
+
+			epoch_ids = file['Flies'][fly_id]['epoch_runs'][serie].get('epochs').keys()
+			printlog(F"Num epochs in {fly_id} {serie}: {len(epoch_ids)}")
+			stim_ids = []
+			angles = []
+			for i, epoch_id in enumerate(epoch_ids):
+				stim_id = file['Flies'][fly_id]['epoch_runs'][serie].get('epochs').get(epoch_id).attrs['component_stim_type']
+				stim_ids.append(stim_id)
+				if stim_id == 'DriftingSquareGrating':
+					angle = file['Flies'][fly_id]['epoch_runs'][serie].get('epochs').get(epoch_id).attrs['angle']
+					angles.append(angle)
+				else:
+					angles.append(None)
+					
+			if len(stim_ids) > 100:
+				if found_a_full_series:
+					printlog('WARNING - FOUND 2 FULL SERIES IN THIS VISPROTOCOL HDF5 FILE. YOU NEED TO RESOLVE WHICH TO CHOOSE')
+					printlog('QUITING')
+					return None
+				found_a_full_series = True
+				### save dic for final save below
+				metadata = {'stim_ids': stim_ids, 'angles': angles}
+	return metadata
+
+def parse_visual_stimulation_metadata(file):
+	### currently this is a list of angles presented in a single cluster
+	# so, we will need to copy this and add the long 1 min greys between them
+	# we also need to set the stim_ids here.
+	# should change this to be saved by visual_stimulation package...
+
+    angles = list(file['data'][:])
+
+	stim_ids = ['DriftingSquareGrating'] * len(angles)
+	stim_ids.insert(0,'ConstantBackground')
+	stim_ids = stim_ids + stim_ids + stim_ids + stim_ids
+	stim_ids.append('ConstantBackground')
+
+	angles.insert(0,None)
+	angles = angles + angles + angles + angles
+	angles.append(None)
+
+	metadata = {'stim_ids': stim_ids, 'angles': angles}
+	return metadata
 
 def extract_stim_times_from_pd(photodiode_trace, time_vector):
 	threshold=0.8,
