@@ -63,6 +63,7 @@ def main(args):
         correlation = brainsss.parse_true_false(settings.get('correlation', False))
         STA = brainsss.parse_true_false(settings.get('STA', False))
         h5_to_nii = brainsss.parse_true_false(settings.get('h5_to_nii', False))
+        use_warp = brainsss.parse_true_false(settings.get('use_warp', False))
     else:
         fictrac_qc = False
         stim_triggered_beh = False
@@ -75,6 +76,7 @@ def main(args):
         correlation = False
         STA = False
         h5_to_nii = False
+        use_warp = False
 
 
     ### Parse remaining command line args
@@ -119,6 +121,8 @@ def main(args):
         STA = True
     if args ['H5_TO_NII'] != '':
         h5_to_nii = True
+    if args ['USE_WARP'] != '':
+        use_warp = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -351,7 +355,10 @@ def main(args):
         for func in funcs:
             load_directory = os.path.join(func)
             save_directory = os.path.join(func, 'corr')
-            brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
+            if use_warp:
+                brain_file = 'functional_channel_2_moco_zscore_highpass_warped.nii'
+            else:
+                brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
 
             behaviors = ['dRotLabZneg', 'dRotLabZpos', 'dRotLabY']
             for behavior in behaviors:
