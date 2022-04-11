@@ -39,8 +39,16 @@ def main(args):
     ### Load brain ###
     printlog('loading brain')
     full_load_path = os.path.join(load_directory, brain_file)
-    with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data'][:] 
+
+    if full_load_path.endswith('.h5'):
+        with h5py.File(full_load_path, 'r') as hf:
+            brain = hf['data'][:]
+        save_str = ''
+
+    elif full_load_path.endswith('.nii'):
+        brain = np.asarray(nib.load(full_load_path).get_data().squeeze(), dtype='float32')
+        save_str = '_warp'
+
     printlog('done')
     
     ### Correlate ###
@@ -67,7 +75,7 @@ def main(args):
     if not os.path.exists(save_directory):
         os.mkdir(save_directory)
 
-    save_file = os.path.join(save_directory, 'corr_{}.nii'.format(behavior))
+    save_file = os.path.join(save_directory, 'corr_{}{}.nii'.format(behavior, save_str))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
     printlog("Saved {}".format(save_file))
     save_maxproj_img(save_file)
