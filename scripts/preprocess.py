@@ -78,7 +78,9 @@ def main(args):
         h5_to_nii = False
         use_warp = False
         loco_dataset = False
-
+        clean_anat = False
+        func2anat = False
+        anat2atlas False
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
@@ -126,6 +128,12 @@ def main(args):
         use_warp = True
     if args ['LOCO_DATASET'] != '':
         loco_dataset = True
+    if args ['CLEAN_ANAT'] != '':
+        clean_anat = True
+    if args ['FUNC2ANAT'] != '':
+        func2anat = True
+    if args ['ANAT2ATLAS'] != '':
+        anat2atlas = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -434,6 +442,166 @@ def main(args):
                                  args=args,
                                  logfile=logfile, time=3, mem=12, nice=nice, nodes=nodes, global_resources=True)
         brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if clean_anat:
+
+        ##################
+        ### Clean Anat ###
+        ##################
+
+        printlog(f"\n{'   Clean Anat   ':=^{width}}")
+        for anat in anats:
+            directory = os.path.join(anat, 'moco')
+            args = {'logfile': logfile, 'directory': directory}
+            script = 'clean_anat.py'
+            job_id = brainsss.sbatch(jobname='clnanat',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if func2anat:
+
+        #################
+        ### func2anat ###
+        #################
+
+        res_anat = (0.653, 0.653, 1)
+        res_func = (2.611, 2.611, 5)
+
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+
+            #moving_path = os.path.join(fly_directory, 'func_0', 'imaging', 'functional_channel_1_mean.nii')
+            moving_path = os.path.join(fly_directory, 'func_0', 'moco', 'functional_channel_1_moc_mean.nii')
+            moving_fly = 'func'
+            moving_resolution = res_func
+
+
+            #fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'stitched_brain_red_mean.nii')
+            fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean.nii')
+            fixed_fly = 'anat'
+            fixed_resolution = res_anat
+
+            save_directory = os.path.join(fly_directory, 'warp')
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+
+            type_of_transform = 'Affine'
+            save_warp_params = True
+            flip_X = False
+            flip_Z = False
+
+            low_res = False
+            very_low_res = False
+
+            iso_2um_fixed = True
+            iso_2um_moving = False
+
+            grad_step = 0.2
+            flow_sigma = 3
+            total_sigma = 0
+            syn_sampling = 32
+
+            args = {'logfile': logfile,
+                    'save_directory': save_directory,
+                    'fixed_path': fixed_path,
+                    'moving_path': moving_path,
+                    'fixed_fly': fixed_fly,
+                    'moving_fly': moving_fly,
+                    'type_of_transform': type_of_transform,
+                    'flip_X': flip_X,
+                    'flip_Z': flip_Z,
+                    'moving_resolution': moving_resolution,
+                    'fixed_resolution': fixed_resolution,
+                    'save_warp_params': save_warp_params,
+                    'low_res': low_res,
+                    'very_low_res': very_low_res,
+                    'iso_2um_fixed': iso_2um_fixed,
+                    'iso_2um_moving': iso_2um_moving,
+                    'grad_step': grad_step,
+                    'flow_sigma': flow_sigma,
+                    'total_sigma': total_sigma,
+                    'syn_sampling': syn_sampling}
+
+            script = 'align_anat.py'
+            job_id = brainsss.sbatch(jobname='align',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=8, mem=4, nice=nice, nodes=nodes) # 2 to 1
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if anat2atlas:
+
+        #################
+        ### anat2mean ###
+        #################
+
+        res_anat = (0.653, 0.653, 1)
+        res_meanbrain = (2,2,2)#(0.38, 0.38, 0.38)
+
+        for fly in flies:
+            fly_directory = os.path.join(dataset_path, fly)
+
+            moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
+            moving_fly = 'anat'
+            moving_resolution = res_anat
+
+
+            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
+            fixed_fly = 'meanbrain'
+            fixed_resolution = res_meanbrain
+
+            save_directory = os.path.join(fly_directory, 'warp')
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+
+            type_of_transform = 'SyN'
+            save_warp_params = True
+            flip_X = False
+            flip_Z = False
+
+            low_res = False
+            very_low_res = False
+
+            iso_2um_fixed = False
+            iso_2um_moving = True
+
+            grad_step = 0.2
+            flow_sigma = 3
+            total_sigma = 0
+            syn_sampling = 32
+
+            args = {'logfile': logfile,
+                    'save_directory': save_directory,
+                    'fixed_path': fixed_path,
+                    'moving_path': moving_path,
+                    'fixed_fly': fixed_fly,
+                    'moving_fly': moving_fly,
+                    'type_of_transform': type_of_transform,
+                    'flip_X': flip_X,
+                    'flip_Z': flip_Z,
+                    'moving_resolution': moving_resolution,
+                    'fixed_resolution': fixed_resolution,
+                    'save_warp_params': save_warp_params,
+                    'low_res': low_res,
+                    'very_low_res': very_low_res,
+                    'iso_2um_fixed': iso_2um_fixed,
+                    'iso_2um_moving': iso_2um_moving,
+                    'grad_step': grad_step,
+                    'flow_sigma': flow_sigma,
+                    'total_sigma': total_sigma,
+                    'syn_sampling': syn_sampling}
+
+            script = 'align_anat.py'
+            job_id = brainsss.sbatch(jobname='align',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=8, mem=8, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###

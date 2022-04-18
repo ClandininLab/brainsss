@@ -76,6 +76,18 @@ while [[ $# -gt 0 ]]; do
       LOCO_DATASET=True
       shift
       ;;
+    --clean_anat)
+      CLEAN_ANAT=True
+      shift
+      ;;
+    --f2a)
+      FUNC2ANAT=True
+      shift
+      ;;
+    --a2a)
+      ANAT2ATLAS=True
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -88,7 +100,7 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 \"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\
 \"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"STA\":\"$STA\",\"H5_TO_NII\":\"$H5_TO_NII\",\
 \"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"USE_WARP\":\"$USE_WARP\",\
-\"LOCO_DATASET\":\"$LOCO_DATASET\"}"
+\"LOCO_DATASET\":\"$LOCO_DATASET\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\"FUNC2ANAT\":\"$FUNC2ANAT\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\"}"
 
 ml python/3.6
 date
