@@ -43,12 +43,8 @@ def main(args):
     if full_load_path.endswith('.h5'):
         with h5py.File(full_load_path, 'r') as hf:
             brain = hf['data'][:]
-        save_str = ''
-
     elif full_load_path.endswith('.nii'):
         brain = np.asarray(nib.load(full_load_path).get_data().squeeze(), dtype='float32')
-        save_str = '_warp'
-
     printlog('done')
     
     ### Correlate ###
@@ -72,10 +68,18 @@ def main(args):
                 else:
                     corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, brain[i,j,z,:])[0]
 
+    ### SAVE ###
     if not os.path.exists(save_directory):
         os.mkdir(save_directory)
 
-    save_file = os.path.join(save_directory, 'corr_{}{}.nii'.format(behavior, save_str))
+    if 'warp' in full_load_path:
+       save_str = '_warp'
+    else:
+        save_str = ''
+
+    date = time.strftime("%Y%m%d")
+
+    save_file = os.path.join(save_directory, '{}_corr_{}{}.nii'.format(date, behavior, save_str))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
     printlog("Saved {}".format(save_file))
     save_maxproj_img(save_file)
