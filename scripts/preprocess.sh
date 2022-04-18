@@ -88,6 +88,10 @@ while [[ $# -gt 0 ]]; do
       ANAT2ATLAS=True
       shift
       ;;
+    --apply_t)
+      APPLY_TRANSFORMS=True
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -100,7 +104,8 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 \"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\
 \"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"STA\":\"$STA\",\"H5_TO_NII\":\"$H5_TO_NII\",\
 \"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"USE_WARP\":\"$USE_WARP\",\
-\"LOCO_DATASET\":\"$LOCO_DATASET\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\"FUNC2ANAT\":\"$FUNC2ANAT\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\"}"
+\"LOCO_DATASET\":\"$LOCO_DATASET\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\"FUNC2ANAT\":\"$FUNC2ANAT\",\
+\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"APPLY_TRANSFORMS\":\"$APPLY_TRANSFORMS\"}"
 
 ml python/3.6
 date

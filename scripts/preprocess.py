@@ -80,7 +80,8 @@ def main(args):
         loco_dataset = False
         clean_anat = False
         func2anat = False
-        anat2atlas False
+        anat2atlas = False
+        apply_transforms = False
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
@@ -134,6 +135,8 @@ def main(args):
         func2anat = True
     if args ['ANAT2ATLAS'] != '':
         anat2atlas = True
+    if args ['APPLY_TRANSFORMS'] != '':
+        apply_transforms = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
