@@ -542,7 +542,7 @@ def main(args):
         res_anat = (0.653, 0.653, 1)
         res_meanbrain = (2,2,2)#(0.38, 0.38, 0.38)
 
-        for fly in flies:
+        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
             moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
@@ -602,6 +602,51 @@ def main(args):
                                  args=args,
                                  logfile=logfile, time=8, mem=8, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if apply_transforms:
+
+        ########################
+        ### Apply transforms ###
+        ########################
+        res_func = (2.611, 2.611, 5)
+        res_anat = (2,2,2)#(0.38, 0.38, 0.38)
+        final_2um_iso = False #already 2iso so don't need to downsample
+
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+
+            behaviors = ['dRotLabY', 'dRotLabZneg', 'dRotLabZpos']
+            for behavior in behaviors:
+                moving_path = os.path.join(fly_directory, 'func_0', 'corr', 'corr_{}.nii'.format(behavior))
+                moving_fly = 'corr_{}'.format(behavior)
+                moving_resolution = res_func
+
+                #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/luke.nii"
+                fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
+                fixed_fly = 'meanbrain'
+                fixed_resolution = res_anat
+
+                save_directory = os.path.join(fly_directory, 'warp')
+                if not os.path.exists(save_directory):
+                    os.mkdir(save_directory)
+
+                args = {'logfile': logfile,
+                        'save_directory': save_directory,
+                        'fixed_path': fixed_path,
+                        'moving_path': moving_path,
+                        'fixed_fly': fixed_fly,
+                        'moving_fly': moving_fly,
+                        'moving_resolution': moving_resolution,
+                        'fixed_resolution': fixed_resolution,
+                        'final_2um_iso': final_2um_iso}
+
+                script = 'apply_transforms.py'
+                job_id = brainsss.sbatch(jobname='aplytrns',
+                                     script=os.path.join(scripts_path, script),
+                                     modules=modules,
+                                     args=args,
+                                     logfile=logfile, time=12, mem=4, nice=nice, nodes=nodes) # 2 to 1
+                brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###
