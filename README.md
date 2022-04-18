@@ -65,11 +65,11 @@ There are currently three main ways to use this package:
         -   files will be renamed for convenience. for example, long bruker names like "TSeries-12172018-1322-002_channel_1.nii" will be changed to functional_channel_1.nii if it was in a func directory, etc.
         -   flies will be added to an excel spreadsheet to help track metadata. If you would like this feature, copy the master_2P.xlsx file (found in root of brainsss) into your dataset path.
       - When you are ready to build flies navigate to brainsss/scripts
-      - Launch the job with ```sbatch preprocessing.sh --build_flies 20220307```. Swap the date to match the name of the directory in your imports path. You can watch the progress of your job by navigating to brainsss/scripts/logs. A new logfile with date-time will be created. You can view it with ```nano 20220310-135620.txt``` or whatever the name is. Note that if an error happened very early during the setup of this job this file will not be created but the error will be printed to mainlog.out.
+      - Launch the job with ```sbatch preprocess.sh --build_flies 20220307```. Swap the date to match the name of the directory in your imports path. You can watch the progress of your job by navigating to brainsss/scripts/logs. A new logfile with date-time will be created. You can view it with ```nano 20220310-135620.txt``` or whatever the name is. Note that if an error happened very early during the setup of this job this file will not be created but the error will be printed to mainlog.out.
       - After the flies are built the script will automatically continue executing the preprocessing steps as set in your preferences and the output will be saved in the same log.
 
 2) Run specific preprocessing or analysis steps.
-      - Launch the job ```sbatch preprocessing.sh``` with specific flags. For example, if you would like to motion correct a file: ```sbatch preprocessing.sh --moco --flies fly_006,fly007```
+      - Launch the job ```sbatch preprocess.sh``` with specific flags. For example, if you would like to motion correct a file: ```sbatch preprocess.sh --moco --flies fly_006,fly007```
       - These flies must be in your dataset_path
       - These fly folders must contain a subfolder with 'func' or 'anat' in the name.
       - This func or anat folder must have a subfolder called imaging
@@ -94,7 +94,7 @@ Final comments:
 A note that should be mentioned: to achieve creation of a common log file, I have stolen the print() function. So, for anything you want to print, you must use the printlog() function, but otherwise it is the same.
 
 Here is a little detail on the guts:
-preprocessing.sh will always be called via sbatch to start the program. This will start preprocessing.py, which will use a single core and manage the submission of jobs. Two core functions are:
+preprocess.sh will always be called via sbatch to start the program. This will start preprocess.py, which will use a single core and manage the submission of jobs. Two core functions are:
 - brainsss.sbatch
 - brainsss.wait_for_job   
 These are in the utils.py file if you want to check them out.
