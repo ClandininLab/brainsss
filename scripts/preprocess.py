@@ -77,6 +77,7 @@ def main(args):
         STA = False
         h5_to_nii = False
         use_warp = False
+        loco_dataset = False
 
 
     ### Parse remaining command line args
@@ -123,6 +124,8 @@ def main(args):
         h5_to_nii = True
     if args ['USE_WARP'] != '':
         use_warp = True
+    if args ['LOCO_DATASET'] != '':
+        loco_dataset = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -357,6 +360,8 @@ def main(args):
             save_directory = os.path.join(func, 'corr')
             if use_warp:
                 brain_file = 'functional_channel_2_moco_zscore_highpass_warped.nii'
+            elif loco_dataset:
+                brain_file = 'brain_zscored_green_high_pass_masked.nii'
             else:
                 brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
 
