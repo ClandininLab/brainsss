@@ -360,15 +360,18 @@ def main(args):
             save_directory = os.path.join(func, 'corr')
             if use_warp:
                 brain_file = 'functional_channel_2_moco_zscore_highpass_warped.nii'
+                fps = 100
             elif loco_dataset:
                 brain_file = 'brain_zscored_green_high_pass_masked.nii'
+                fps = 50
             else:
                 brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
+                fps =100
 
             behaviors = ['dRotLabZneg', 'dRotLabZpos', 'dRotLabY']
             for behavior in behaviors:
 
-                args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file, 'behavior': behavior}
+                args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file, 'behavior': behavior, 'fps': fps}
                 script = 'correlation.py'
                 job_id = brainsss.sbatch(jobname='corr',
                                      script=os.path.join(scripts_path, script),

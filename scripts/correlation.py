@@ -20,13 +20,14 @@ def main(args):
     brain_file = args['brain_file']
 
     behavior = args['behavior']
+    fps = args['fps'] # of fictrac camera
 
     logfile = args['logfile']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
     printlog(load_directory)
 
-    fps = 100 # of fictrac camera
+    fps = 100 
 
     ### load brain timestamps ###
     timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
