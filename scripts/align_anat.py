@@ -122,6 +122,8 @@ def main(args):
         fwdtransforms_save_dir = os.path.join(save_directory, '{}-to-{}_fwdtransforms'.format(moving_fly, fixed_fly))
         if low_res:
             fwdtransforms_save_dir += '_lowres'
+        if True in [iso_2um_moving, iso_2um_fixed]:
+            fwdtransforms_save_dir += '_2umiso'
         if not os.path.exists(fwdtransforms_save_dir):
             os.mkdir(fwdtransforms_save_dir)
         for source_path in fwdtransformlist:
@@ -135,6 +137,8 @@ def main(args):
         fwdtransforms_save_dir = os.path.join(save_directory, '{}-to-{}_invtransforms'.format(moving_fly, fixed_fly))
         if low_res:
             fwdtransforms_save_dir += '_lowres'
+        if True in [iso_2um_moving, iso_2um_fixed]:
+            fwdtransforms_save_dir += '_2umiso'
         if not os.path.exists(fwdtransforms_save_dir):
             os.mkdir(fwdtransforms_save_dir)
         for source_path in fwdtransformlist:

@@ -46,12 +46,12 @@ def main(args):
     ###########################
     ### Organize Transforms ###
     ###########################
-    affine_file = os.listdir(os.path.join(save_directory, 'func-to-anat_fwdtransforms'))[0]
-    affine_path = os.path.join(save_directory, 'func-to-anat_fwdtransforms', affine_file)
+    affine_file = os.listdir(os.path.join(save_directory, 'func-to-anat_fwdtransforms_2umiso'))[0]
+    affine_path = os.path.join(save_directory, 'func-to-anat_fwdtransforms_2umiso', affine_file)
 
-    syn_files = os.listdir(os.path.join(save_directory, 'anat-to-meanbrain_fwdtransforms'))
-    syn_linear_path = os.path.join(save_directory, 'anat-to-meanbrain_fwdtransforms', [x for x in syn_files if '.mat' in x][0])
-    syn_nonlinear_path = os.path.join(save_directory, 'anat-to-meanbrain_fwdtransforms', [x for x in syn_files if '.nii.gz' in x][0])
+    syn_files = os.listdir(os.path.join(save_directory, 'anat-to-meanbrain_fwdtransforms_2umiso'))
+    syn_linear_path = os.path.join(save_directory, 'anat-to-meanbrain_fwdtransforms_2umiso', [x for x in syn_files if '.mat' in x][0])
+    syn_nonlinear_path = os.path.join(save_directory, 'anat-to-meanbrain_fwdtransforms_2umiso', [x for x in syn_files if '.nii.gz' in x][0])
 
     transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
 

@@ -476,14 +476,17 @@ def main(args):
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
-            #moving_path = os.path.join(fly_directory, 'func_0', 'imaging', 'functional_channel_1_mean.nii')
-            moving_path = os.path.join(fly_directory, 'func_0', 'moco', 'functional_channel_1_moc_mean.nii')
+            if loco_dataset:
+                moving_path = os.path.join(fly_directory, 'func_0', 'imaging', 'functional_channel_1_mean.nii')
+            else:
+                moving_path = os.path.join(fly_directory, 'func_0', 'moco', 'functional_channel_1_moc_mean.nii')
             moving_fly = 'func'
             moving_resolution = res_func
 
-
-            #fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'stitched_brain_red_mean.nii')
-            fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean.nii')
+            if loco_dataset:
+                fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'stitched_brain_red_mean.nii')
+            else:
+                fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean.nii')
             fixed_fly = 'anat'
             fixed_resolution = res_anat
 
@@ -543,12 +546,15 @@ def main(args):
         #################
 
         res_anat = (0.653, 0.653, 1)
-        res_meanbrain = (2,2,2)#(0.38, 0.38, 0.38)
+        res_meanbrain = (2,2,2)
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
-            moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
+            if loco_dataset:
+                moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anat_red_clean.nii')
+            else:
+                moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
             moving_fly = 'anat'
             moving_resolution = res_anat
 
@@ -620,7 +626,10 @@ def main(args):
 
             behaviors = ['dRotLabY', 'dRotLabZneg', 'dRotLabZpos']
             for behavior in behaviors:
-                moving_path = os.path.join(fly_directory, 'func_0', 'corr', 'corr_{}.nii'.format(behavior))
+                if loco_dataset:
+                    moving_path = os.path.join(fly_directory, 'func_0', 'corr', '20220418_corr_{}.nii'.format(behavior))
+                else:
+                    moving_path = os.path.join(fly_directory, 'func_0', 'corr', 'corr_{}.nii'.format(behavior))
                 moving_fly = 'corr_{}'.format(behavior)
                 moving_resolution = res_func
 
