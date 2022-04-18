@@ -27,8 +27,6 @@ def main(args):
 
     printlog(load_directory)
 
-    fps = 100 
-
     ### load brain timestamps ###
     timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
 
