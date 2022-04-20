@@ -18,6 +18,7 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']
+    grey_only = args['grey_only']
 
     behavior = args['behavior']
     fps = args['fps'] # of fictrac camera
@@ -29,6 +30,27 @@ def main(args):
 
     ### load brain timestamps ###
     timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
+
+    ### this means only calculat correlation during periods of grey stimuli ###
+    if grey_only:
+        vision_path = os.path.join(load_directory, 'visual')
+        stim_ids, angles = brainsss.get_stimulus_metadata(vision_path)
+        t, ft_triggers, pd1, pd2 = brainsss.load_photodiode(vision_path)
+        stimulus_start_times = brainsss.extract_stim_times_from_pd(pd2, t)
+        grey_starts = []
+        grey_stops = []
+        for i,stim in enumerate(stim_ids):
+            if stim == 'ConstantBackground':
+                grey_starts.append(stimulus_start_times[i])
+                grey_stops.append(stimulus_start_times[i]+60)
+        grey_starts = [i*1000 for i in grey_starts] # convert from s to ms
+        grey_stops = [i*1000 for i in grey_stops] # convert from s to ms
+        idx_to_use = []
+        for i in range(len(grey_starts)):
+            idx_to_use.extend(np.where((grey_starts[i] < timestamps[:,0]) & (timestamps[:,0] < grey_stops[i]))[0])
+        ### this is now a list of indices where grey stim was presented
+    else:
+        idx_to_use = list(range(timestamps.shape[0]))
 
     ### Load fictrac ###
     fictrac_raw = brainsss.load_fictrac(os.path.join(load_directory, 'fictrac'))
@@ -66,7 +88,8 @@ def main(args):
                 #         printlog(F'warning found non-zero constant value at x = {i}; y = {j}; z = {z}')
                     corr_brain[i,j,z] = 0
                 else:
-                    corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp, brain[i,j,z,:])[0]
+                    #idx_to_use can be used to select a subset of timepoints
+                    corr_brain[i,j,z] = scipy.stats.pearsonr(fictrac_interp[idx_to_use], brain[i,j,z,:][idx_to_use])[0]
 
     ### SAVE ###
     if not os.path.exists(save_directory):
