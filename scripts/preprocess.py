@@ -64,6 +64,10 @@ def main(args):
         STA = brainsss.parse_true_false(settings.get('STA', False))
         h5_to_nii = brainsss.parse_true_false(settings.get('h5_to_nii', False))
         use_warp = brainsss.parse_true_false(settings.get('use_warp', False))
+        clean_anat = brainsss.parse_true_false(settings.get('clean_anat', False))
+        func2anat = brainsss.parse_true_false(settings.get('func2anat', False))
+        anat2atlas = brainsss.parse_true_false(settings.get('anat2atlas', False))
+        apply_transforms = brainsss.parse_true_false(settings.get('apply_transforms', False))
     else:
         fictrac_qc = False
         stim_triggered_beh = False
@@ -82,6 +86,7 @@ def main(args):
         func2anat = False
         anat2atlas = False
         apply_transforms = False
+        grey_only = False
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
@@ -137,6 +142,8 @@ def main(args):
         anat2atlas = True
     if args ['APPLY_TRANSFORMS'] != '':
         apply_transforms = True
+    if args ['GREY_ONLY'] != '':
+        grey_only = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -382,7 +389,9 @@ def main(args):
             behaviors = ['dRotLabZneg', 'dRotLabZpos', 'dRotLabY']
             for behavior in behaviors:
 
-                args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file, 'behavior': behavior, 'fps': fps}
+                args = {'logfile': logfile, 'load_directory': load_directory,
+                'save_directory': save_directory, 'brain_file': brain_file, 
+                'behavior': behavior, 'fps': fps, 'grey_only': grey_only}
                 script = 'correlation.py'
                 job_id = brainsss.sbatch(jobname='corr',
                                      script=os.path.join(scripts_path, script),
