@@ -96,13 +96,17 @@ def main(args):
         os.mkdir(save_directory)
 
     if 'warp' in full_load_path:
-       save_str = '_warp'
+       warp_str = '_warp'
     else:
-        save_str = ''
+        warp_str = ''
+    if grey_only:
+        grey_str = '_grey'
+    else:
+        grey_str = ''
 
     date = time.strftime("%Y%m%d")
 
-    save_file = os.path.join(save_directory, '{}_corr_{}{}.nii'.format(date, behavior, save_str))
+    save_file = os.path.join(save_directory, '{}_corr_{}{}{}.nii'.format(date, behavior, warp_str, grey_str))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
     printlog("Saved {}".format(save_file))
     save_maxproj_img(save_file)
