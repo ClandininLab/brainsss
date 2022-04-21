@@ -638,7 +638,7 @@ def main(args):
                 if loco_dataset:
                     moving_path = os.path.join(fly_directory, 'func_0', 'corr', '20220418_corr_{}.nii'.format(behavior))
                 else:
-                    moving_path = os.path.join(fly_directory, 'func_0', 'corr', 'corr_{}.nii'.format(behavior))
+                    moving_path = os.path.join(fly_directory, 'func_0', 'corr', '20220420_corr_{}.nii'.format(behavior))
                 moving_fly = 'corr_{}'.format(behavior)
                 moving_resolution = res_func
 
