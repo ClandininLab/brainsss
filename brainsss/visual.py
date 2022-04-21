@@ -165,9 +165,16 @@ def parse_visual_stimulation_metadata(file):
 	# we also need to set the stim_ids here.
 	# should change this to be saved by visual_stimulation package...
 
-	angles = list(file['data'][:])
+	angles = list(file['angle'][:])
+	translation = list(file['translation'][:])
 
 	stim_ids = ['DriftingSquareGrating'] * len(angles)
+
+	for i in range(len(translation)):
+		if translation[i] == 'True':
+			angles[i] = None
+			stim_ids[i] = 'Translation'
+
 	stim_ids.insert(0,'ConstantBackground')
 	stim_ids = stim_ids + stim_ids + stim_ids + stim_ids
 	stim_ids.append('ConstantBackground')
