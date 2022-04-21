@@ -11,7 +11,7 @@
     "highpass": "True",
     "correlation": "True",
     "STA": "True",
-    "h5_to_nii": "True",
+    "h5_to_nii": "False",
     "clean_anat": "True",
     "func2anat": "True",
     "anat2atlas": "True",
