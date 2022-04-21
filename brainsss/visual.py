@@ -171,7 +171,7 @@ def parse_visual_stimulation_metadata(file):
 	stim_ids = ['DriftingSquareGrating'] * len(angles)
 
 	for i in range(len(translation)):
-		if translation[i] == 'True':
+		if translation[i] == True:
 			angles[i] = None
 			stim_ids[i] = 'Translation'
 
