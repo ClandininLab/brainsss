@@ -104,7 +104,8 @@ def main(args):
     else:
         grey_str = ''
 
-    date = time.strftime("%Y%m%d")
+    #date = time.strftime("%Y%m%d")
+    date = '20220420'
 
     save_file = os.path.join(save_directory, '{}_corr_{}{}{}.nii'.format(date, behavior, warp_str, grey_str))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
