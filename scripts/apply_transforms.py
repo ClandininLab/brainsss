@@ -27,6 +27,7 @@ def main(args):
     moving_resolution = args['moving_resolution']
 
     final_2um_iso = args['final_2um_iso']
+    #nonmyr_to_myr_transform = args['nonmyr_to_myr_transform']
 
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
