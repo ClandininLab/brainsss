@@ -81,12 +81,14 @@ def main(args):
         STA = False
         h5_to_nii = False
         use_warp = False
-        loco_dataset = False
         clean_anat = False
         func2anat = False
         anat2atlas = False
         apply_transforms = False
         grey_only = False
+
+    # this arg should not be available to the .json settings
+    loco_dataset = False
 
     ### Parse remaining command line args
     if args['FLIES'] == '':
