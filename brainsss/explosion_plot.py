@@ -83,7 +83,7 @@ def get_dim_info(item, full_x_mid, full_y_mid):
     bottom = top + height
     return {'left': left, 'right': right, 'top': top, 'bottom': bottom}
 
-def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_plot, input_canvas, gain):
+def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_plot, input_canvas, vmax, cmap):
     full_y_mid = int(input_canvas.shape[0]/2)
     full_x_mid = int(input_canvas.shape[1]/2)
     
@@ -100,7 +100,8 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
         
         for roi in explosion_rois[roi_group]['rois']:
             mask = roi_masks[roi]
-            masked_roi = mask[...,np.newaxis]*data_to_plot
+            #masked_roi = mask[...,np.newaxis]*data_to_plot # for 3 channel
+            masked_roi = mask*data_to_plot
 
             ### maximum projection along z-axis
             # works for negative values
@@ -129,10 +130,15 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
         ### this projects across all the roi_data from each roi 
         roi_datas = np.max(np.asarray(roi_data),axis=0)
         ### cutout this grouping
-        data_map = np.swapaxes(roi_datas[top_edge:bottom_edge,left_edge:right_edge,:],0,1)
+        #data_map = np.swapaxes(roi_datas[top_edge:bottom_edge,left_edge:right_edge,:],0,1) # for 3 channel
+        data_map = np.swapaxes(roi_datas[top_edge:bottom_edge,left_edge:right_edge],0,1)
         ### apply gain
-        data_map = data_map * gain
+        #data_map = data_map * gain
         
+        data_map = data_map/vmax
+        mycmap = matplotlib.cm.get_cmap(cmap)
+        data_map = mycmap(data_map)[...,:3] #loose alpha channel
+
         dims = get_dim_info(data_map, full_x_mid, full_y_mid)
 
         ### ADD TO CANVAS
