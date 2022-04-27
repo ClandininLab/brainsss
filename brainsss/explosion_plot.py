@@ -103,8 +103,16 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
             masked_roi = mask[...,np.newaxis]*data_to_plot
 
             ### maximum projection along z-axis
-            masked_roi_flat = np.max(masked_roi,axis=2)
-            roi_data.append(masked_roi_flat)
+            # works for negative values
+            maxs = np.max(masked_roi,axis=2)
+            mins = np.min(masked_roi,axis=2)
+            maxs[np.where(np.abs(mins)>maxs)] = mins[np.where(np.abs(mins)>maxs)]
+            roi_data.append(maxs)
+            #masked_roi_flat = maxs
+
+            ### maximum projection along z-axis
+            #masked_roi_flat = np.max(masked_roi,axis=2)
+            #roi_data.append(masked_roi_flat)
             
             left_edges.append(roi_contours[roi]['left_edge'])
             right_edges.append(roi_contours[roi]['right_edge'])
