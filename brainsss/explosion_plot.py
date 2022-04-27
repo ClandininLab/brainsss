@@ -7,6 +7,7 @@ from scipy.ndimage.morphology import binary_erosion
 from scipy.ndimage.morphology import binary_dilation
 import cv2
 import time
+import matplotlib
 
 def load_roi_atlas():
     atlas_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/jfrc_2018_rois_improve_reorient_transformed.nii"
