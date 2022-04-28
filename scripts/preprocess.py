@@ -388,8 +388,8 @@ def main(args):
                 brain_file = 'brain_zscored_green_high_pass_masked.nii'
                 fps = 50
             elif no_zscore_highpass:
-                brain_file = 'functional_channel_2_moco.h5'
-                load_directory = os.path.join(func, 'moco')
+                brain_file = 'moco/functional_channel_2_moco.h5'
+                #load_directory = os.path.join(func, 'moco')
                 fps = 100
             else:
                 brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
