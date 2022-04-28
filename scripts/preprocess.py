@@ -86,6 +86,7 @@ def main(args):
         anat2atlas = False
         apply_transforms = False
         grey_only = False
+        no_zscore_highpass = False
 
     # this arg should not be available to the .json settings
     loco_dataset = False
@@ -146,6 +147,8 @@ def main(args):
         apply_transforms = True
     if args ['GREY_ONLY'] != '':
         grey_only = True
+    if args ['NO_ZSCORE_HIGHPASS'] != '':
+        no_zscore_highpass = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -384,9 +387,13 @@ def main(args):
             elif loco_dataset:
                 brain_file = 'brain_zscored_green_high_pass_masked.nii'
                 fps = 50
+            elif no_zscore_highpass:
+                brain_file = 'functional_channel_2_moco.h5'
+                load_directory = os.path.join(func, 'moco')
+                fps = 100
             else:
                 brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
-                fps =100
+                fps = 100
 
             behaviors = ['dRotLabZneg', 'dRotLabZpos', 'dRotLabY']
             for behavior in behaviors:

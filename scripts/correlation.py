@@ -103,6 +103,10 @@ def main(args):
         grey_str = '_grey'
     else:
         grey_str = ''
+    if 'zscore' not in full_load_path:
+        no_zscore_highpass_str = '_mocoonly'
+    else:
+        no_zscore_highpass_str = ''
 
     #date = time.strftime("%Y%m%d")
     date = '20220420'
