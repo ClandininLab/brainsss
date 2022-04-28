@@ -84,7 +84,7 @@ def get_dim_info(item, full_x_mid, full_y_mid):
     bottom = top + height
     return {'left': left, 'right': right, 'top': top, 'bottom': bottom}
 
-def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_plot, input_canvas, vmax, cmap):
+def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_plot, input_canvas, vmax, cmap, diverging=False):
     full_y_mid = int(input_canvas.shape[0]/2)
     full_x_mid = int(input_canvas.shape[1]/2)
     
@@ -136,10 +136,15 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
         ### apply gain
         #data_map = data_map * gain
 
-        norm = matplotlib.colors.Normalize(vmin=-vmax, vmax=vmax)
-        data_map = norm(data_map)
-        #data_map = data_map/vmax
         mycmap = matplotlib.cm.get_cmap(cmap)
+
+        if diverging:
+            # this will normalize all value to [0,1], with 0.5 being the new "0" basically
+            norm = matplotlib.colors.Normalize(vmin=-vmax, vmax=vmax)
+            data_map = norm(data_map)
+        else:
+            data_map = data_map/vmax
+        
         data_map = mycmap(data_map)[...,:3] #loose alpha channel
 
         dims = get_dim_info(data_map, full_x_mid, full_y_mid)
