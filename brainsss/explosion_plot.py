@@ -135,8 +135,10 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
         data_map = np.swapaxes(roi_datas[top_edge:bottom_edge,left_edge:right_edge],0,1)
         ### apply gain
         #data_map = data_map * gain
-        
-        data_map = data_map/vmax
+
+        norm = matplotlib.colors.Normalize(vmin=-vmax, vmax=vmax)
+        data_map = norm(data_map)
+        #data_map = data_map/vmax
         mycmap = matplotlib.cm.get_cmap(cmap)
         data_map = mycmap(data_map)[...,:3] #loose alpha channel
 
