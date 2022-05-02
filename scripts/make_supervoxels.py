@@ -10,11 +10,11 @@ from sklearn.feature_extraction.image import grid_to_graph
 def main(args):
 
 	func_path = args['func_path']
-    logfile = args['logfile']
-    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+	logfile = args['logfile']
+	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 	n_clusters = 2000
 
-    ### LOAD BRAIN ###
+	### LOAD BRAIN ###
 
 	brain_path = os.path.join(func_path, 'functional_channel_2_moco_zscore_highpass.h5')
 	t0 = time.time()
@@ -68,4 +68,4 @@ def main(args):
 	printlog('cluster average duration: {} sec'.format(time.time()-t0))
 
 if __name__ == '__main__':
-    main(json.loads(sys.argv[1]))
+	main(json.loads(sys.argv[1]))
