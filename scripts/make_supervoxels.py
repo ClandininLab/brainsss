@@ -8,6 +8,22 @@ import brainsss
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.feature_extraction.image import grid_to_graph
 
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+'''
+Suppressing this warning:
+UserWarning: Persisting input arguments took 1.06s to run.
+If this happens often in your code, it can cause performance problems
+(results will be correct in all cases).
+The reason for this is probably some large input arguments for a wrapped
+ function (e.g. large strings).
+THIS IS A JOBLIB ISSUE. If you can, kindly provide the joblib's team with an
+ example so that they can fix the problem.
+  **kwargs)
+ '''
+
 def main(args):
 
 	func_path = args['func_path']
@@ -20,7 +36,7 @@ def main(args):
 	brain_path = os.path.join(func_path, 'functional_channel_2_moco_zscore_highpass.h5')
 	t0 = time.time()
 	with h5py.File(brain_path, 'r+') as h5_file:
-		brain = h5_file.get("data")[:].astype('float32')
+		brain = np.nan_to_num(h5_file.get("data")[:].astype('float32'))
 	printlog('brain shape: {}'.format(brain.shape))
 	printlog('load duration: {} sec'.format(time.time()-t0))
 
