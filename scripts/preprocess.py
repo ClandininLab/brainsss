@@ -87,6 +87,7 @@ def main(args):
         apply_transforms = False
         grey_only = False
         no_zscore_highpass = False
+        make_supervoxels = False
 
     # this arg should not be available to the .json settings
     loco_dataset = False
@@ -149,6 +150,8 @@ def main(args):
         grey_only = True
     if args ['NO_ZSCORE_HIGHPASS'] != '':
         no_zscore_highpass = True
+    if args ['MAKE_SUPERVOXELS'] != '':
+        make_supervoxels = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -470,7 +473,6 @@ def main(args):
         ### Clean Anat ###
         ##################
 
-        printlog(f"\n{'   Clean Anat   ':=^{width}}")
         for anat in anats:
             directory = os.path.join(anat, 'moco')
             args = {'logfile': logfile, 'directory': directory}
@@ -680,6 +682,18 @@ def main(args):
                                      args=args,
                                      logfile=logfile, time=12, mem=4, nice=nice, nodes=nodes) # 2 to 1
                 brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if make_supervoxels:
+        for func in funcs:
+            directory = os.path.join(anat, 'moco')
+            args = {'logfile': logfile, 'directory': directory}
+            script = 'make_supervoxels.py'
+            job_id = brainsss.sbatch(jobname='supervox',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=2, mem=6, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###
