@@ -685,8 +685,7 @@ def main(args):
 
     if make_supervoxels:
         for func in funcs:
-            directory = os.path.join(anat, 'moco')
-            args = {'logfile': logfile, 'directory': directory}
+            args = {'logfile': logfile, 'func_path': func}
             script = 'make_supervoxels.py'
             job_id = brainsss.sbatch(jobname='supervox',
                                  script=os.path.join(scripts_path, script),
