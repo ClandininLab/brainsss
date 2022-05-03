@@ -2,6 +2,7 @@ import numpy as np
 import ants
 import scipy
 import nibabel as nib
+import os
 
 def extract_traces(fictrac, stim_times, pre_window, post_window):
     traces = []
