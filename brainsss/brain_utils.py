@@ -106,7 +106,10 @@ def warp_STA_brain(STA_brain, fly, fixed, anat_to_mean_type):
 	syn_files = os.listdir(os.path.join(warp_directory, warp_sub_dir))
 	syn_linear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.mat' in x][0])
 	syn_nonlinear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.nii.gz' in x][0])
-	transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
+	####transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
+	transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
+	#ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
+
 
 	### Warp timeponts
 	warps = []
