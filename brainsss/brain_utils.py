@@ -13,7 +13,7 @@ def extract_traces(fictrac, stim_times, pre_window, post_window):
     sem_trace = scipy.stats.sem(traces,axis=0)
     return traces, mean_trace, sem_trace
 
-def get_visually_evoked_turns(traces, start, stop, r_thresh, av_thresh, stim_times):
+def get_visually_evoked_turns(traces, start, stop, r_thresh, av_thresh, stim_times, expected_direction):
     mean_trace = np.mean(traces,axis=0)
     mean_trace = mean_trace[start:stop]
     
@@ -21,12 +21,18 @@ def get_visually_evoked_turns(traces, start, stop, r_thresh, av_thresh, stim_tim
     rs = []
     for i in range(traces.shape[0]):
         rs.append(scipy.stats.pearsonr(mean_trace, traces[i,start:stop])[0])
-        
+    
+    ### this will flip the sign of the trace to get the correct av_thresh comparison
+    if expected_direction == 'pos':
+    	flip = 1
+    elif expected_direction == 'neg':
+    	flip = -1
+
     turns = []
     stim_evoked_turn_times = []
     for i in range(traces.shape[0]):
         if rs[i]>r_thresh:
-            if max(traces[i,start:stop]) > av_thresh:
+            if max(traces[i,start:stop]*flip) > av_thresh:
                 turns.append(traces[i,:])
                 stim_evoked_turn_times.append(stim_times[i])
     turns = np.asarray(turns)
