@@ -44,8 +44,8 @@ def make_STA_brain(neural_signals, neural_timestamps, event_times_list, neural_b
 	STA_brain = []
 	for z in range(49):
 		all_bin_indicies = []
-		for stim_idx in range(len(starts_angle_180_ms)):
-			stim_time = starts_angle_180_ms[stim_idx]
+		for stim_idx in range(len(event_times_list)):
+			stim_time = event_times_list[stim_idx]
 			stim_centered_bins = neural_bins + stim_time
 			bin_indicies = np.digitize(neural_timestamps[:,z] , stim_centered_bins)
 			all_bin_indicies.append(bin_indicies)
