@@ -10,7 +10,7 @@ def extract_traces(fictrac, stim_times, pre_window, post_window):
             traces.append(trace)
     traces = np.asarray(traces)
     mean_trace = np.mean(traces,axis=0)
-    sem_trace = sem(traces,axis=0)
+    sem_trace = scipy.stats.sem(traces,axis=0)
     return traces, mean_trace, sem_trace
 
 def get_visually_evoked_turns(traces, start, stop, r_thresh, av_thresh, stim_times):
