@@ -13,7 +13,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 '''
-Suppressing this warning:
+Suppressing this warning from AgglomerativeClustering:
 UserWarning: Persisting input arguments took 1.06s to run.
 If this happens often in your code, it can cause performance problems
 (results will be correct in all cases).
