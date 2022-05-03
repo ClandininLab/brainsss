@@ -1,6 +1,7 @@
 import numpy as np
 import ants
 import scipy
+import nibabel as nib
 
 def extract_traces(fictrac, stim_times, pre_window, post_window):
     traces = []
@@ -83,7 +84,7 @@ def load_fda_meanbrain():
 	fixed.set_spacing(fixed_resolution)
 	return fixed
 
-def warp_STA_brain(STA_brain, fly, anat_to_mean_type):
+def warp_STA_brain(STA_brain, fly, fixed, anat_to_mean_type):
 	n_tp = STA_brain.shape[1]
 	dataset_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset'
 	moving_resolution = (2.611, 2.611, 5)
