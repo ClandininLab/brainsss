@@ -130,6 +130,9 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
             
         ### this projects across all the roi_data from each roi 
         roi_datas = np.max(np.asarray(roi_data),axis=0)
+
+        ###ADD MAX MIN HERE LIKE ABOVE
+
         ### cutout this grouping
         #data_map = np.swapaxes(roi_datas[top_edge:bottom_edge,left_edge:right_edge,:],0,1) # for 3 channel
         data_map = np.swapaxes(roi_datas[top_edge:bottom_edge,left_edge:right_edge],0,1)
@@ -137,15 +140,21 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
         #data_map = data_map * gain
 
         mycmap = matplotlib.cm.get_cmap(cmap)
+        #mycmap.set_bad('k',1) # make nans black
 
         if diverging:
             # this will normalize all value to [0,1], with 0.5 being the new "0" basically
+            # current issue - a zero that should be background now looks like negative.
+            # solution: could use nans instead and set bad color
+            # with diverging we should make background white!
+            # so actually just set the input_canvas as 0.5!!!
+            # then make contours nan and set back as black
             norm = matplotlib.colors.Normalize(vmin=-vmax, vmax=vmax)
             data_map = norm(data_map)
         else:
             data_map = data_map/vmax
         
-        data_map = mycmap(data_map)[...,:3] #loose alpha channel
+        data_map = mycmap(data_map)[...,:3] #lose alpha channel
 
         dims = get_dim_info(data_map, full_x_mid, full_y_mid)
 
@@ -161,5 +170,5 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
             contour = np.swapaxes(contour[top_edge:bottom_edge,left_edge:right_edge],0,1)
             ys = np.where(contour[:,:,0]>0)[0] + dims['top'] + y_shift
             xs = np.where(contour[:,:,0]>0)[1] + dims['left'] + x_shift
-            input_canvas[ys,xs]=1
+            input_canvas[ys,xs]=0#1
     return input_canvas
