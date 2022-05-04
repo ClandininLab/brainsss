@@ -127,9 +127,13 @@ def place_roi_groups_on_canvas(explosion_rois, roi_masks, roi_contours, data_to_
         right_edge = np.max(right_edges) + 1
         top_edge = np.min(top_edges) - 1
         bottom_edge = np.max(bottom_edges) + 1
-            
+        
         ### this projects across all the roi_data from each roi 
-        roi_datas = np.max(np.asarray(roi_data),axis=0)
+        #roi_datas = np.max(np.asarray(roi_data),axis=0) # this one line is sufficient for not diverging
+        maxs = np.max(np.asarray(roi_data),axis=0)
+        mins = np.min(np.asarray(roi_data),axis=0)
+        maxs[np.where(np.abs(mins)>maxs)] = mins[np.where(np.abs(mins)>maxs)]
+        roi_datas = maxs
 
         ###ADD MAX MIN HERE LIKE ABOVE
 
