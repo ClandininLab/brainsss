@@ -68,6 +68,9 @@ def main(args):
         func2anat = brainsss.parse_true_false(settings.get('func2anat', False))
         anat2atlas = brainsss.parse_true_false(settings.get('anat2atlas', False))
         apply_transforms = brainsss.parse_true_false(settings.get('apply_transforms', False))
+        grey_only = brainsss.parse_true_false(settings.get('grey_only', False))
+        no_zscore_highpass = brainsss.parse_true_false(settings.get('no_zscore_highpass', False))
+        make_supervoxels = brainsss.parse_true_false(settings.get('make_supervoxels', False))
     else:
         fictrac_qc = False
         stim_triggered_beh = False
