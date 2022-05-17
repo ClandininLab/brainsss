@@ -166,14 +166,16 @@ def parse_visual_stimulation_metadata(file):
 	# should change this to be saved by visual_stimulation package...
 
 	angles = list(file['angle'][:])
-	translation = list(file['translation'][:])
-
 	stim_ids = ['DriftingSquareGrating'] * len(angles)
-
-	for i in range(len(translation)):
-		if translation[i] == True:
-			angles[i] = None
-			stim_ids[i] = 'Translation'
+	
+	try:
+		translation = list(file['translation'][:])
+		for i in range(len(translation)):
+			if translation[i] == True:
+				angles[i] = None
+				stim_ids[i] = 'Translation'
+	except:
+		pass
 
 	stim_ids.insert(0,'ConstantBackground')
 	stim_ids = stim_ids + stim_ids + stim_ids + stim_ids
