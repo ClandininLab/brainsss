@@ -15,9 +15,8 @@ def extract_traces(fictrac, stim_times, pre_window, post_window):
     sem_trace = scipy.stats.sem(traces,axis=0)
     return traces, mean_trace, sem_trace
 
-def get_visually_evoked_turns(traces, start, stop, r_thresh, av_thresh, stim_times, expected_direction):
-    mean_trace = np.mean(traces,axis=0)
-    mean_trace = mean_trace[start:stop]
+def get_visually_evoked_turns(traces, mean_turn, start, stop, r_thresh, av_thresh, stim_times, expected_direction):
+    mean_trace = mean_turn[start:stop]
     
     ### calculate correlation of each turn to mean turn within a defined window
     rs = []
