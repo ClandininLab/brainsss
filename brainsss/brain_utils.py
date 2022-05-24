@@ -3,6 +3,7 @@ import ants
 import scipy
 import nibabel as nib
 import os
+import time
 
 def extract_traces(fictrac, stim_times, pre_window, post_window):
     traces = []
@@ -240,7 +241,7 @@ def load_roi_hemi_ids():
     ### ROI LABELS ###
     ##################
     names = []
-    for name in full_left_group.values():
+    for name in roi_ids['left'].values():
         if '_R' in name:
             names.append(name[:-2])
         else:
