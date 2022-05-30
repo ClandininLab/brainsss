@@ -331,7 +331,8 @@ def copy_fictrac(destination_region, printlog, user):
     #printlog(f'true_ymd: {true_ymd}; true_total_seconds: {true_total_seconds}')
 
     # Find .dat file of 1) correct-ish time, 2) correct-ish size
-    datetime_correct = None
+    correct_date_and_size = []
+    time_differences = []
     for file in os.listdir(fictrac_folder):
 
         # must be .dat file
@@ -354,22 +355,31 @@ def copy_fictrac(destination_region, printlog, user):
             continue
         #printlog('Found file from same day: {}'.format(file))
 
-        # Time must be within 10min
-        time_difference = np.abs(true_total_seconds - test_total_seconds)
-        if time_difference > 10 * 60:
-            continue
-        #printlog('Found fictrac file that matches time.')
-
         # Must be correct size
         fp = os.path.join(fictrac_folder, file)
         file_size = os.path.getsize(fp)
-        if file_size > 30000000: #30MB
-            width = 120
-            printlog(F"Found correct .dat file{file:.>{width-23}}")
-            datetime_correct = datetime
-            break
+        if file_size < 1000000: #changed to 1MB to accomidate 1 min long recordings. #30000000: #30MB
+            #width = 120
+            #printlog(F"Found correct .dat file{file:.>{width-23}}")
+            #datetime_correct = datetime
+            #break
+            continue
 
-    if datetime_correct is None:
+        # get time difference from expt
+        time_difference = np.abs(true_total_seconds - test_total_seconds)
+        # Time must be within 10min
+        if time_difference > 10 * 60:
+            continue
+
+        # if correct date and size append to list of potential file
+        correct_date_and_size.append(file)
+        time_differences.append(time_difference)
+
+    # now that we have all potential files, pick the one with closest time
+    # except clause will happen if empty list
+    try:
+        datetime_correct = correct_date_and_size[np.argmin(time_differences)]
+    except:
         width = 120
         printlog(F"{'   No fictrac data found --- continuing without fictrac data   ':*^{width}}")
         return
