@@ -399,6 +399,7 @@ def copy_fictrac(destination_region, printlog, user):
     # Now transfer these 4 files to the fly
     os.mkdir(fictrac_destination)
     for file in correct_time_files:
+        width=120
         target_path = os.path.join(fictrac_destination, file)
         source_path = os.path.join(fictrac_folder, file)
         to_print = ('/').join(target_path.split('/')[-4:])
