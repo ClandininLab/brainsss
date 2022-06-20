@@ -255,6 +255,7 @@ def main(args):
         printlog(func_to_check)
         printlog('aborting all')
         return
+    
 
     if stim_triggered_beh:
 

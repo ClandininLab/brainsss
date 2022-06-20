@@ -68,17 +68,22 @@ def main(args):
         brain = np.asarray(nib.load(full_load_path).get_data().squeeze(), dtype='float32')
     printlog('done')
     
+    # Get brain size
+    x_dim = brain.shape[0]
+    y_dim = brain.shape[1]
+    z_dim = brain.shape[2]
+
     ### Correlate ###
     printlog("Performing Correlation on {}; behavior: {}".format(brain_file, behavior))
-    corr_brain = np.zeros((256,128,49))
-    for z in range(49):
+    corr_brain = np.zeros((x_dim,y_dim,z_dim))
+    for z in range(z_dim):
         
         ### interpolate fictrac to match the timestamps of this slice
         printlog(F"{z}")
         fictrac_interp = brainsss.smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, behavior, timestamps=timestamps, z=z)
 
-        for i in range(256):
-            for j in range(128):
+        for i in range(x_dim):
+            for j in range(y_dim):
                 # nan to num should be taken care of in zscore, but checking here for some already processed brains
                 if np.any(np.isnan(brain[i,j,z,:])):
                     printlog(F'warning found nan at x = {i}; y = {j}; z = {z}')
