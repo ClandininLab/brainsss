@@ -583,8 +583,8 @@ def main(args):
         #################
         ### anat2mean ###
         #################
-
-        res_anat = (0.653, 0.653, 1)
+        res_anat = (1.3,1.3,1.3) # new anat res <------------------ this is set !!!!!
+        #res_anat = (0.653, 0.653, 1)
         res_meanbrain = (2,2,2)
 
         for fly in fly_dirs:
