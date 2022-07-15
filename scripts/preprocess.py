@@ -247,14 +247,15 @@ def main(args):
     # this is a dirty solution for a few reasons, in particular it will just base it on 
     # the first func dir
     # this will also break if only an anat scan was taken
-    func_to_check = os.path.join(funcanats[0], 'imaging', 'functional_channel_1.nii')
-    img_to_check = nib.load(func_to_check) # this loads a proxy
-    img_shape = img_to_check.header.get_data_shape()
-    if len(img_shape) < 4:
-        printlog('image is not a volume')
-        printlog(func_to_check)
-        printlog('aborting all')
-        return
+    
+    # func_to_check = os.path.join(funcanats[0], 'imaging', 'functional_channel_1.nii')
+    # img_to_check = nib.load(func_to_check) # this loads a proxy
+    # img_shape = img_to_check.header.get_data_shape()
+    # if len(img_shape) < 4:
+    #     printlog('image is not a volume')
+    #     printlog(func_to_check)
+    #     printlog('aborting all')
+    #     return
     
 
     if stim_triggered_beh:
