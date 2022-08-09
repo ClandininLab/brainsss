@@ -15,15 +15,17 @@ Navigate to where you would like to install this package, then:
 > git clone https://github.com/ClandininLab/brainsss.git
 > cd brainsss
 > ml python/3.6.1
-> pip3 install -e . --user
+> pip install -e . --user
 ```
 
 Install required python packages:
 ```shell
-  > pip3 install pyfiglet
-  > pip3 install psutil
-  > pip3 install lxml
-  > pip3 install openpyxl
+  > pip install pyfiglet
+  > pip install psutil
+  > pip install lxml
+  > pip install openpyxl
+  > pip install opencv-python
+
 ```
 
 Create your user preferences:  
