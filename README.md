@@ -24,7 +24,7 @@ Install required python packages:
   > pip install psutil
   > pip install lxml
   > pip install openpyxl
-  > pip install opencv-python
+  > pip install opencv-python-headless
   > pip install antspyx==0.3.2
 
 ```
