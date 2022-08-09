@@ -25,6 +25,7 @@ Install required python packages:
   > pip install lxml
   > pip install openpyxl
   > pip install opencv-python
+  > pip install antspyx==0.3.2
 
 ```
 
