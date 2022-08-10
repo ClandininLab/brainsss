@@ -323,6 +323,10 @@ def copy_fictrac(destination_region, printlog, user):
 
     if user == 'brezovec':
         user = 'luke'
+    if user == 'yandanw':
+        user = 'luke'
+    if user == 'ilanazs':
+        user = 'luke'
     fictrac_folder = os.path.join("/oak/stanford/groups/trc/data/fictrac",user)
     fictrac_destination = os.path.join(destination_region, 'fictrac')
 
