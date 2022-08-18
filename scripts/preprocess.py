@@ -16,7 +16,7 @@ def main(args):
     ### Setup preferences ###
     #########################
 
-    width = 120 # width of print log
+    width = 120 ## width of print log
     nodes = 2 # 1 or 2
     nice = True # true to lower priority of jobs. ie, other users jobs go first
 
