@@ -189,7 +189,7 @@ def parse_visual_stimulation_metadata(file):
 	return metadata
 
 def extract_stim_times_from_pd(photodiode_trace, time_vector):
-	threshold=0.8,
+	threshold=0.8
 	command_frame_rate=120
 	sample_rate = 10000
 	minimum_epoch_separation = 0.9 * (1 + 0) * sample_rate
