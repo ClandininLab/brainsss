@@ -199,17 +199,20 @@ def extract_stim_times_from_pd(photodiode_trace, time_vector):
 	photodiode_trace = photodiode_trace / np.max(photodiode_trace)
 
 	# find frame flip times
-	V_orig = photodiode_trace[0:-2]
-	V_shift = photodiode_trace[1:-1]
-	ups = np.where(np.logical_and(V_orig < threshold, V_shift >= threshold))[0] + 1
-	downs = np.where(np.logical_and(V_orig >= threshold, V_shift < threshold))[0] + 1
+	# V_orig = photodiode_trace[0:-2]
+	# V_shift = photodiode_trace[1:-1]
+	# ups = np.where(np.logical_and(V_orig < threshold, V_shift >= threshold))[0] + 1
+	# downs = np.where(np.logical_and(V_orig >= threshold, V_shift < threshold))[0] + 1
+	photodiode_diff = np.diff(photodiode_trace)
+	ups = np.where(photodiode_diff > threshold)[0] + 1
+	downs = np.where(photodiode_diff < -threshold)[0] + 1
 	frame_times = np.sort(np.append(ups, downs))
 
 	# Use frame flip times to find stimulus start times
 	stimulus_start_frames = np.append(0, np.where(np.diff(frame_times) > minimum_epoch_separation)[0] + 1)
-	stimulus_end_frames = np.append(np.where(np.diff(frame_times) > minimum_epoch_separation)[0], len(frame_times)-1)
-	stimulus_start_times = frame_times[stimulus_start_frames] / sample_rate  # datapoints -> sec
-	stimulus_end_times = frame_times[stimulus_end_frames] / sample_rate  # datapoints -> sec
+	stimulus_start_times = time_vector[frame_times[stimulus_start_frames]]
+	# stimulus_end_frames = np.append(np.where(np.diff(frame_times) > minimum_epoch_separation)[0], len(frame_times)-1)
+	# stimulus_end_times = frame_times[stimulus_end_frames] / sample_rate  # datapoints -> sec
 
-	stim_durations = stimulus_end_times - stimulus_start_times # sec
+	# stim_durations = stimulus_end_times - stimulus_start_times # sec
 	return stimulus_start_times
