@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=prepro
 #SBATCH --partition=trc
-#SBATCH --time=7-00:00:00
+#SBATCH --time=4-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --output=./logs/mainlog.out
