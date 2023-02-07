@@ -31,6 +31,7 @@ def main(args):
 	total_sigma = int(args.get('total_sigma', 0))  # For ants.registration(), higher values will restrict the amount of deformation allowed | Default 0
 	meanbrain_n_frames = args.get('meanbrain_n_frames', None)  # First n frames to average over when computing mean/fixed brain | Default None (average over all frames)
 	aff_metric = args.get('aff_metric', 'mattes')  # For ants.registration(), metric for affine registration | Default 'mattes'. Also allowed: 'GC', 'meansquares'
+	meanbrain_target = args.get('meanbrain_target', None)  # filename of precomputed target meanbrain to register to
 
 	#####################
 	### SETUP LOGGING ###
@@ -68,6 +69,7 @@ def main(args):
 	printlog(F"flow_sigma{flow_sigma:.>{width-10}}")
 	printlog(F"total_sigma{total_sigma:.>{width-11}}")
 	printlog(F"meanbrain_n_frames{str(meanbrain_n_frames):.>{width-18}}")
+	printlog(F"meanbrain_target{str(meanbrain_target):.>{width-12}}")
 
 	######################
 	### PARSE SCANTYPE ###
@@ -134,8 +136,12 @@ def main(args):
 	printlog(F"Master brain shape{str(brain_dims):.>{width-18}}")
 
 	### Try to load meanbrain
-	existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
-	existing_meanbrain_path = os.path.join(dataset_path, existing_meanbrain_file)
+	if meanbrain_target is not None:
+		existing_meanbrain_path = os.path.join(dataset_path, meanbrain_target)
+	else:
+		existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
+		existing_meanbrain_path = os.path.join(dataset_path, existing_meanbrain_file)
+
 	if os.path.exists(existing_meanbrain_path):
 		meanbrain = np.asarray(nib.load(existing_meanbrain_path).get_data(), dtype='uint16')
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
