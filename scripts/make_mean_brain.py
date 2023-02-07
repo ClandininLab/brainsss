@@ -21,6 +21,8 @@ def main(args):
     if type(files) is str:
         files = [files]
 
+    
+
     for file in files:
         try:
             ### make mean ###
@@ -30,8 +32,12 @@ def main(args):
             elif full_path.endswith('.h5'):
                 with h5py.File(full_path, 'r') as hf:
                     brain = np.asarray(hf['data'][:], dtype='uint16')
-            # average over first meanbrain_n_frames frames (:None means til the end)
-            meanbrain = np.mean(brain[...,:meanbrain_n_frames], axis=-1)
+
+            if meanbrain_n_frames is not None:
+                # average over first meanbrain_n_frames frames
+                meanbrain = np.mean(brain[...,:int(meanbrain_n_frames)], axis=-1)
+            else: # average over all frames
+                meanbrain = np.mean(brain, axis=-1)
 
             ### Save ###
             save_file = os.path.join(directory, file[:-4] + '_mean.nii')
