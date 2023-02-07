@@ -137,11 +137,11 @@ def main(args):
 
 	### Try to load meanbrain
 	if meanbrain_target is not None:
-		existing_meanbrain_path = os.path.join(dataset_path, meanbrain_target)
+		existing_meanbrain_file = meanbrain_target
 	else:
 		existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
-		existing_meanbrain_path = os.path.join(dataset_path, existing_meanbrain_file)
 
+	existing_meanbrain_path = os.path.join(dataset_path, existing_meanbrain_file)
 	if os.path.exists(existing_meanbrain_path):
 		meanbrain = np.asarray(nib.load(existing_meanbrain_path).get_data(), dtype='uint16')
 		fixed = ants.from_numpy(np.asarray(meanbrain, dtype='float32'))
