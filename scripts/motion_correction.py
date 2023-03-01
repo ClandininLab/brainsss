@@ -16,7 +16,7 @@ from time import strftime
 from time import sleep
 
 def main(args):
-
+	# REQUIRED args
 	dataset_path = args['directory']
 	brain_master = args['brain_master']
 
@@ -30,6 +30,8 @@ def main(args):
 	flow_sigma = int(args.get('flow_sigma', 3))  # For ants.registration(), higher sigma focuses on coarser features | Default 3
 	total_sigma = int(args.get('total_sigma', 0))  # For ants.registration(), higher values will restrict the amount of deformation allowed | Default 0
 	meanbrain_n_frames = args.get('meanbrain_n_frames', None)  # First n frames to average over when computing mean/fixed brain | Default None (average over all frames)
+	aff_metric = args.get('aff_metric', 'mattes')  # For ants.registration(), metric for affine registration | Default 'mattes'. Also allowed: 'GC', 'meansquares'
+	meanbrain_target = args.get('meanbrain_target', None)  # filename of precomputed target meanbrain to register to
 
 	#####################
 	### SETUP LOGGING ###
@@ -67,6 +69,7 @@ def main(args):
 	printlog(F"flow_sigma{flow_sigma:.>{width-10}}")
 	printlog(F"total_sigma{total_sigma:.>{width-11}}")
 	printlog(F"meanbrain_n_frames{str(meanbrain_n_frames):.>{width-18}}")
+	printlog(F"meanbrain_target{str(meanbrain_target):.>{width-12}}")
 
 	######################
 	### PARSE SCANTYPE ###
@@ -133,7 +136,11 @@ def main(args):
 	printlog(F"Master brain shape{str(brain_dims):.>{width-18}}")
 
 	### Try to load meanbrain
-	existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
+	if meanbrain_target is not None:
+		existing_meanbrain_file = meanbrain_target
+	else:
+		existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
+
 	existing_meanbrain_path = os.path.join(dataset_path, existing_meanbrain_file)
 	if os.path.exists(existing_meanbrain_path):
 		meanbrain = np.asarray(nib.load(existing_meanbrain_path).get_data(), dtype='uint16')
@@ -223,7 +230,8 @@ def main(args):
 			moco = ants.registration(fixed, moving,
 									 type_of_transform=type_of_transform,
 									 flow_sigma=flow_sigma,
-                                	 total_sigma=total_sigma)
+                                	 total_sigma=total_sigma,
+									 aff_metric=aff_metric)
 			moco_ch1 = moco['warpedmovout'].numpy()
 			moco_ch1_chunk.append(moco_ch1)
 			transformlist = moco['fwdtransforms']

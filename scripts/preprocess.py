@@ -200,7 +200,7 @@ def main(args):
                              script=os.path.join(scripts_path, script),
                              modules=modules,
                              args=args,
-                             logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+                             logfile=logfile, time=3, mem=1, nice=nice, nodes=nodes)
         func_and_anats = brainsss.wait_for_job(job_id, logfile, com_path)
         func_and_anats = func_and_anats.split('\n')[:-1]
         funcs = [x.split(':')[1] for x in func_and_anats if 'func:' in x] # will be full paths to fly/expt
