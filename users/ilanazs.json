@@ -1,6 +1,6 @@
 {
-    "imports_path": "/oak/stanford/groups/trc/data/Ilana/2P/imports",
-    "dataset_path": "/oak/stanford/groups/trc/data/Ilana/2P/data",
+    "imports_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports",
+    "dataset_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset",
     "fictrac_qc": "True",
     "stim_triggered_beh": "True",
     "bleaching_qc": "True",
