@@ -122,5 +122,6 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 
 ml python/3.6.1
 ml py-ants/0.3.2_py36
+source brainsss/bin/activate
 date
 python3 -u ./preprocess.py $ARGS
