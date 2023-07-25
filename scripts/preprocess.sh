@@ -120,6 +120,7 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 \"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"APPLY_TRANSFORMS\":\"$APPLY_TRANSFORMS\",\"GREY_ONLY\":\"$GREY_ONLY\",\
 \"NO_ZSCORE_HIGHPASS\":\"$NO_ZSCORE_HIGHPASS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
 
-ml python/3.6
+ml python/3.6.1
+ml py-ants/0.3.2_py36
 date
 python3 -u ./preprocess.py $ARGS
