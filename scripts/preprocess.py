@@ -347,7 +347,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=1,
-                mem=2,
+                mem=4,
                 nice=nice,
                 nodes=nodes,
             )
