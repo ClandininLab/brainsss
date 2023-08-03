@@ -1,5 +1,5 @@
 {
-    "imports_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker/brainsss_imports/20230719",
+    "imports_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker/brainsss_imports",
     "dataset_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker/brainsss/20230719",
     "fictrac_qc": "True",
     "stim_triggered_beh": "True",
