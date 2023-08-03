@@ -1,6 +1,6 @@
 {
-    "imports_path": "C:\Users\jcsimon\Documents\Lab\Stanford\Data\ImagingData\Bruker",
-    "dataset_path": "C:\Users\jcsimon\Documents\Lab\Stanford\Data\ImagingData\Bruker\brainsss",
+    "imports_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker",
+    "dataset_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker/brainsss",
     "fictrac_qc": "True",
     "stim_triggered_beh": "True",
     "bleaching_qc": "True",
