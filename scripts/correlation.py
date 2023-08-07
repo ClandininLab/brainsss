@@ -26,7 +26,7 @@ def main(args):
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
     printlog(load_directory)
-    printlog(fps)
+    printlog(str(fps))
     ### load brain timestamps ###
     timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
 
