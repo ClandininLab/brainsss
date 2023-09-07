@@ -364,7 +364,7 @@ def main(args):
         for func in funcs:
             load_directory = os.path.join(func, 'moco')
             save_directory = os.path.join(func)
-            brain_file = 'functional_channel_2_moco.h5'
+            brain_file = 'functional_channel_1_moco.h5'
 
             args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
             script = 'zscore.py'
