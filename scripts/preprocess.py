@@ -384,7 +384,7 @@ def main(args):
         for func in funcs:
             load_directory = os.path.join(func)
             save_directory = os.path.join(func)
-            brain_file = 'functional_channel_2_moco_zscore.h5'
+            brain_file = 'functional_channel_1_moco_zscore.h5'
 
             args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
             script = 'temporal_high_pass_filter.py'
@@ -415,7 +415,7 @@ def main(args):
                 #load_directory = os.path.join(func, 'moco')
                 fps = 100
             else:
-                brain_file = 'functional_channel_2_moco_zscore_highpass.h5'
+                brain_file = 'functional_channel_1_moco_zscore_highpass.h5'
                 fps = 100
 
             behaviors = ['dRotLabZneg', 'dRotLabZpos', 'dRotLabY']
