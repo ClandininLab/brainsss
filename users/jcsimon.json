@@ -1,6 +1,6 @@
 {
     "imports_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker/brainsss_imports",
-    "dataset_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker/brainsss/wb_gflamp1_jrgeco1a",
+    "dataset_path": "/oak/stanford/groups/trc/data/Jacob/ImagingData/Bruker/brainsss/wb_gcamp8s_rcgull",
     "fictrac_qc": "True",
     "stim_triggered_beh": "True",
     "bleaching_qc": "True",
