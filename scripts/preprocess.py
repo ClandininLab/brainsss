@@ -10,8 +10,7 @@ import nibabel as nib
 
 def main(args):
 
-    modules = 'gcc/6.3.0 python/3.6 py-numpy/1.14.3_py36 py-pandas/0.23.0_py36 viz py-scikit-learn/0.19.1_py36 antspy/0.2.2'
-
+    
     #########################
     ### Setup preferences ###
     #########################
@@ -48,10 +47,10 @@ def main(args):
         #printlog('building flies')
         build_flies = True
         dir_to_build = args['BUILDFLIES']
-
+        
     ### Parse user settings
-    imports_path = settings['imports_path']
-    dataset_path = settings['dataset_path']
+    imports_path = args['IMPORTDIR']
+    dataset_path = args['DATADIR']
     if build_flies:
         fictrac_qc = brainsss.parse_true_false(settings.get('fictrac_qc',False))
         stim_triggered_beh = brainsss.parse_true_false(settings.get('stim_triggered_beh',False))

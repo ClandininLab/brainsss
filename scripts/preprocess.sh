@@ -9,6 +9,16 @@
 
 while [[ $# -gt 0 ]]; do
   case $1 in
+    -datadir|--datadirectory)
+      DATADIR="$2"
+      shift
+      shift
+      ;;
+    -importdir|--importdirectory)
+      IMPORTDIR="$2"
+      shift
+      shift
+      ;;
     -b|--build_flies)
       BUILDFLIES="$2"
       shift
@@ -111,7 +121,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
+ARGS="{\"PWD\":\"$PWD\",\"DATADIR\":\"$DATADIR\",\"IMPORTDIR\":\"$IMPORTDIR\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
 \"MOCO\":\"$MOCO\",\"ZSCORE\":\"$ZSCORE\",\"HIGHPASS\":\"$HIGHPASS\",\"CORRELATION\":\"$CORRELATION\",\
 \"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\
 \"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"STA\":\"$STA\",\"H5_TO_NII\":\"$H5_TO_NII\",\
