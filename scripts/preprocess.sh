@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       MOCO=True
       shift
       ;;
+    -bg|--background_subtraction)
+      BACKGROUND_SUBTRACTION=True
+      shift
+      ;;
     -z|--zscore)
       ZSCORE=True
       shift
@@ -112,7 +116,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
-\"MOCO\":\"$MOCO\",\"ZSCORE\":\"$ZSCORE\",\"HIGHPASS\":\"$HIGHPASS\",\"CORRELATION\":\"$CORRELATION\",\
+\"MOCO\":\"$MOCO\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\"ZSCORE\":\"$ZSCORE\",\"HIGHPASS\":\"$HIGHPASS\",\"CORRELATION\":\"$CORRELATION\",\
 \"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\
 \"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"STA\":\"$STA\",\"H5_TO_NII\":\"$H5_TO_NII\",\
 \"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"USE_WARP\":\"$USE_WARP\",\
