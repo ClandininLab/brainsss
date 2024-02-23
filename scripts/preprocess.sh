@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       MOCO=True
       shift
       ;;
+    -bg|--background_subtraction)
+      BACKGROUND_SUBTRACTION=True
+      shift
+      ;;
     -z|--zscore)
       ZSCORE=True
       shift
