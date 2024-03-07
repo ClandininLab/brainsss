@@ -141,19 +141,19 @@ def main(args):
     ### BACKGROUND SUBTRACTION ###
     ##############################
 
-    printlog("Beginning ZSCORE")
+    printlog("Beginning BACKGROUND SUBTRACTION")
     with h5py.File(full_load_path, 'r') as hf:
         data = hf['data'][:]
         dims = np.shape(data)
 
-	printlog("Data shape is {}".format(dims  
+        printlog("Data shape is {}".format(dims))  
         br = BgRemover3D(img_path, half_wid=5)
 
-	br.draw_bg()
-	br.show_bg()
-	br.remove_bg()
-	br.show_spectrum(fs=180)
-	br.save_out()
+        br.draw_bg()
+        br.show_bg()
+        br.remove_bg()
+        br.show_spectrum(fs=180)
+        br.save_out()
 
     printlog("background subtraction  done")
 
