@@ -18,12 +18,12 @@ def main(args):
     logfile = args['logfile']
     fly_directory = args['fly_directory']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
-	save_directory = os.path.join(fly_directory, 'warp')
+    save_directory = os.path.join(fly_directory, 'warp')
 
-	###################
+    ###################
     ### Load Brains ###
     ###################
-	fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res_PtoA.nii"
+    fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res_PtoA.nii"
     fixed = np.asarray(nib.load(fixed_path).get_data().squeeze(), dtype='float32')
     fixed = ants.from_numpy(fixed)
     fixed.set_spacing((2.611,2.611,5))
@@ -49,9 +49,10 @@ def main(args):
     ########################
     ### Apply Transforms ###
     ########################
-	warped = ants.apply_transforms(fixed, moving, transforms, imagetype=3, interpolator='nearestNeighbor')
-	save_file = os.path.join(fly_directory, 'func_0', 'brain_in_FDA.nii')
-	nib.Nifti1Image(warped.numpy(), np.eye(4)).to_filename(save_file)
+    printlog("applying transforms....")
+    warped = ants.apply_transforms(fixed, moving, transforms, imagetype=3, interpolator='nearestNeighbor')
+    save_file = os.path.join(fly_directory, 'func_0', 'brain_in_FDA.nii')
+    nib.Nifti1Image(warped.numpy(), np.eye(4)).to_filename(save_file)
 
 def sec_to_hms(t):
         secs=F"{np.floor(t%60):02.0f}"
