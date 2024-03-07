@@ -104,6 +104,10 @@ while [[ $# -gt 0 ]]; do
       MAKE_SUPERVOXELS=True
       shift
       ;;
+    --warptime)
+      WARP_TIMESERIES=True
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -118,7 +122,8 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 \"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"USE_WARP\":\"$USE_WARP\",\
 \"LOCO_DATASET\":\"$LOCO_DATASET\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\"FUNC2ANAT\":\"$FUNC2ANAT\",\
 \"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"APPLY_TRANSFORMS\":\"$APPLY_TRANSFORMS\",\"GREY_ONLY\":\"$GREY_ONLY\",\
-\"NO_ZSCORE_HIGHPASS\":\"$NO_ZSCORE_HIGHPASS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
+\"NO_ZSCORE_HIGHPASS\":\"$NO_ZSCORE_HIGHPASS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\",\
+\"WARP_TIMESERIES\":\"$WARP_TIMESERIES\"}"
 
 ml python/3.6
 date

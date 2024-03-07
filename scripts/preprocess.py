@@ -71,6 +71,7 @@ def main(args):
         apply_transforms = brainsss.parse_true_false(settings.get('apply_transforms', False))
         grey_only = brainsss.parse_true_false(settings.get('grey_only', False))
         no_zscore_highpass = brainsss.parse_true_false(settings.get('no_zscore_highpass', False))
+        warp_timeseries = brainsss.parse_true_false(settings.get('warp_timeseries', False))
         make_supervoxels = brainsss.parse_true_false(settings.get('make_supervoxels', False))
     else:
         fictrac_qc = False
@@ -92,6 +93,7 @@ def main(args):
         grey_only = False
         no_zscore_highpass = False
         make_supervoxels = False
+        warp_timeseries = False
 
     # this arg should not be available to the .json settings
     loco_dataset = False
@@ -156,6 +158,8 @@ def main(args):
         no_zscore_highpass = True
     if args ['MAKE_SUPERVOXELS'] != '':
         make_supervoxels = True
+    if args ['WARP_TIMESERIES'] != '':
+        warp_timeseries = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
