@@ -49,7 +49,7 @@ def main(args):
     ########################
     ### Apply Transforms ###
     ########################
-	warped = ants.apply_transforms(fixed_lowres, moving, transforms, imagetype=3, interpolator='nearestNeighbor')
+	warped = ants.apply_transforms(fixed, moving, transforms, imagetype=3, interpolator='nearestNeighbor')
 	save_file = os.path.join(fly_directory, 'func_0', 'brain_in_FDA.nii')
 	nib.Nifti1Image(warped.numpy(), np.eye(4)).to_filename(save_file)
 
