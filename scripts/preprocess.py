@@ -520,17 +520,11 @@ def main(args):
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
-            if loco_dataset:
-                moving_path = os.path.join(fly_directory, 'func_0', 'imaging', 'functional_channel_1_mean.nii')
-            else:
-                moving_path = os.path.join(fly_directory, 'func_0', 'moco', 'functional_channel_1_moc_mean.nii')
+            moving_path = os.path.join(fly_directory, 'func_0', 'moco', 'functional_channel_1_moc_mean.nii')
             moving_fly = 'func'
             moving_resolution = res_func
 
-            if loco_dataset:
-                fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'stitched_brain_red_mean.nii')
-            else:
-                fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean.nii')
+            fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean.nii')
             fixed_fly = 'anat'
             fixed_resolution = res_anat
 
@@ -706,13 +700,13 @@ def main(args):
             args = {'logfile': logfile,
                     'fly_directory': fly_directory}
 
-                script = 'warp_timeseries.py'
-                job_id = brainsss.sbatch(jobname='warptime',
-                                     script=os.path.join(scripts_path, script),
-                                     modules=modules,
-                                     args=args,
-                                     logfile=logfile, time=12, mem=24, nice=nice, nodes=nodes) # 2 to 1
-                brainsss.wait_for_job(job_id, logfile, com_path)
+            script = 'warp_timeseries.py'
+            job_id = brainsss.sbatch(jobname='warptime',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=12, mem=24, nice=nice, nodes=nodes) # 2 to 1
+            brainsss.wait_for_job(job_id, logfile, com_path)
 
     if make_supervoxels:
         for func in funcs:
