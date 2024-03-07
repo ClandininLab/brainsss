@@ -44,8 +44,10 @@ def get_visually_evoked_turns(traces, mean_turn, start, stop, r_thresh, av_thres
 def make_STA_brain(neural_signals, neural_timestamps, event_times_list, neural_bins):
     #### super voxel version
     
+    num_z = all_signals.shape[0]
+
     STA_brain = []
-    for z in range(49):
+    for z in range(num_z):
         all_bin_indicies = []
         for stim_idx in range(len(event_times_list)):
             stim_time = event_times_list[stim_idx]
@@ -64,17 +66,17 @@ def make_STA_brain(neural_signals, neural_timestamps, event_times_list, neural_b
     STA_brain = np.asarray(STA_brain)
     return STA_brain
 
-def STA_supervoxel_to_full_res(STA_brain, cluster_labels):
+def STA_supervoxel_to_full_res(STA_brain, cluster_labels, dim_x=256, dim_y=128, dim_z=49):
     n_clusters = STA_brain.shape[2]
     n_tp = STA_brain.shape[1]
     
     reformed_STA_brain = []
-    for z in range(49):
-        colored_by_betas = np.zeros((n_tp, 256*128))
+    for z in range(dim_z):
+        colored_by_betas = np.zeros((n_tp, dim_x*dim_y))
         for cluster_num in range(n_clusters):
             cluster_indicies = np.where(cluster_labels[z,:]==cluster_num)[0]
             colored_by_betas[:,cluster_indicies] = STA_brain[z,:,cluster_num,np.newaxis]
-        colored_by_betas = colored_by_betas.reshape(n_tp,256,128)
+        colored_by_betas = colored_by_betas.reshape(n_tp,dim_x,dim_y)
         reformed_STA_brain.append(colored_by_betas)
     return np.asarray(reformed_STA_brain)
 
