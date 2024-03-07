@@ -70,7 +70,7 @@ def main(args):
             settings.get("temporal_mean_brain_post", False)
         )
         background_subtraction = brainsss.parse_true_false(settings.get("background_subtraction", False))
-	zscore = brainsss.parse_true_false(settings.get("zscore", False))
+        zscore = brainsss.parse_true_false(settings.get("zscore", False))
         highpass = brainsss.parse_true_false(settings.get("highpass", False))
         correlation = brainsss.parse_true_false(settings.get("correlation", False))
         STA = brainsss.parse_true_false(settings.get("STA", False))
@@ -97,7 +97,7 @@ def main(args):
         motion_correction = False
         temporal_mean_brain_post = False
         background_subtraction = False
-	zscore = False
+        zscore = False
         highpass = False
         correlation = False
         STA = False
@@ -146,9 +146,9 @@ def main(args):
         motion_correction = True
     if args["TEMPORAL_MEAN_BRAIN_POST"] != "":
         temporal_mean_brain_post = True
-   if args["BACKGROUND_SUBTRACTION"] !="":
-      background_subtraction = True	
-   if args["ZSCORE"] != "":
+    if args["BACKGROUND_SUBTRACTION"] !="":
+        background_subtraction = True	
+    if args["ZSCORE"] != "":
         zscore = True
     if args["HIGHPASS"] != "":
         highpass = True
@@ -417,7 +417,7 @@ def main(args):
             # else:
             #     dur = 96
             #     mem = 4
-            global_resources = True
+            global_resources = False
             dur = 48
             mem = 8
             job_id = brainsss.sbatch(
@@ -476,12 +476,12 @@ def main(args):
         ##############
 
         for func in funcs:
-	#for background subtraction need to change the directory and the brain file, once I have that figured out
+            #for background subtraction need to change the directory and the brain file, once I have that figured out
             #load_directory = os.path.join(func, "moco")
-	    load_directory = os.path.join(fnc, "background_subtraction")
+            load_directory = os.path.join(func, "background_subtraction")
             save_directory = os.path.join(func)
             #brain_file = "functional_channel_2_moco.h5"
-	    brain_file = "functional_channel_2_moco_cleaned.h5"
+            brain_file = "functional_channel_2_moco_cleaned.h5"
 
             args = {
                 "logfile": logfile,
