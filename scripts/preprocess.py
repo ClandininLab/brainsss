@@ -584,28 +584,18 @@ def main(args):
         #################
         ### anat2mean ###
         #################
-        #res_anat = (1.3,1.3,1.3) # new anat res <------------------ this is set !!!!!
         res_anat = (0.653, 0.653, 1)
-        res_meanbrain = (2,2,2)
+        res_meanbrain = (2.6,2.6,5)
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
-            if loco_dataset:
-                moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anat_red_clean.nii')
-            else:
-                moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
+            moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
             moving_fly = 'anat'
             moving_resolution = res_anat
 
-            # for gcamp6f with actual myr-tdtom
-            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
-            fixed_fly = 'meanbrain'
-
-            # for gcamp8s with non-myr-tdtom
-            #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20220421_make_nonmyr_meanbrain/non_myr_2_fdaatlas_40_8.nii"
-            #fixed_fly = 'non_myr_mean'
-
+            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res.nii"
+            fixed_fly = 'FDA'
             fixed_resolution = res_meanbrain
 
             save_directory = os.path.join(fly_directory, 'warp')
@@ -615,13 +605,13 @@ def main(args):
             type_of_transform = 'SyN'
             save_warp_params = True
             flip_X = False
-            flip_Z = False
+            flip_Z = True ### THIS IS WHERE THE ZFLIP HAPPENS
 
             low_res = False
             very_low_res = False
 
             iso_2um_fixed = False
-            iso_2um_moving = True
+            iso_2um_moving = False
 
             grad_step = 0.2
             flow_sigma = 3
@@ -663,8 +653,9 @@ def main(args):
         ### Apply transforms ###
         ########################
         res_func = (2.611, 2.611, 5)
-        res_anat = (2,2,2)#(0.38, 0.38, 0.38)
-        final_2um_iso = False #already 2iso so don't need to downsample
+        res_anat = (0.38, 0.38, 0.38)
+        final_2um_iso = False
+        final_2um_iso
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
@@ -678,8 +669,7 @@ def main(args):
                 moving_fly = 'corr_{}'.format(behavior)
                 moving_resolution = res_func
 
-                #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/luke.nii"
-                fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
+                fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip.nii"
                 fixed_fly = 'meanbrain'
                 fixed_resolution = res_anat
 
