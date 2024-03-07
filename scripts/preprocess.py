@@ -585,7 +585,7 @@ def main(args):
         ### anat2mean ###
         #################
         res_anat = (0.653, 0.653, 1)
-        res_meanbrain = (2.6,2.6,5)
+        res_meanbrain = (2.611,2.611,5)
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
@@ -594,7 +594,7 @@ def main(args):
             moving_fly = 'anat'
             moving_resolution = res_anat
 
-            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res.nii"
+            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res_PtoA.nii"
             fixed_fly = 'FDA'
             fixed_resolution = res_meanbrain
 
@@ -605,7 +605,7 @@ def main(args):
             type_of_transform = 'SyN'
             save_warp_params = True
             flip_X = False
-            flip_Z = True ### THIS IS WHERE THE ZFLIP HAPPENS
+            flip_Z = False
 
             low_res = False
             very_low_res = False
@@ -693,6 +693,21 @@ def main(args):
                                      modules=modules,
                                      args=args,
                                      logfile=logfile, time=12, mem=4, nice=nice, nodes=nodes) # 2 to 1
+                brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if warp_timeseries:
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+
+            args = {'logfile': logfile,
+                    'fly_directory': fly_directory}
+
+                script = 'warp_timeseries.py'
+                job_id = brainsss.sbatch(jobname='warptime',
+                                     script=os.path.join(scripts_path, script),
+                                     modules=modules,
+                                     args=args,
+                                     logfile=logfile, time=12, mem=24, nice=nice, nodes=nodes) # 2 to 1
                 brainsss.wait_for_job(job_id, logfile, com_path)
 
     if make_supervoxels:
