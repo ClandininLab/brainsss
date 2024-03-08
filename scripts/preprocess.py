@@ -540,7 +540,7 @@ def main(args):
             low_res = False
             very_low_res = False
 
-            iso_2um_fixed = True
+            iso_2um_fixed = False
             iso_2um_moving = False
 
             grad_step = 0.2
