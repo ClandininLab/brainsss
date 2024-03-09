@@ -36,8 +36,8 @@ def main(args):
     ###########################
     ### Organize Transforms ###
     ###########################
-    affine_file = os.listdir(os.path.join(save_directory, 'func-to-anat_fwdtransforms_2umiso'))[0]
-    affine_path = os.path.join(save_directory, 'func-to-anat_fwdtransforms_2umiso', affine_file)
+    affine_file = os.listdir(os.path.join(save_directory, 'func-to-anat_fwdtransforms'))[0]
+    affine_path = os.path.join(save_directory, 'func-to-anat_fwdtransforms', affine_file)
 
     warp_dir = 'anat-to-FDA_fwdtransforms'
     syn_files = os.listdir(os.path.join(save_directory, warp_dir))
