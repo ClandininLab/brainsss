@@ -44,7 +44,8 @@ def main(args):
     syn_linear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.mat' in x][0])
     syn_nonlinear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.nii.gz' in x][0])
 
-    transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
+    #transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
+    transforms = [syn_nonlinear_path, syn_linear_path, affine_path]
 
     ########################
     ### Apply Transforms ###
