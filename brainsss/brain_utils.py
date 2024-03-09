@@ -44,7 +44,7 @@ def get_visually_evoked_turns(traces, mean_turn, start, stop, r_thresh, av_thres
 def make_STA_brain(neural_signals, neural_timestamps, event_times_list, neural_bins):
     #### super voxel version
     
-    num_z = all_signals.shape[0]
+    num_z = neural_signals.shape[0]
 
     STA_brain = []
     for z in range(num_z):
