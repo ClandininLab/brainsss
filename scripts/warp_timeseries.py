@@ -12,6 +12,7 @@ import warnings
 warnings.filterwarnings("ignore")
 from shutil import copyfile
 import ants
+import h5py
 
 def main(args):
 
