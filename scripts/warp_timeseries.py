@@ -40,7 +40,7 @@ def main(args):
     affine_path = os.path.join(save_directory, 'func-to-anat_fwdtransforms', affine_file)
 
     #warp_dir = 'anat-to-FDA_fwdtransforms'
-    warp_dir = 'anat-to-FDAfullres_fwdtransforms'
+    warp_dir = 'anat-to-FDA076iso_fwdtransforms'
     syn_files = os.listdir(os.path.join(save_directory, warp_dir))
     syn_linear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.mat' in x][0])
     syn_nonlinear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.nii.gz' in x][0])

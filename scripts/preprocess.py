@@ -593,8 +593,8 @@ def main(args):
             moving_resolution = res_anat
 
             #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res_PtoA.nii"
-            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip.nii"
-            fixed_fly = 'FDAfullres'
+            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_076iso.nii"
+            fixed_fly = 'FDA076iso'
             fixed_resolution = res_atlas
 
             save_directory = os.path.join(fly_directory, 'warp')
@@ -643,7 +643,7 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=8, mem=8, nice=nice, nodes=nodes)
+                                 logfile=logfile, time=8, mem=22, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if apply_transforms:
