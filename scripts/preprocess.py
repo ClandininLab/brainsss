@@ -583,7 +583,7 @@ def main(args):
         ### anat2mean ###
         #################
         res_anat = (0.653, 0.653, 1)
-        res_meanbrain = (2.611,2.611,5)
+        res_atlas = (0.38,0.38,0.38)#(2.611,2.611,5)
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
@@ -592,9 +592,10 @@ def main(args):
             moving_fly = 'anat'
             moving_resolution = res_anat
 
-            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res_PtoA.nii"
-            fixed_fly = 'FDA'
-            fixed_resolution = res_meanbrain
+            #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res_PtoA.nii"
+            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip.nii"
+            fixed_fly = 'FDAfullres'
+            fixed_resolution = res_atlas
 
             save_directory = os.path.join(fly_directory, 'warp')
             if not os.path.exists(save_directory):

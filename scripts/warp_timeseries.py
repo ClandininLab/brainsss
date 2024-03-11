@@ -39,7 +39,8 @@ def main(args):
     affine_file = os.listdir(os.path.join(save_directory, 'func-to-anat_fwdtransforms'))[0]
     affine_path = os.path.join(save_directory, 'func-to-anat_fwdtransforms', affine_file)
 
-    warp_dir = 'anat-to-FDA_fwdtransforms'
+    #warp_dir = 'anat-to-FDA_fwdtransforms'
+    warp_dir = 'anat-to-FDAfullres_fwdtransforms'
     syn_files = os.listdir(os.path.join(save_directory, warp_dir))
     syn_linear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.mat' in x][0])
     syn_nonlinear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.nii.gz' in x][0])
@@ -52,7 +53,7 @@ def main(args):
     ########################
     printlog("applying transforms....")
     warped = ants.apply_transforms(fixed, moving, transforms, imagetype=3, interpolator='nearestNeighbor')
-    save_file = os.path.join(fly_directory, 'func_0', 'brain_in_FDA.nii')
+    save_file = os.path.join(fly_directory, 'func_0', 'brain_in_FDAfullres.nii')
     nib.Nifti1Image(warped.numpy(), np.eye(4)).to_filename(save_file)
 
 def sec_to_hms(t):
