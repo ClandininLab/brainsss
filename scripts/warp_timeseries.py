@@ -28,8 +28,9 @@ def main(args):
     fixed = ants.from_numpy(fixed)
     fixed.set_spacing((2.611,2.611,5))
 
-    moving_path = os.path.join(fly_directory, 'func_0', 'functional_channel_2_moco_zscore_highpass.nii')
-    moving = np.asarray(nib.load(moving_path).get_data().squeeze(), dtype='float32')
+    moving_path = os.path.join(fly_directory, 'func_0', 'functional_channel_2_moco_zscore_highpass.h5')
+    with h5py.File(moving_path, 'r') as hf:
+        moving = hf['data'][:]
     moving = ants.from_numpy(moving)
     moving.set_spacing((2.611, 2.611, 5, 1))
 
@@ -39,13 +40,11 @@ def main(args):
     affine_file = os.listdir(os.path.join(save_directory, 'func-to-anat_fwdtransforms'))[0]
     affine_path = os.path.join(save_directory, 'func-to-anat_fwdtransforms', affine_file)
 
-    #warp_dir = 'anat-to-FDA_fwdtransforms'
     warp_dir = 'anat-to-FDA076iso_fwdtransforms'
     syn_files = os.listdir(os.path.join(save_directory, warp_dir))
     syn_linear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.mat' in x][0])
     syn_nonlinear_path = os.path.join(save_directory, warp_dir, [x for x in syn_files if '.nii.gz' in x][0])
 
-    #transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
     transforms = [syn_nonlinear_path, syn_linear_path, affine_path]
 
     ########################
@@ -53,7 +52,7 @@ def main(args):
     ########################
     printlog("applying transforms....")
     warped = ants.apply_transforms(fixed, moving, transforms, imagetype=3, interpolator='nearestNeighbor')
-    save_file = os.path.join(fly_directory, 'func_0', 'brain_in_FDAfullres.nii')
+    save_file = os.path.join(fly_directory, 'func_0', 'brain_in_FDA.nii')
     nib.Nifti1Image(warped.numpy(), np.eye(4)).to_filename(save_file)
 
 def sec_to_hms(t):

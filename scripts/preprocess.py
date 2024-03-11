@@ -583,7 +583,7 @@ def main(args):
         ### anat2mean ###
         #################
         res_anat = (0.653, 0.653, 1)
-        res_atlas = (0.38,0.38,0.38)#(2.611,2.611,5)
+        res_atlas = (0.76,0.76,0.76)
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
@@ -592,7 +592,6 @@ def main(args):
             moving_fly = 'anat'
             moving_resolution = res_anat
 
-            #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/FDA_at_func_res_PtoA.nii"
             fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_076iso.nii"
             fixed_fly = 'FDA076iso'
             fixed_resolution = res_atlas
@@ -719,6 +718,18 @@ def main(args):
                                  args=args,
                                  logfile=logfile, time=2, mem=12, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if superslices:
+        args = {'logfile': logfile,
+                'dataset_path': dataset_path,
+                'fly_dirs': fly_dirs}
+        script = 'superslices.py'
+        job_id = brainsss.sbatch(jobname='supersli',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=8, mem=22, nice=nice, nodes=nodes)
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###
