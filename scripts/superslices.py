@@ -58,7 +58,7 @@ def main(args):
         ###################
         brain_superslice = []
         for fly in fly_dirs:
-            brain_path = os.path.join(func_path, 'brain_in_FDA.nii')
+            brain_path = os.path.join(dataset_path, fly, 'func_0' 'brain_in_FDA.nii')
             brain = np.asarray(nib.load(brain_path).get_data().squeeze(), dtype='float32')
             brain_superslice.append(brain[:,:,z,:])
             brain = None #release memory
