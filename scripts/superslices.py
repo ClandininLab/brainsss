@@ -27,7 +27,7 @@ THIS IS A JOBLIB ISSUE. If you can, kindly provide the joblib's team with an
 def main(args):
 
     dataset_path = args['dataset_path']
-    fly_dirs = args['fly_dirs'].split(',')
+    fly_dirs = args['fly_dirs']#.split(',')
     logfile = args['logfile']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
     n_clusters = 2000
@@ -36,6 +36,7 @@ def main(args):
     ###############################
     ### MAKE SUPERFLY DIRECTORY ###
     ###############################
+    printlog(fly_dirs)
 
     day = time.strftime("%Y%m%d")
     superfly_dir = os.path.join(dataset_path,F'{day}_superfly')
@@ -61,10 +62,13 @@ def main(args):
             brain = np.asarray(nib.load(brain_path).get_data().squeeze(), dtype='float32')
             brain_superslice.append(brain[:,:,z,:])
             brain = None #release memory
-        brain_superslice = np.asarray(brain_superslice)
+
         dims = {'x': brain.shape[0],
                 'y': brain.shape[1],
-                't': brain.shape[2]}
+                't': int(brain.shape[2]*len(fly_dirs))}
+
+        brain_superslice = np.asarray(brain_superslice) ### will be shape nfly,x,y,t
+        brain_superslice = np.moveaxis(brain_superslice,0,2) ###x,y,n,t
 
         ####################
         ### FIT CLUSTERS ###
