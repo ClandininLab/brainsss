@@ -7,6 +7,7 @@ import time
 import brainsss
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.feature_extraction.image import grid_to_graph
+import nibabel as nib
 
 def warn(*args, **kwargs):
     pass
