@@ -36,7 +36,7 @@ def main(args):
     ###############################
     ### MAKE SUPERFLY DIRECTORY ###
     ###############################
-    printlog(fly_dirs)
+    printlog(str(fly_dirs))
 
     day = time.strftime("%Y%m%d")
     superfly_dir = os.path.join(dataset_path,F'{day}_superfly')
