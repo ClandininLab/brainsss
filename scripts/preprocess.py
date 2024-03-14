@@ -94,6 +94,7 @@ def main(args):
         no_zscore_highpass = False
         make_supervoxels = False
         warp_timeseries = False
+        superfly = False
 
     # this arg should not be available to the .json settings
     loco_dataset = False
@@ -160,6 +161,8 @@ def main(args):
         make_supervoxels = True
     if args ['WARP_TIMESERIES'] != '':
         warp_timeseries = True
+    if args ['SUPERFLY'] != '':
+        superfly = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -719,7 +722,7 @@ def main(args):
                                  logfile=logfile, time=2, mem=12, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
-    if superslices:
+    if superfly:
         args = {'logfile': logfile,
                 'dataset_path': dataset_path,
                 'fly_dirs': fly_dirs}
