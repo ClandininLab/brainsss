@@ -40,11 +40,11 @@ def main(args):
 
     day = time.strftime("%Y%m%d")
     superfly_dir = os.path.join(dataset_path,F'{day}_superfly')
-    if not os.path.exists(superfly_dir)
+    if not os.path.exists(superfly_dir):
         os.mkdir(superfly_dir)
 
     slices_dir = os.path.join(superfly_dir, 'superslices')
-    if not os.path.exists(slices_dir)
+    if not os.path.exists(slices_dir):
         os.mkdir(slices_dir)
 
     ####################################################
