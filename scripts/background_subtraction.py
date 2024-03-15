@@ -146,8 +146,9 @@ def main(args):
         data = hf['data'][:]
         dims = np.shape(data)
 
+        printlog(full_load_path)
         printlog("Data shape is {}".format(dims))  
-        br = BgRemover3D(brain_file, half_wid=5)
+        br = BgRemover3D(full_load_path, half_wid=5)
 
         br.draw_bg()
         br.show_bg()
