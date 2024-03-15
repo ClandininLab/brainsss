@@ -64,7 +64,6 @@ def main(args):
             brain_path = os.path.join(dataset_path, fly, 'func_0', 'brain_in_FDA.nii')
             brain = np.asarray(nib.load(brain_path).get_data().squeeze(), dtype='float32')
             brain_superslice.append(brain[:,:,z,:])
-            brain = None #release memory
 
         dims = {'x': brain.shape[0],
                 'y': brain.shape[1],
