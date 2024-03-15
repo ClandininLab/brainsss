@@ -37,7 +37,7 @@ class BgRemover3D:
         if not os.path.exists(saving_dir):
             os.mkdir(saving_dir)
         self.saving_dir = saving_dir
-        self.file_head = self.path.split('.')[0].split('/')[-1]
+        self.file_head = os.path.basename(self.path).split('.')[0]
     
     def draw_bg(self):
         half_wid = self.half_wid
@@ -158,7 +158,7 @@ def main(args):
         br.show_spectrum(fs=180)
         br.save_out()
 
-    printlog("background subtraction  done")
+    printlog("background subtraction done")
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
