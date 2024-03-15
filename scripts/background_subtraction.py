@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 from time import time
 from time import strftime
 from time import sleep
-
 class BgRemover3D:
 
     def __init__(self, img_path, save_path, half_wid=25):
@@ -32,7 +31,7 @@ class BgRemover3D:
         self.make_savedir()
     
     def make_savedir(self):
-        working_dir = os.path.dirname(self.save)
+        working_dir = self.save
         saving_dir = os.path.join(working_dir, 'background_subtraction')
         if not os.path.exists(saving_dir):
             os.mkdir(saving_dir)
