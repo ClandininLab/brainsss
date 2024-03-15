@@ -116,7 +116,7 @@ class BgRemover3D:
             save_name = os.path.join(self.saving_dir, self.file_head+'_cleaned.nii')
             nib.Nifti1Image(np.round(self.out).astype('int16'), np.eye(4)).to_filename(save_name)
         elif '.h5' in self.path:
-            save_name = os.path.join(self.saving_dir, self.file_head+'_cleaned.h5')
+            save_name = os.path.join(self.saving_dir, self.file_head+'.h5')
             with h5py.File(save_name, "w") as data_file:
                 data_file.create_dataset("data", data=np.round(self.out).astype('int16'))
             

@@ -481,7 +481,7 @@ def main(args):
             load_directory = os.path.join(func, "background_subtraction")
             save_directory = os.path.join(func)
             #brain_file = "functional_channel_2_moco.h5"
-            brain_file = "functional_channel_2_moco_cleaned.h5"
+            brain_file = "functional_channel_2_moco.h5"
 
             args = {
                 "logfile": logfile,
