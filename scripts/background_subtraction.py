@@ -17,8 +17,9 @@ from time import sleep
 
 class BgRemover3D:
 
-    def __init__(self, img_path, half_wid=25):
+    def __init__(self, img_path, save_path, half_wid=25):
         self.path = img_path
+        self.save = save_path
         self.half_wid = half_wid
         # self.img shoud have dimension x, y, z, t here, x is along the line scan direction
         if '.nii' in img_path:
@@ -31,7 +32,7 @@ class BgRemover3D:
         self.make_savedir()
     
     def make_savedir(self):
-        working_dir = os.path.dirname(self.path)
+        working_dir = os.path.dirname(self.save)
         saving_dir = os.path.join(working_dir, 'background_subtraction')
         if not os.path.exists(saving_dir):
             os.mkdir(saving_dir)
@@ -148,7 +149,7 @@ def main(args):
 
         printlog(full_load_path)
         printlog("Data shape is {}".format(dims))  
-        br = BgRemover3D(full_load_path, half_wid=5)
+        br = BgRemover3D(full_load_path, save_directory, half_wid=5)
 
         br.draw_bg()
         br.show_bg()
