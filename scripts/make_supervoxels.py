@@ -52,8 +52,9 @@ def main(args):
 	t0 = time.time()
 	connectivity = grid_to_graph(256,128)
 	cluster_labels = []
+	t_shape = np.shape(brain)[3]
 	for z in range(49):
-		neural_activity = brain[:,:,z,:].reshape(-1, 3384)
+		neural_activity = brain[:,:,z,:].reshape(-1, t_shape)
 		cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
 									memory=cluster_dir,
 									linkage='ward',
@@ -71,7 +72,7 @@ def main(args):
 	t0 = time.time()
 	all_signals = []
 	for z in range(49):
-		neural_activity = brain[:,:,z,:].reshape(-1, 3384)
+		neural_activity = brain[:,:,z,:].reshape(-1, t_shape)
 		signals = []
 		for cluster_num in range(n_clusters):
 			cluster_indicies = np.where(cluster_labels[z,:]==cluster_num)[0]
