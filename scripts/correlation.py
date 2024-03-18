@@ -30,7 +30,7 @@ def main(args):
 
     ### load brain timestamps ###
     timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
-
+    
     ### this means only calculat correlation during periods of grey stimuli ###
     if grey_only:
         vision_path = os.path.join(load_directory, 'visual')
@@ -67,6 +67,8 @@ def main(args):
     elif full_load_path.endswith('.nii'):
         brain = np.asarray(nib.load(full_load_path).get_data().squeeze(), dtype='float32')
     printlog('done')
+    
+    timestamps = timestamps[:np.shape(brain)[3]]
     
     # Get brain size
     x_dim = brain.shape[0]
