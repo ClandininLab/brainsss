@@ -69,6 +69,7 @@ def main(args):
                 'y': brain.shape[1],
                 't': int(brain.shape[2]*len(fly_dirs))}
 
+        printlog(F'{dims}')
         brain_superslice = np.asarray(brain_superslice) ### will be shape nfly,x,y,t
         brain_superslice = np.moveaxis(brain_superslice,0,2) ###x,y,n,t
 
