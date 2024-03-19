@@ -62,14 +62,13 @@ def main(args):
         brain_superslice = []
         for fly in fly_dirs:
             brain_path = os.path.join(dataset_path, fly, 'func_0', 'brain_in_FDA.nii')
-            brain = np.asarray(nib.load(brain_path).get_data().squeeze(), dtype='float32')
+            brain = np.nan_to_num(np.asarray(nib.load(brain_path).get_data().squeeze(), dtype='float32'))
             brain_superslice.append(brain[:,:,z,:])
 
         dims = {'x': brain.shape[0],
                 'y': brain.shape[1],
                 't': int(brain.shape[3]*len(fly_dirs))}
 
-        printlog(F'{dims}')
         brain_superslice = np.asarray(brain_superslice) ### will be shape nfly,x,y,t
         brain_superslice = np.moveaxis(brain_superslice,0,2) ###x,y,n,t
 
