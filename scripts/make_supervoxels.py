@@ -40,6 +40,11 @@ def main(args):
 	printlog('brain shape: {}'.format(brain.shape))
 	printlog('load duration: {} sec'.format(time.time()-t0))
 
+	dims = {'x': brain.shape[0],
+			'y': brain.shape[1],
+			'z': brain.shape[2],
+			't': brain.shape[3]}
+
 	### MAKE CLUSTER DIRECTORY ###
 
 	cluster_dir = os.path.join(func_path, 'clustering')
@@ -50,10 +55,10 @@ def main(args):
 
 	printlog('fitting clusters')
 	t0 = time.time()
-	connectivity = grid_to_graph(256,128)
+	connectivity = grid_to_graph(dims['x'],dims['y'])
 	cluster_labels = []
-	for z in range(49):
-		neural_activity = brain[:,:,z,:].reshape(-1, 3384)
+	for z in range(dims['z']):
+		neural_activity = brain[:,:,z,:].reshape(-1, dims['t'])
 		cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
 									memory=cluster_dir,
 									linkage='ward',
@@ -70,8 +75,8 @@ def main(args):
 	printlog('getting cluster averages')
 	t0 = time.time()
 	all_signals = []
-	for z in range(49):
-		neural_activity = brain[:,:,z,:].reshape(-1, 3384)
+	for z in range(dims['z']):
+		neural_activity = brain[:,:,z,:].reshape(-1, dims['t'])
 		signals = []
 		for cluster_num in range(n_clusters):
 			cluster_indicies = np.where(cluster_labels[z,:]==cluster_num)[0]

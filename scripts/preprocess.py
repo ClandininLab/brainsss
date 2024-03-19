@@ -10,7 +10,7 @@ import nibabel as nib
 
 def main(args):
 
-    modules = 'gcc/6.3.0 python/3.6 py-numpy/1.14.3_py36 py-pandas/0.23.0_py36 viz py-scikit-learn/0.19.1_py36 antspy/0.2.2'
+    modules = 'gcc/6.3.0 python/3.6 py-numpy/1.14.3_py36 py-pandas/0.23.0_py36 viz py-scikit-learn/0.19.1_py36'
 
     #########################
     ### Setup preferences ###
@@ -71,6 +71,7 @@ def main(args):
         apply_transforms = brainsss.parse_true_false(settings.get('apply_transforms', False))
         grey_only = brainsss.parse_true_false(settings.get('grey_only', False))
         no_zscore_highpass = brainsss.parse_true_false(settings.get('no_zscore_highpass', False))
+        warp_timeseries = brainsss.parse_true_false(settings.get('warp_timeseries', False))
         make_supervoxels = brainsss.parse_true_false(settings.get('make_supervoxels', False))
     else:
         fictrac_qc = False
@@ -92,6 +93,8 @@ def main(args):
         grey_only = False
         no_zscore_highpass = False
         make_supervoxels = False
+        warp_timeseries = False
+        superfly = False
 
     # this arg should not be available to the .json settings
     loco_dataset = False
@@ -157,6 +160,10 @@ def main(args):
         no_zscore_highpass = True
     if args ['MAKE_SUPERVOXELS'] != '':
         make_supervoxels = True
+    if args ['WARP_TIMESERIES'] != '':
+        warp_timeseries = True
+    if args ['SUPERFLY'] != '':
+        superfly = True
 
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
@@ -201,7 +208,7 @@ def main(args):
                              script=os.path.join(scripts_path, script),
                              modules=modules,
                              args=args,
-                             logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
+                             logfile=logfile, time=3, mem=1, nice=nice, nodes=nodes)
         func_and_anats = brainsss.wait_for_job(job_id, logfile, com_path)
         func_and_anats = func_and_anats.split('\n')[:-1]
         funcs = [x.split(':')[1] for x in func_and_anats if 'func:' in x] # will be full paths to fly/expt
@@ -518,17 +525,11 @@ def main(args):
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
-            if loco_dataset:
-                moving_path = os.path.join(fly_directory, 'func_0', 'imaging', 'functional_channel_1_mean.nii')
-            else:
-                moving_path = os.path.join(fly_directory, 'func_0', 'moco', 'functional_channel_1_moc_mean.nii')
+            moving_path = os.path.join(fly_directory, 'func_0', 'moco', 'functional_channel_1_moc_mean.nii')
             moving_fly = 'func'
             moving_resolution = res_func
 
-            if loco_dataset:
-                fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'stitched_brain_red_mean.nii')
-            else:
-                fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean.nii')
+            fixed_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean.nii')
             fixed_fly = 'anat'
             fixed_resolution = res_anat
 
@@ -544,7 +545,7 @@ def main(args):
             low_res = False
             very_low_res = False
 
-            iso_2um_fixed = True
+            iso_2um_fixed = False
             iso_2um_moving = False
 
             grad_step = 0.2
@@ -586,29 +587,19 @@ def main(args):
         #################
         ### anat2mean ###
         #################
-        #res_anat = (1.3,1.3,1.3) # new anat res <------------------ this is set !!!!!
         res_anat = (0.653, 0.653, 1)
-        res_meanbrain = (2,2,2)
+        res_atlas = (0.76,0.76,0.76)
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
-            if loco_dataset:
-                moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anat_red_clean.nii')
-            else:
-                moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
+            moving_path = os.path.join(fly_directory, 'anat_0', 'moco', 'anatomy_channel_1_moc_mean_clean.nii')
             moving_fly = 'anat'
             moving_resolution = res_anat
 
-            # for gcamp6f with actual myr-tdtom
-            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
-            fixed_fly = 'meanbrain'
-
-            # for gcamp8s with non-myr-tdtom
-            #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20220421_make_nonmyr_meanbrain/non_myr_2_fdaatlas_40_8.nii"
-            #fixed_fly = 'non_myr_mean'
-
-            fixed_resolution = res_meanbrain
+            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_076iso.nii"
+            fixed_fly = 'FDA076iso'
+            fixed_resolution = res_atlas
 
             save_directory = os.path.join(fly_directory, 'warp')
             if not os.path.exists(save_directory):
@@ -623,7 +614,7 @@ def main(args):
             very_low_res = False
 
             iso_2um_fixed = False
-            iso_2um_moving = True
+            iso_2um_moving = False
 
             grad_step = 0.2
             flow_sigma = 3
@@ -656,7 +647,7 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=8, mem=8, nice=nice, nodes=nodes)
+                                 logfile=logfile, time=8, mem=22, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if apply_transforms:
@@ -665,8 +656,9 @@ def main(args):
         ### Apply transforms ###
         ########################
         res_func = (2.611, 2.611, 5)
-        res_anat = (2,2,2)#(0.38, 0.38, 0.38)
-        final_2um_iso = False #already 2iso so don't need to downsample
+        res_anat = (0.38, 0.38, 0.38)
+        final_2um_iso = False
+        final_2um_iso
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
@@ -680,8 +672,7 @@ def main(args):
                 moving_fly = 'corr_{}'.format(behavior)
                 moving_resolution = res_func
 
-                #fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/luke.nii"
-                fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
+                fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip.nii"
                 fixed_fly = 'meanbrain'
                 fixed_resolution = res_anat
 
@@ -707,6 +698,21 @@ def main(args):
                                      logfile=logfile, time=12, mem=4, nice=nice, nodes=nodes) # 2 to 1
                 brainsss.wait_for_job(job_id, logfile, com_path)
 
+    if warp_timeseries:
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+
+            args = {'logfile': logfile,
+                    'fly_directory': fly_directory}
+
+            script = 'warp_timeseries.py'
+            job_id = brainsss.sbatch(jobname='warptime',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile, time=12, mem=24, nice=nice, nodes=nodes) # 2 to 1
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
     if make_supervoxels:
         for func in funcs:
             args = {'logfile': logfile, 'func_path': func}
@@ -717,6 +723,18 @@ def main(args):
                                  args=args,
                                  logfile=logfile, time=2, mem=12, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if superfly:
+        args = {'logfile': logfile,
+                'dataset_path': dataset_path,
+                'fly_dirs': fly_dirs}
+        script = 'superslices.py'
+        job_id = brainsss.sbatch(jobname='supersli',
+                             script=os.path.join(scripts_path, script),
+                             modules=modules,
+                             args=args,
+                             logfile=logfile, time=8, mem=22, nice=nice, nodes=nodes)
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###

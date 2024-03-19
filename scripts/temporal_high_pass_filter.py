@@ -36,6 +36,10 @@ def main(args):
     ### HIGH PASS ###
     #################
 
+    timestamps = brainsss.load_timestamps(os.path.join(load_directory, 'imaging'))
+    hz = 1/np.diff(timestamps[:,0])[0]*1000
+    sigma = int(hz/0.01) #gets a good sigma of ~1.5min
+
     printlog("Beginning high pass")
     with h5py.File(full_load_path, 'r') as hf:
         data = hf['data'] # this doesn't actually LOAD the data - it is just a proxy
@@ -58,7 +62,7 @@ def main(args):
 
                     ### SMOOTH ###
                     t0 = time()
-                    smoothed_chunk = gaussian_filter1d(chunk,sigma=200,axis=-1,truncate=1)
+                    smoothed_chunk = gaussian_filter1d(chunk,sigma=sigma,axis=-1,truncate=1)
 
                     ### Apply Smooth Correction ###
                     t0 = time()
