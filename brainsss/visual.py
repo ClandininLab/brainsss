@@ -107,7 +107,7 @@ def get_stimulus_metadata(vision_path, printlog=None):
 		try:
 			## if no key error it must be a visprotocol metadata file ##
 			fly_ids = file['Flies']
-			metadata = parse_visprotocol_metadata(file)
+			metadata = parse_visprotocol_metadata(file, printlog)
 		except KeyError:
 			## if keyerror it is a visual_stimulation metadata file ##
 			metadata = parse_visual_stimulation_metadata(file)
@@ -124,7 +124,7 @@ def get_stimulus_metadata(vision_path, printlog=None):
 		return metadata['stim_ids'], metadata['angles']
 		printlog('Could not get visual metadata.')
 
-def parse_visprotocol_metadata(file):
+def parse_visprotocol_metadata(file, printlog):
 	### loop over flies and series to find the one that has many stim presentations (others were aborted)
 	# note it is critical each fly has their own .h5 file saved
 	found_a_full_series = False
