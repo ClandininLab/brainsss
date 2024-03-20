@@ -81,7 +81,7 @@ def main(args):
     for z in range(z_dim):
         
         ### interpolate fictrac to match the timestamps of this slice
-        printlog(F"{z}")
+        # printlog(F"{z}")
         fictrac_interp = brainsss.smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, behavior, timestamps=timestamps, z=z)
 
         for i in range(x_dim):
