@@ -659,7 +659,7 @@ def main(args):
                 mem=12,
                 nice=nice,
                 nodes=nodes,
-                global_resources=True,
+                global_resources=False,
             )
         brainsss.wait_for_job(job_id, logfile, com_path)
 
