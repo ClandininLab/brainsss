@@ -417,7 +417,7 @@ def main(args):
             # else:
             #     dur = 96
             #     mem = 4
-            global_resources = True
+            global_resources = False
             dur = 48
             mem = 8
             job_id = brainsss.sbatch(
