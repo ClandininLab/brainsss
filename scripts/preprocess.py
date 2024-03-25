@@ -100,7 +100,6 @@ def main(args):
     loco_dataset = False
 
     ### Parse remaining command line args
-    printlog(f"fly arg is: {args['FLIES']}")
     if args['FLIES'] == '':
         #printlog('no flies specified')
         fly_dirs = None
@@ -194,7 +193,7 @@ def main(args):
         #                      script=os.path.join(scripts_path, script),
         #                      modules=modules,
         #                      args=args,
-        #                      logfile=logfile, time=24, mem=1, nice=nice, nodes=nodes)
+        #                      logfile=logfile, time=1, mem=1, nice=nice, nodes=nodes)
         # flagged_dir = brainsss.wait_for_job(job_id, logfile, com_path)
 
         ###################
@@ -380,7 +379,7 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=24, mem=2, nice=nice, nodes=nodes)
+                                 logfile=logfile, time=1, mem=2, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if highpass:
@@ -391,9 +390,8 @@ def main(args):
 
         for func in funcs:
             load_directory = os.path.join(func)
-            load_directory = os.path.join(load_directory, "moco") ## ADDED
             save_directory = os.path.join(func)
-            brain_file = 'functional_channel_2_moco.h5' ### removed "zscore" on 20231031
+            brain_file = 'functional_channel_2_moco_zscore.h5'
 
             args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
             script = 'temporal_high_pass_filter.py'
@@ -493,7 +491,7 @@ def main(args):
                                  script=os.path.join(scripts_path, script),
                                  modules=modules,
                                  args=args,
-                                 logfile=logfile, time=3, mem=12, nice=nice, nodes=nodes, global_resources=False)
+                                 logfile=logfile, time=3, mem=12, nice=nice, nodes=nodes, global_resources=True)
         brainsss.wait_for_job(job_id, logfile, com_path)
 
     if clean_anat:
