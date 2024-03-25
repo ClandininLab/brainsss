@@ -102,9 +102,11 @@ def main(args):
 
     cluster_labels_all = np.asarray(cluster_labels_all)
     save_file = os.path.join(slices_dir, 'cluster_labels.npy')
+    np.save(save_file, cluster_labels_all)
 
     signals_all = np.asarray(signals_all)
     save_file = os.path.join(slices_dir, 'cluster_signals.npy')
+    np.save(save_file, signals_all)
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
