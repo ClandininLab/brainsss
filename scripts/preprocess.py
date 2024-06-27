@@ -146,11 +146,11 @@ def main(args):
         temporal_mean_brain_pre = True
     if args["MOCO"] != "":
         motion_correction = True
-    if args["CHANNEL_CHANGE"] !="":
+    if args["CHANNEL_CHANGE"] != "":
         channel_change = True
     if args["TEMPORAL_MEAN_BRAIN_POST"] != "":
         temporal_mean_brain_post = True
-    if args["BACKGROUND_SUBTRACTION"] !="":
+    if args["BACKGROUND_SUBTRACTION"] != "":
         background_subtraction = True	
     if args["ZSCORE"] != "":
         zscore = True
