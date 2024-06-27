@@ -2,7 +2,7 @@
     "imports_path": "/oak/stanford/groups/trc/data/Ilana/2P/imports",
     "dataset_path": "/oak/stanford/groups/trc/data/Ilana/2P/data",
     "fictrac_qc": "True",
-    "stim_triggered_beh": "True",
+    "stim_triggered_beh": "False",
     "bleaching_qc": "True",
     "temporal_mean_brain_pre": "True",
     "motion_correction": "True",
