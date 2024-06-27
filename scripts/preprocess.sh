@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       MOCO=True
       shift
       ;;
+    --channel_change)
+      CHANNEL_CHANGE=True
+      shift
+      ;;
     -bg|--background_subtraction)
       BACKGROUND_SUBTRACTION=True
       shift
