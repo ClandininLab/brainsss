@@ -66,6 +66,7 @@ def main(args):
         motion_correction = brainsss.parse_true_false(
             settings.get("motion_correction", False)
         )
+        channel_change = brainsss.parse_true_false(settings.get("channel_change", False))
         temporal_mean_brain_post = brainsss.parse_true_false(
             settings.get("temporal_mean_brain_post", False)
         )
@@ -95,6 +96,7 @@ def main(args):
         bleaching_qc = False
         temporal_mean_brain_pre = False
         motion_correction = False
+        channel_change = False
         temporal_mean_brain_post = False
         background_subtraction = False
         zscore = False
@@ -144,6 +146,8 @@ def main(args):
         temporal_mean_brain_pre = True
     if args["MOCO"] != "":
         motion_correction = True
+    if args["CHANNEL_CHANGE"] !="":
+        channel_change = True
     if args["TEMPORAL_MEAN_BRAIN_POST"] != "":
         temporal_mean_brain_post = True
     if args["BACKGROUND_SUBTRACTION"] !="":
@@ -446,7 +450,9 @@ def main(args):
             load_directory = os.path.join(func, "moco")
             save_directory = os.path.join(func)
             brain_file = "functional_channel_2_moco.h5"
-
+            if channel_change:
+                brain_file = "functional_channel_1_moco.h5"
+                
             args = {
                 "logfile": logfile,
                 "load_directory": load_directory,
