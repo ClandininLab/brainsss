@@ -65,7 +65,7 @@ def main(args):
 		cluster_model.fit(neural_activity)
 		cluster_labels.append(cluster_model.labels_)
 	cluster_labels = np.asarray(cluster_labels)
-	save_file = os.path.join(cluster_dir, 'cluster_labels.npy')
+	save_file = os.path.join(cluster_dir, 'cluster_labels_{}.npy'.format(ch_num))
 	np.save(save_file,cluster_labels)
 	printlog('cluster fit duration: {} sec'.format(time.time()-t0))
 
@@ -84,7 +84,7 @@ def main(args):
 		signals = np.asarray(signals)
 		all_signals.append(signals)
 	all_signals = np.asarray(all_signals)
-	save_file = os.path.join(cluster_dir, ch_num+'_cluster_signals.npy')
+	save_file = os.path.join(cluster_dir, 'cluster_signals_{}.npy'.format(ch_num)
 	np.save(save_file, all_signals)
 	printlog('cluster average duration: {} sec'.format(time.time()-t0))
 
