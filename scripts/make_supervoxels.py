@@ -84,7 +84,7 @@ def main(args):
 		signals = np.asarray(signals)
 		all_signals.append(signals)
 	all_signals = np.asarray(all_signals)
-	save_file = os.path.join(cluster_dir, 'cluster_signals_{}.npy'.format(ch_num)
+	save_file = os.path.join(cluster_dir, 'cluster_signals_{}.npy'.format(ch_num))
 	np.save(save_file, all_signals)
 	printlog('cluster average duration: {} sec'.format(time.time()-t0))
 
