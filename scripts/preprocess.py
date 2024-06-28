@@ -441,6 +441,15 @@ def main(args):
    
     if channel_change:
         ch_num = '1'
+        background_subtraction = True
+        zscore = True
+        highpass = True
+        correlation = True
+        clean_anat
+        func2anat = True
+        anat2atlas = True
+        make_supervoxels = True
+        #if changing the channel number, you'll need to rebuild all these things. I think this should work we shall see
     else:
         ch_num = '2'
     printlog('Channel number: {}'.format(ch_num))
