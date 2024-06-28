@@ -898,14 +898,14 @@ def main(args):
                         fly_directory,
                         "func_0",
                         "corr",
-                        "20220418_corr_{}.nii".format(behavior), # WHY IS THIS HARD CODED????
+                        "20220418_corr_{}{}.nii".format(behavior, ch_num), # WHY IS THIS HARD CODED????
                     )
                 else:
                     moving_path = os.path.join(
                         fly_directory,
                         "func_0",
                         "corr",
-                        "20220420_corr_{}.nii".format(behavior), # WHY IS THIS HARD CODED????
+                        "20220420_corr_{}{}.nii".format(behavior, ch_num), # WHY IS THIS HARD CODED????
                     )
                 moving_fly = "corr_{}".format(behavior)
                 moving_resolution = res_func
