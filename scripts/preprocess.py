@@ -438,7 +438,11 @@ def main(args):
             )
         ### currently submitting these jobs simultaneously since using global resources
         brainsss.wait_for_job(job_id, logfile, com_path)
-
+   
+    if channel_change:
+        ch_num = '1'
+    else:
+        ch_num = '2'
 
     if background_subtraction:
 
@@ -449,9 +453,7 @@ def main(args):
         for func in funcs:
             load_directory = os.path.join(func, "moco")
             save_directory = os.path.join(func)
-            brain_file = "functional_channel_2_moco.h5"
-            if channel_change:
-                brain_file = "functional_channel_1_moco.h5"
+            brain_file = f"functional_channel_{ch_num}_moco.h5"
                 
             args = {
                 "logfile": logfile,
@@ -487,8 +489,7 @@ def main(args):
             #load_directory = os.path.join(func, "moco")
             load_directory = os.path.join(func, "background_subtraction")
             save_directory = os.path.join(func)
-            #brain_file = "functional_channel_2_moco.h5"
-            brain_file = "functional_channel_2_moco.h5"
+            brain_file = f"functional_channel_{ch_num}_moco.h5"
 
             args = {
                 "logfile": logfile,
@@ -519,7 +520,7 @@ def main(args):
         for func in funcs:
             load_directory = os.path.join(func)
             save_directory = os.path.join(func)
-            brain_file = "functional_channel_2_moco_zscore.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_zscore.h5"
 
             args = {
                 "logfile": logfile,
@@ -551,17 +552,17 @@ def main(args):
             load_directory = os.path.join(func)
             save_directory = os.path.join(func, "corr")
             if use_warp:
-                brain_file = "functional_channel_2_moco_zscore_highpass_warped.nii"
+                brain_file = f"functional_channel_{ch_num}_moco_zscore_highpass_warped.nii"
                 fps = 100
             elif loco_dataset:
                 brain_file = "brain_zscored_green_high_pass_masked.nii"
                 fps = 50
             elif no_zscore_highpass:
-                brain_file = "moco/functional_channel_2_moco.h5"
+                brain_file = f"moco/functional_channel_{ch_num}_moco.h5"
                 # load_directory = os.path.join(func, 'moco')
                 fps = 100
             else:
-                brain_file = "functional_channel_2_moco_zscore_highpass.h5"
+                brain_file = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
                 fps = 100
 
             behaviors = ["dRotLabZneg", "dRotLabZpos", "dRotLabY"]
@@ -619,10 +620,11 @@ def main(args):
         #################
 
         for func in funcs:
+            name = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
             args = {
                 "logfile": logfile,
                 "h5_path": os.path.join(
-                    func, "functional_channel_2_moco_zscore_highpass.h5"
+                    func, name
                 ),
             }
             script = "h5_to_nii.py"
@@ -944,7 +946,8 @@ def main(args):
 
     if make_supervoxels:
         for func in funcs:
-            args = {"logfile": logfile, "func_path": func}
+            brain_file = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
+            args = {"logfile": logfile, "func_path": func, 'brain_file': brain_file, 'ch_num': ch_num}
             script = "make_supervoxels.py"
             job_id = brainsss.sbatch(
                 jobname="supervox",

@@ -28,12 +28,15 @@ def main(args):
 
 	func_path = args['func_path']
 	logfile = args['logfile']
+	brain_file = args['brain_file']
+	ch_num = args['ch_num']
 	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 	n_clusters = 2000
 
 	### LOAD BRAIN ###
 
-	brain_path = os.path.join(func_path, 'functional_channel_2_moco_zscore_highpass.h5')
+	# brain_path = os.path.join(func_path, 'functional_channel_2_moco_zscore_highpass.h5')
+	brain_path = os.path.join(func_path, brain_file)
 	t0 = time.time()
 	with h5py.File(brain_path, 'r+') as h5_file:
 		brain = np.nan_to_num(h5_file.get("data")[:].astype('float32'))
@@ -81,7 +84,7 @@ def main(args):
 		signals = np.asarray(signals)
 		all_signals.append(signals)
 	all_signals = np.asarray(all_signals)
-	save_file = os.path.join(cluster_dir, 'cluster_signals.npy')
+	save_file = os.path.join(cluster_dir, ch_num, 'cluster_signals.npy')
 	np.save(save_file, all_signals)
 	printlog('cluster average duration: {} sec'.format(time.time()-t0))
 
