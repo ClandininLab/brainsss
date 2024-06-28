@@ -116,8 +116,8 @@ def main(args):
     else:
         no_zscore_highpass_str = ''
 
-    date = time.strftime("%Y%m%d")
-    # date = '20220420'
+    # date = time.strftime("%Y%m%d")
+    date = '20220420' # WHY IS THIS HARDCODED????
 
     save_file = os.path.join(save_directory, '{}_corr_{}{}{}{}{}.nii'.format(date, behavior, warp_str, grey_str, no_zscore_highpass_str, ch_num))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
