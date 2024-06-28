@@ -443,6 +443,7 @@ def main(args):
         ch_num = '1'
     else:
         ch_num = '2'
+    printlog('Channel number: {}'.format(ch_num))
 
     if background_subtraction:
 
