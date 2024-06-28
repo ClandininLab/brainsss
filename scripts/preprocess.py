@@ -907,7 +907,7 @@ def main(args):
                         "corr",
                         "20220420_corr_{}{}.nii".format(behavior, ch_num), # WHY IS THIS HARD CODED????
                     )
-                moving_fly = "corr_{}".format(behavior)
+                moving_fly = "corr_{}{}".format(behavior, ch_num)
                 moving_resolution = res_func
 
                 # fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/luke.nii"
