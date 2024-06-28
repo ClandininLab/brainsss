@@ -576,7 +576,7 @@ def main(args):
                     "behavior": behavior,
                     "fps": fps,
                     "grey_only": grey_only,
-                    "ch": ch_num,
+                    "ch_num": ch_num,
                 }
                 script = "correlation.py"
                 job_id = brainsss.sbatch(
