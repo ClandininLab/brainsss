@@ -19,6 +19,7 @@ def main(args):
     save_directory = args['save_directory']
     brain_file = args['brain_file']
     grey_only = args['grey_only']
+    ch_num = args['ch_num']
 
     behavior = args['behavior']
     fps = args['fps'] # of fictrac camera
@@ -115,10 +116,10 @@ def main(args):
     else:
         no_zscore_highpass_str = ''
 
-    #date = time.strftime("%Y%m%d")
-    date = '20220420'
+    date = time.strftime("%Y%m%d")
+    # date = '20220420'
 
-    save_file = os.path.join(save_directory, '{}_corr_{}{}{}{}.nii'.format(date, behavior, warp_str, grey_str, no_zscore_highpass_str))
+    save_file = os.path.join(save_directory, '{}_corr_{}{}{}{}{}.nii'.format(date, behavior, warp_str, grey_str, no_zscore_highpass_str, ch_num))
     nib.Nifti1Image(corr_brain, np.eye(4)).to_filename(save_file)
     printlog("Saved {}".format(save_file))
     save_maxproj_img(save_file)
