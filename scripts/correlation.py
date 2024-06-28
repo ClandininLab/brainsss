@@ -19,7 +19,7 @@ def main(args):
     save_directory = args['save_directory']
     brain_file = args['brain_file']
     grey_only = args['grey_only']
-    ch_num = args['ch']
+    ch_num = args['ch_num']
 
     behavior = args['behavior']
     fps = args['fps'] # of fictrac camera
