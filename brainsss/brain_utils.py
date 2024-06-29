@@ -4,17 +4,125 @@ import scipy
 import nibabel as nib
 import os
 import time
+from scipy.signal import butter, filtfilt, freqz
 
-def extract_traces(fictrac, stim_times, pre_window, post_window):
+def extract_traces(fictrac, stim_times, pre_window, post_window, val=None):
     traces = []
     for i in range(len(stim_times)):
-        trace = fictrac['Z'][stim_times[i]-pre_window:stim_times[i]+post_window]
+        if val != None:
+            trace = fictrac[val][stim_times[i]-pre_window:stim_times[i]+post_window]
+        else:
+            trace = fictrac[stim_times[i]-pre_window:stim_times[i]+post_window]
         if len(trace) == pre_window + post_window: # this handles fictrac that crashed or was aborted or some bullshit
             traces.append(trace)
     traces = np.asarray(traces)
     mean_trace = np.mean(traces,axis=0)
     sem_trace = scipy.stats.sem(traces,axis=0)
     return traces, mean_trace, sem_trace
+
+def get_vals_for_analysis(tp_width_sec=0, trial_time_sec=0, before_stim_sec=0, pre_trial_window_sec=0, pre_trial_size_sec=0, post_trial_window_sec=0, post_trial_size_sec=0, thresh=0, fr=0):
+        
+    stim_end_sec = before_stim_sec + trial_time_sec
+    
+    stim_idx = int(before_stim_sec/tp_width_sec)
+    stim_end_idx = int(stim_end_sec/tp_width_sec)
+    pre_trial_window_idx = int(pre_trial_window_sec/tp_width_sec)
+
+    # first val i use to make delta to compare change in vel
+    first_val_end_idx = int(stim_idx - pre_trial_window_idx)
+    first_val_start_idx = int(first_val_end_idx - (pre_trial_size_sec/tp_width_sec)) #only needed if you're averaging across a window, otherwise just start val is used
+
+    # second val used to make delta
+    second_val_start_idx = int(stim_idx + post_trial_size_sec/tp_width_sec)
+    second_val_end_idx = int(second_val_start_idx + post_trial_window_sec/tp_width_sec)
+    return stim_idx, stim_end_idx, pre_trial_window_idx, first_val_end_idx, first_val_start_idx, second_val_end_idx, second_val_start_idx
+
+def butter_lowpass(cutoff, fs, order=5):
+    return butter(order, cutoff, fs=fs, btype='low', analog=False)
+
+def butter_lowpass_filter(data, cutoff, fs, order=5):
+    b, a = butter_lowpass(cutoff, fs, order=order)
+    y = filtfilt(b, a, data, method="gust")
+    return y
+
+def apply_butter_lowpass(behavior_traces, stim_idx, fr):
+    # Filter requirements.
+    order = 4
+    fs = fr      # sample rate, Hz
+    cutoff = 3  # desired cutoff frequency of the filter, Hz
+
+    # Filter the data, and plot both the original and filtered signals.
+    lpf_behavior = np.zeros((behavior_traces.shape[0], behavior_traces.shape[1] - stim_idx))
+
+    for i in range(behavior_traces.shape[0]):
+        lpf_behavior[i, :] = butter_lowpass_filter(behavior_traces[i,stim_idx:], cutoff, fs, order)
+
+    return lpf_behavior
+
+def get_speed_change(behavior, stim_idx, first_val_start_idx, first_val_end_idx, second_val_start_idx, second_val_end_idx):
+    pre_tsi= first_val_start_idx-stim_idx
+    pre_tei = first_val_end_idx-stim_idx
+    post_tsi = second_val_start_idx-stim_idx
+    post_tei = second_val_end_idx-stim_idx
+    
+    if first_val_start_idx!=first_val_end_idx:
+        first_speed = np.mean(behavior[:,pre_tsi:pre_tei], axis = 1)
+    else:
+        first_val_start_idx = int(first_val_start_idx)
+        first_speed = np.asarray(behavior[:,pre_tsi])
+
+    if second_val_start_idx!=second_val_end_idx:
+        second_speed = np.mean(behavior[:,post_tsi:post_tei], axis = 1)
+    else: 
+        second_speed = np.asarray(behavior[:,post_tsi])
+    speed_change = second_speed-first_speed
+    return speed_change
+
+def get_trials(speed_change, thresh):
+    decrease_trials = speed_change <-thresh
+    decrease_idx = np.where(decrease_trials)
+    increase_trials = speed_change>thresh
+    increase_idx = np.where(increase_trials)
+    flat_trials = np.logical_and(speed_change>-thresh, speed_change<thresh)
+    flat_idx = np.where(flat_trials)
+    return increase_trials, increase_idx, decrease_trials, decrease_idx, flat_trials, flat_idx
+
+def separate_traces(behavior_struct, value_struct):
+
+    increase_total= {}
+    increase_trial_num = 0
+    decrease_total= {}
+    decrease_trial_num = 0
+    flat_total= {}
+    flat_trial_num = 0
+
+    stim_idx, stim_end_idx, pre_trial_window_idx, first_val_end_idx, first_val_start_idx, second_val_end_idx, second_val_start_idx = get_vals_for_analysis(**value_struct)
+
+    for key in behavior_struct:
+        traces = behavior_struct[key]
+        lpf_behavior = apply_butter_lowpass(traces, stim_idx, value_struct["fr"])
+        speed_change = get_speed_change(lpf_behavior, stim_idx, first_val_start_idx, first_val_end_idx, second_val_start_idx, second_val_end_idx)
+        increase_trials,increase_idx, decrease_trials, decrease_idx, flat_trials, flat_idx = get_trials(speed_change, value_struct["thresh"])
+        increase_traces = traces[increase_trials]
+        increase_trial_num += np.shape(increase_traces)[0]
+        increase_total[key]={}
+        increase_total[key]['traces'] = increase_traces
+        increase_total[key]['idx'] = increase_idx
+        decrease_traces = traces[decrease_trials]
+        decrease_trial_num += np.shape(decrease_traces)[0]
+        decrease_total[key]={}
+        decrease_total[key]['traces'] = decrease_traces
+        decrease_total[key]['idx'] = decrease_idx
+        flat_traces = traces[flat_trials]
+        flat_trial_num += np.shape(flat_traces)[0]
+        flat_total[key]={}
+        flat_total[key]['traces'] = flat_traces
+        flat_total[key]['idx'] = flat_idx
+
+    print(f"Increase trial number: {increase_trial_num}")
+    print(f"Decrease trial number: {decrease_trial_num}")
+    print(f"Flat trial number: {flat_trial_num}")
+    return increase_total, decrease_total, flat_total
 
 def get_visually_evoked_turns(traces, mean_turn, start, stop, r_thresh, av_thresh, stim_times, expected_direction):
     ### this will flip the sign of the trace to get the correct av_thresh comparison
