@@ -10,7 +10,7 @@ import nibabel as nib
 
 def main(args):
 
-    modules = 'gcc/6.3.0 python/3.6 py-numpy/1.14.3_py36 py-pandas/0.23.0_py36 viz py-scikit-learn/0.19.1_py36'
+    modules = ''#'gcc/6.3.0 python/3.6 py-numpy/1.14.3_py36 py-pandas/0.23.0_py36 viz py-scikit-learn/0.19.1_py36'
 
     #########################
     ### Setup preferences ###
@@ -18,7 +18,7 @@ def main(args):
 
     width = 120 # width of print log
     nodes = 2 # 1 or 2
-    nice = True # true to lower priority of jobs. ie, other users jobs go first
+    nice = False # true to lower priority of jobs. ie, other users jobs go first
 
     #####################
     ### Setup logging ###

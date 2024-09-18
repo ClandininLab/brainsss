@@ -1,2 +1,2 @@
-brainsss.egg-info/*
-brainsss/brainsss/__pycache__/*
+brainsss.egg-info/
+brainsss/brainsss/__pycache__/
