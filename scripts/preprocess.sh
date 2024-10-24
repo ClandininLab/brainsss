@@ -36,24 +36,8 @@ while [[ $# -gt 0 ]]; do
       BACKGROUND_SUBTRACTION=True
       shift
       ;;
-    -z|--zscore)
-      ZSCORE=True
-      shift
-      ;;
-    -h|--highpass)
-      HIGHPASS=True
-      shift
-      ;;
-    -c|--correlation)
-      CORRELATION=True
-      shift
-      ;;
     --fictrac_qc)
       FICTRAC_QC=True
-      shift
-      ;;
-    --STB)
-      STB=True
       shift
       ;;
     --bleaching_qc)
@@ -68,20 +52,8 @@ while [[ $# -gt 0 ]]; do
       TEMPORAL_MEAN_BRAIN_POST=True
       shift
       ;;
-    --STA)
-      STA=True
-      shift
-      ;;
     --h52nii|--H5_TO_NII)
       H5_TO_NII=True
-      shift
-      ;;
-    --use_warp)
-      USE_WARP=True
-      shift
-      ;;
-    --loco_dataset)
-      LOCO_DATASET=True
       shift
       ;;
     --clean_anat)
@@ -94,18 +66,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --a2a)
       ANAT2ATLAS=True
-      shift
-      ;;
-    --apply_t)
-      APPLY_TRANSFORMS=True
-      shift
-      ;;
-    --grey_only)
-      GREY_ONLY=True
-      shift
-      ;;
-    --NZH)
-      NO_ZSCORE_HIGHPASS=True
       shift
       ;;
     --supervox)
@@ -121,13 +81,9 @@ done
 
 ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
 \"MOCO\":\"$MOCO\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\
-\"ZSCORE\":\"$ZSCORE\",\"HIGHPASS\":\"$HIGHPASS\",\"CORRELATION\":\"$CORRELATION\",\
-\"FICTRAC_QC\":\"$FICTRAC_QC\",\"STB\":\"$STB\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\
-\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"STA\":\"$STA\",\"H5_TO_NII\":\"$H5_TO_NII\",\
-\"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"USE_WARP\":\"$USE_WARP\",\
-\"LOCO_DATASET\":\"$LOCO_DATASET\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\"FUNC2ANAT\":\"$FUNC2ANAT\",\
-\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"APPLY_TRANSFORMS\":\"$APPLY_TRANSFORMS\",\"GREY_ONLY\":\"$GREY_ONLY\",\
-\"NO_ZSCORE_HIGHPASS\":\"$NO_ZSCORE_HIGHPASS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
+\"FICTRAC_QC\":\"$FICTRAC_QC\",\"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
+\"H5_TO_NII\":\"$H5_TO_NII\",\"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
+\"FUNC2ANAT\":\"$FUNC2ANAT\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
 
 ml python/3.6
 date
