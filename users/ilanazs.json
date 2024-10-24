@@ -2,19 +2,14 @@
     "imports_path": "/oak/stanford/groups/trc/data/Ilana/2P/imports",
     "dataset_path": "/oak/stanford/groups/trc/data/Ilana/2P/data",
     "fictrac_qc": "True",
-    "stim_triggered_beh": "False",
     "bleaching_qc": "True",
     "temporal_mean_brain_pre": "True",
     "motion_correction": "True",
     "temporal_mean_brain_post": "True", 
     "background_subtraction": "True",
-    "zscore": "True",
-    "highpass": "True",
-    "correlation": "True",
-    "STA": "True",
+    "raw_warp": "True",
     "h5_to_nii": "False",
     "clean_anat": "True",
     "func2anat": "True",
-    "anat2atlas": "True",
-    "apply_transforms": "True"
+    "anat2atlas": "True"
 }
