@@ -8,6 +8,7 @@ import nibabel as nib
 import brainsss
 import h5py
 import ants
+import matplotlib.pyplot as plt
 
 
 
@@ -29,9 +30,9 @@ def main(args):
     logfile = args['logfile']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
-    ##############
-    ### ZSCORE ###
-    ##############
+    ################
+    ### RAW WARP ###
+    ################
 
     printlog("Beginning RAW WARP")
     with h5py.File(full_load_path, 'r') as hf:
@@ -39,7 +40,16 @@ def main(args):
         dims = np.shape(data)
 
         printlog("Data shape is {}".format(dims))
-
+        
+        #QC fig of raw data
+        z_rand=20
+        plt.rcParams.update({'font.size': 24})
+        plt.figure(figsize=(10,10))
+        plt.imshow(np.mean(data[:,:,z_rand,:],axis=-1).T, cmap='bone')
+        plt.axis('off')
+        plt.title('Raw Brain, z='+z_rand, ha='center', va='bottom')
+        save_file = os.path.join(load_directory, 'raw_brain.png')
+        plt.savefig(save_file,dpi=300,bbox_inches='tight')
         
         #Warp in chunks so we don't run out of memory, this is creating the stepsize of chunks
         stepsize = 100
@@ -89,6 +99,17 @@ def main(args):
     total_ts=np.array(total_ts)
     total_ts=np.moveaxis(total_ts,0,-1)
     printlog("Warped brain shape is {}".format(np.shape(total_ts)))
+    
+    #QC fig of warped data
+    plt.rcParams.update({'font.size': 24})
+    plt.figure(figsize=(10,10))
+    plt.subplot(2,1,1)
+    plt.imshow(np.mean(warped[:,:,z_rand,:],axis=-1).T)
+    plt.subplot(2,1,2)
+    plt.imshow(np.mean(total_ts[:,:,z_rand,:],axis=-1).T)
+    plt.axis('off')
+    save_file = os.path.join(save_directory, 'warped_data.png')
+    plt.savefig(save_file,dpi=300,bbox_inches='tight')
     
     #Save the warped brain and timestamps
     with h5py.File(save_file, "w") as data_file:
