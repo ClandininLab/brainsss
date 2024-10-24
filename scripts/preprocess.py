@@ -68,6 +68,7 @@ def main(args):
             settings.get("temporal_mean_brain_post", False)
         )
         background_subtraction = brainsss.parse_true_false(settings.get("background_subtraction", False))
+        raw_warp = brainsss.parse_true_false(settings.get("raw_warp", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
@@ -83,6 +84,7 @@ def main(args):
         channel_change = False
         temporal_mean_brain_post = False
         background_subtraction = False
+        raw_warp = False
         h5_to_nii = False
         clean_anat = False
         func2anat = False
@@ -123,6 +125,8 @@ def main(args):
         temporal_mean_brain_post = True
     if args["BACKGROUND_SUBTRACTION"] != "":
         background_subtraction = True	
+    if args["RAW_WARP"] != "":
+        raw_warp = True	
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
     if args["CLEAN_ANAT"] != "":
@@ -582,15 +586,6 @@ def main(args):
    
     if channel_change:
         ch_num = '1'
-        background_subtraction = True
-        zscore = True
-        highpass = True
-        correlation = True
-        clean_anat
-        func2anat = True
-        anat2atlas = True
-        make_supervoxels = True
-        #if changing the channel number, you'll need to rebuild all these things. I think this should work we shall see
     else:
         ch_num = '2'
     printlog('Channel number: {}'.format(ch_num))
@@ -620,6 +615,45 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=2,
+                mem=24,
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+            
+    if raw_warp:
+
+        ######################
+        ### Warp Raw Brain ###
+        ######################
+
+       for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            
+            load_directory = os.path.join(fly_directory, "func_0", "background_subtraction")
+
+            save_directory = os.path.join(fly_directory, "warp")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+            
+            brain_file = f"functional_channel_{ch_num}_moco.h5"
+            
+            args = {
+                "logfile": logfile,
+                "fly_directory": fly_directory,
+                "load_directory": load_directory,
+                "save_directory": save_directory,
+                "brain_file": brain_file,
+            }
+            script = "raw_warp.py"
+            job_id = brainsss.sbatch(
+                jobname="raw_warp",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=24,
                 mem=24,
                 nice=nice,
                 nodes=nodes,
