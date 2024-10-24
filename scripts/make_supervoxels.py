@@ -56,7 +56,7 @@ def main(args):
 	connectivity = grid_to_graph(256,128)
 	cluster_labels = []
 	t_shape = np.shape(brain)[3]
-	for z in range(49):
+	for z in range(49): #THIS SHOULD NOT BE HARD CODED
 		neural_activity = brain[:,:,z,:].reshape(-1, t_shape)
 		cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
 									memory=cluster_dir,

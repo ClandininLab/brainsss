@@ -56,9 +56,6 @@ def main(args):
     dataset_path = settings["dataset_path"]
     if build_flies:
         fictrac_qc = brainsss.parse_true_false(settings.get("fictrac_qc", False))
-        stim_triggered_beh = brainsss.parse_true_false(
-            settings.get("stim_triggered_beh", False)
-        )
         bleaching_qc = brainsss.parse_true_false(settings.get("bleaching_qc", False))
         temporal_mean_brain_pre = brainsss.parse_true_false(
             settings.get("temporal_mean_brain_pre", False)
@@ -71,50 +68,26 @@ def main(args):
             settings.get("temporal_mean_brain_post", False)
         )
         background_subtraction = brainsss.parse_true_false(settings.get("background_subtraction", False))
-        zscore = brainsss.parse_true_false(settings.get("zscore", False))
-        highpass = brainsss.parse_true_false(settings.get("highpass", False))
-        correlation = brainsss.parse_true_false(settings.get("correlation", False))
-        STA = brainsss.parse_true_false(settings.get("STA", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
-        use_warp = brainsss.parse_true_false(settings.get("use_warp", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
         anat2atlas = brainsss.parse_true_false(settings.get("anat2atlas", False))
-        apply_transforms = brainsss.parse_true_false(
-            settings.get("apply_transforms", False)
-        )
-        grey_only = brainsss.parse_true_false(settings.get("grey_only", False))
-        no_zscore_highpass = brainsss.parse_true_false(
-            settings.get("no_zscore_highpass", False)
-        )
         make_supervoxels = brainsss.parse_true_false(
             settings.get("make_supervoxels", False)
         )
     else:
         fictrac_qc = False
-        stim_triggered_beh = False
         bleaching_qc = False
         temporal_mean_brain_pre = False
         motion_correction = False
         channel_change = False
         temporal_mean_brain_post = False
         background_subtraction = False
-        zscore = False
-        highpass = False
-        correlation = False
-        STA = False
         h5_to_nii = False
-        use_warp = False
         clean_anat = False
         func2anat = False
         anat2atlas = False
-        apply_transforms = False
-        grey_only = False
-        no_zscore_highpass = False
         make_supervoxels = False
-
-    # this arg should not be available to the .json settings
-    loco_dataset = False
 
     ### Parse remaining command line args
     if args["FLIES"] == "":
@@ -138,8 +111,6 @@ def main(args):
     # These command line arguments will be empty unless the flag is called from the command line
     if args["FICTRAC_QC"] != "":
         fictrac_qc = True
-    if args["STB"] != "":
-        stim_triggered_beh = True
     if args["BLEACHING_QC"] != "":
         bleaching_qc = True
     if args["TEMPORAL_MEAN_BRAIN_PRE"] != "":
@@ -152,32 +123,14 @@ def main(args):
         temporal_mean_brain_post = True
     if args["BACKGROUND_SUBTRACTION"] != "":
         background_subtraction = True	
-    if args["ZSCORE"] != "":
-        zscore = True
-    if args["HIGHPASS"] != "":
-        highpass = True
-    if args["CORRELATION"] != "":
-        correlation = True
-    if args["STA"] != "":
-        STA = True
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
-    if args["USE_WARP"] != "":
-        use_warp = True
-    if args["LOCO_DATASET"] != "":
-        loco_dataset = True
     if args["CLEAN_ANAT"] != "":
         clean_anat = True
     if args["FUNC2ANAT"] != "":
         func2anat = True
     if args["ANAT2ATLAS"] != "":
         anat2atlas = True
-    if args["APPLY_TRANSFORMS"] != "":
-        apply_transforms = True
-    if args["GREY_ONLY"] != "":
-        grey_only = True
-    if args["NO_ZSCORE_HIGHPASS"] != "":
-        no_zscore_highpass = True
     if args["MAKE_SUPERVOXELS"] != "":
         make_supervoxels = True
 
@@ -300,42 +253,8 @@ def main(args):
         for job_id in job_ids:
             brainsss.wait_for_job(job_id, logfile, com_path)
 
-    ### quick hack to not proceed if the functional scan is a single slice ###
     # because the scripts below are not built to handle slices, only volumes
-    # this is a dirty solution for a few reasons, in particular it will just base it on
-    # the first func dir
     # this will also break if only an anat scan was taken
-
-    # func_to_check = os.path.join(funcanats[0], 'imaging', 'functional_channel_1.nii')
-    # img_to_check = nib.load(func_to_check) # this loads a proxy
-    # img_shape = img_to_check.header.get_data_shape()
-    # if len(img_shape) < 4:
-    #     printlog('image is not a volume')
-    #     printlog(func_to_check)
-    #     printlog('aborting all')
-    #     return
-
-    if stim_triggered_beh:
-
-        ##########################
-        ### Stim Triggered Beh ###
-        ##########################
-
-        for func in funcs:
-            args = {"logfile": logfile, "func_path": func}
-            script = "stim_triggered_avg_beh.py"
-            job_id = brainsss.sbatch(
-                jobname="stim",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=1,
-                mem=2,
-                nice=nice,
-                nodes=nodes,
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
 
     if bleaching_qc:
 
@@ -439,219 +358,6 @@ def main(args):
         ### currently submitting these jobs simultaneously since using global resources
         brainsss.wait_for_job(job_id, logfile, com_path)
    
-    if channel_change:
-        ch_num = '1'
-        background_subtraction = True
-        zscore = True
-        highpass = True
-        correlation = True
-        clean_anat
-        func2anat = True
-        anat2atlas = True
-        make_supervoxels = True
-        #if changing the channel number, you'll need to rebuild all these things. I think this should work we shall see
-    else:
-        ch_num = '2'
-    printlog('Channel number: {}'.format(ch_num))
-
-    if background_subtraction:
-
-        ##############################
-        ### BACKGROUND SUBTRACTION ###
-        ##############################
-
-        for func in funcs:
-            load_directory = os.path.join(func, "moco")
-            save_directory = os.path.join(func)
-            brain_file = f"functional_channel_{ch_num}_moco.h5"
-                
-            args = {
-                "logfile": logfile,
-                "load_directory": load_directory,
-                "save_directory": save_directory,
-                "brain_file": brain_file,
-            }
-            script = "background_subtraction.py"
-            job_id = brainsss.sbatch(
-                jobname="background_subtraction",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=2,
-                mem=24,
-                nice=nice,
-                nodes=nodes,
-                #global_resources=True, 
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
-
-
-
-    if zscore:
-
-        ##############
-        ### ZSCORE ###
-        ##############
-
-        for func in funcs:
-            #for background subtraction need to change the directory and the brain file, once I have that figured out
-            #load_directory = os.path.join(func, "moco")
-            load_directory = os.path.join(func, "background_subtraction")
-            save_directory = os.path.join(func)
-            brain_file = f"functional_channel_{ch_num}_moco.h5"
-
-            args = {
-                "logfile": logfile,
-                "load_directory": load_directory,
-                "save_directory": save_directory,
-                "brain_file": brain_file,
-            }
-            script = "zscore.py"
-            job_id = brainsss.sbatch(
-                jobname="zscore",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=1,
-                mem=2,
-                nice=nice,
-                nodes=nodes,
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
-
-    if highpass:
-
-        ################
-        ### HIGHPASS ###
-        ################
-
-        for func in funcs:
-            load_directory = os.path.join(func)
-            save_directory = os.path.join(func)
-            brain_file = f"functional_channel_{ch_num}_moco_zscore.h5"
-
-            args = {
-                "logfile": logfile,
-                "load_directory": load_directory,
-                "save_directory": save_directory,
-                "brain_file": brain_file,
-            }
-            script = "temporal_high_pass_filter.py"
-            job_id = brainsss.sbatch(
-                jobname="highpass",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=4,
-                mem=2,
-                nice=nice,
-                nodes=nodes,
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
-
-    if correlation:
-
-        ###################
-        ### CORRELATION ###
-        ###################
-
-        for func in funcs:
-            load_directory = os.path.join(func)
-            save_directory = os.path.join(func, "corr")
-            if use_warp:
-                brain_file = f"functional_channel_{ch_num}_moco_zscore_highpass_warped.nii"
-                fps = 100
-            elif loco_dataset:
-                brain_file = "brain_zscored_green_high_pass_masked.nii"
-                fps = 50
-            elif no_zscore_highpass:
-                brain_file = f"moco/functional_channel_{ch_num}_moco.h5"
-                # load_directory = os.path.join(func, 'moco')
-                fps = 100
-            else:
-                brain_file = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
-                fps = 100
-
-            behaviors = ["dRotLabZneg", "dRotLabZpos", "dRotLabY"]
-            for behavior in behaviors:
-
-                args = {
-                    "logfile": logfile,
-                    "load_directory": load_directory,
-                    "save_directory": save_directory,
-                    "brain_file": brain_file,
-                    "behavior": behavior,
-                    "fps": fps,
-                    "grey_only": grey_only,
-                    "ch_num": ch_num,
-                }
-                script = "correlation.py"
-                job_id = brainsss.sbatch(
-                    jobname="corr",
-                    script=os.path.join(scripts_path, script),
-                    modules=modules,
-                    args=args,
-                    logfile=logfile,
-                    time=2,
-                    mem=4,
-                    nice=nice,
-                    nodes=nodes,
-                )
-                brainsss.wait_for_job(job_id, logfile, com_path)
-
-    if STA:
-
-        #########################################
-        ### STIMULUS TRIGGERED NEURAL AVERAGE ###
-        #########################################
-
-        for func in funcs:
-            args = {"logfile": logfile, "func_path": func}
-            script = "stim_triggered_avg_neu.py"
-            job_id = brainsss.sbatch(
-                jobname="STA",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=4,
-                mem=4,
-                nice=nice,
-                nodes=nodes,
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
-
-    if h5_to_nii:
-
-        #################
-        ### H5 TO NII ###
-        #################
-
-        for func in funcs:
-            name = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
-            args = {
-                "logfile": logfile,
-                "h5_path": os.path.join(
-                    func, name
-                ),
-            }
-            script = "h5_to_nii.py"
-            job_id = brainsss.sbatch(
-                jobname="h5tonii",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=2,
-                mem=10,
-                nice=nice,
-                nodes=nodes,
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
-
     if temporal_mean_brain_post:
 
         #########################################
@@ -716,26 +422,16 @@ def main(args):
 
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
-
-            if loco_dataset:
-                moving_path = os.path.join(
-                    fly_directory, "func_0", "imaging", "functional_channel_1_mean.nii"
-                )
-            else:
-                moving_path = os.path.join(
-                    fly_directory, "func_0", "moco", "functional_channel_1_moc_mean.nii"
-                )
+            
+            moving_path = os.path.join(
+                fly_directory, "func_0", "moco", "functional_channel_1_moc_mean.nii"
+            )
             moving_fly = "func"
             moving_resolution = res_func
 
-            if loco_dataset:
-                fixed_path = os.path.join(
-                    fly_directory, "anat_0", "moco", "stitched_brain_red_mean.nii"
-                )
-            else:
-                fixed_path = os.path.join(
-                    fly_directory, "anat_0", "moco", "anatomy_channel_1_moc_mean.nii"
-                )
+            fixed_path = os.path.join(
+                fly_directory, "anat_0", "moco", "anatomy_channel_1_moc_mean.nii"
+            )
             fixed_fly = "anat"
             fixed_resolution = res_anat
 
@@ -808,17 +504,12 @@ def main(args):
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
 
-            if loco_dataset:
-                moving_path = os.path.join(
-                    fly_directory, "anat_0", "moco", "anat_red_clean.nii"
-                )
-            else:
-                moving_path = os.path.join(
-                    fly_directory,
-                    "anat_0",
-                    "moco",
-                    "anatomy_channel_1_moc_mean_clean.nii",
-                )
+            moving_path = os.path.join(
+                fly_directory,
+                "anat_0",
+                "moco",
+                "anatomy_channel_1_moc_mean_clean.nii",
+            )
             moving_fly = "anat"
             moving_resolution = res_anat
 
@@ -888,64 +579,81 @@ def main(args):
                 nodes=nodes,
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
-        if apply_transforms:
-        ########################
-        ### Apply transforms ###
-        ########################
-        res_func = (2.611, 2.611, 5)
-        res_anat = (2, 2, 2)  # (0.38, 0.38, 0.38)
-        final_2um_iso = False  # already 2iso so don't need to downsample
-        for fly in fly_dirs:
-            fly_directory = os.path.join(dataset_path, fly)
-            behaviors = ["dRotLabY", "dRotLabZneg", "dRotLabZpos"]
-            for behavior in behaviors:
-                if loco_dataset:
-                    moving_path = os.path.join(
-                        fly_directory,
-                        "func_0",
-                        "corr",
-                        "20220418_corr_{}{}.nii".format(behavior, ch_num), # WHY IS THIS HARD CODED????
-                    )
-                else:
-                    moving_path = os.path.join(
-                        fly_directory,
-                        "func_0",
-                        "corr",
-                        "20220420_corr_{}{}.nii".format(behavior, ch_num), # WHY IS THIS HARD CODED????
-                    )
-                moving_fly = "corr_{}{}".format(behavior, ch_num)
-                moving_resolution = res_func
-                # fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/luke.nii"
-                fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"  # luke.nii"
-                fixed_fly = "meanbrain"
-                fixed_resolution = res_anat
-                save_directory = os.path.join(fly_directory, "warp")
-                if not os.path.exists(save_directory):
-                    os.mkdir(save_directory)
-                args = {
-                    "logfile": logfile,
-                    "save_directory": save_directory,
-                    "fixed_path": fixed_path,
-                    "moving_path": moving_path,
-                    "fixed_fly": fixed_fly,
-                    "moving_fly": moving_fly,
-                    "moving_resolution": moving_resolution,
-                    "fixed_resolution": fixed_resolution,
-                    "final_2um_iso": final_2um_iso,
-                }
-                script = "apply_transforms.py"
-                job_id = brainsss.sbatch(
-                    jobname="aplytrns",
-                    script=os.path.join(scripts_path, script),
-                    modules=modules,
-                    args=args,
-                    logfile=logfile,
-                    time=12,
-                    mem=4,
-                    nice=nice,
-                    nodes=nodes,
-                )  # 2 to 1
-                brainsss.wait_for_job(job_id, logfile, com_path)
+   
+    if channel_change:
+        ch_num = '1'
+        background_subtraction = True
+        zscore = True
+        highpass = True
+        correlation = True
+        clean_anat
+        func2anat = True
+        anat2atlas = True
+        make_supervoxels = True
+        #if changing the channel number, you'll need to rebuild all these things. I think this should work we shall see
+    else:
+        ch_num = '2'
+    printlog('Channel number: {}'.format(ch_num))
+
+    if background_subtraction:
+
+        ##############################
+        ### BACKGROUND SUBTRACTION ###
+        ##############################
+
+        for func in funcs:
+            load_directory = os.path.join(func, "moco")
+            save_directory = os.path.join(func)
+            brain_file = f"functional_channel_{ch_num}_moco.h5"
+                
+            args = {
+                "logfile": logfile,
+                "load_directory": load_directory,
+                "save_directory": save_directory,
+                "brain_file": brain_file,
+            }
+            script = "background_subtraction.py"
+            job_id = brainsss.sbatch(
+                jobname="background_subtraction",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=2,
+                mem=24,
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+    if h5_to_nii:
+
+        #################
+        ### H5 TO NII ###
+        #################
+
+        for func in funcs:
+            name = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
+            args = {
+                "logfile": logfile,
+                "h5_path": os.path.join(
+                    func, name
+                ),
+            }
+            script = "h5_to_nii.py"
+            job_id = brainsss.sbatch(
+                jobname="h5tonii",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=2,
+                mem=10,
+                nice=nice,
+                nodes=nodes,
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
 
     if make_supervoxels:
         for func in funcs:
