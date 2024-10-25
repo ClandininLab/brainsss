@@ -116,79 +116,79 @@ def main(args):
         data_file.create_dataset("data", data=warped.astype('float32'))
         data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
     
-    def apply_ants_trans(array, moving_resolution, fixed, transforms):
-        if array.ndim>3:
-            warpst=[]
-            for i in range(np.shape(array)[-1]):
-                moving = ants.from_numpy(array[...,i])
-                moving.set_spacing(moving_resolution)
-                moco = ants.apply_transforms(fixed, moving, transforms)
-                warped = moco.numpy()
-                warpst.append(warped)
-        else:
-            moving = ants.from_numpy(array)
+def apply_ants_trans(array, moving_resolution, fixed, transforms):
+    if array.ndim>3:
+        warpst=[]
+        for i in range(np.shape(array)[-1]):
+            moving = ants.from_numpy(array[...,i])
             moving.set_spacing(moving_resolution)
-            moco = ants.apply_transforms(fixed, moving, transforms, interpolator='nearestNeighbor')
-            warpst = moco.numpy()
-        return warpst
+            moco = ants.apply_transforms(fixed, moving, transforms)
+            warped = moco.numpy()
+            warpst.append(warped)
+    else:
+        moving = ants.from_numpy(array)
+        moving.set_spacing(moving_resolution)
+        moco = ants.apply_transforms(fixed, moving, transforms, interpolator='nearestNeighbor')
+        warpst = moco.numpy()
+    return warpst
 
-    def warp_raw_brain(data, steps, fixed, func_path):
-        moving_resolution = (2.611, 2.611, 5)
-        ###########################
-        ### Organize Transforms ###
-        ###########################
-        warp_directory = os.path.join(func_path,'warp')
-        warp_sub_dir = 'func-to-anat_fwdtransforms_2umiso'
-        affine_file = os.listdir(os.path.join(warp_directory, warp_sub_dir))[0]
-        affine_path = os.path.join(warp_directory, warp_sub_dir, affine_file)
-        warp_sub_dir = 'anat-to-meanbrain_fwdtransforms_2umiso'
-        syn_files = os.listdir(os.path.join(warp_directory, warp_sub_dir))
-        syn_linear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.mat' in x][0])
-        syn_nonlinear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.nii.gz' in x][0])
-        ####transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
-        transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
-        #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
+def warp_raw_brain(data, steps, fixed, func_path):
+    moving_resolution = (2.611, 2.611, 5)
+    ###########################
+    ### Organize Transforms ###
+    ###########################
+    warp_directory = os.path.join(func_path,'warp')
+    warp_sub_dir = 'func-to-anat_fwdtransforms_2umiso'
+    affine_file = os.listdir(os.path.join(warp_directory, warp_sub_dir))[0]
+    affine_path = os.path.join(warp_directory, warp_sub_dir, affine_file)
+    warp_sub_dir = 'anat-to-meanbrain_fwdtransforms_2umiso'
+    syn_files = os.listdir(os.path.join(warp_directory, warp_sub_dir))
+    syn_linear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.mat' in x][0])
+    syn_nonlinear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.nii.gz' in x][0])
+    ####transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
+    transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
+    #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
 
-        warp_dims=[314, 146, 91, np.shape(data)[-1]]#this probs shouldn't be hard coded but idk what else to do here
-        warps = np.zeros(warp_dims)
-        ### Warp timeponts
-    #     with h5py.File(save_dir, 'w') as f:
-    #             dset = f.create_dataset('warps', warp_dims, dtype='float16', chunks=True) 
-                
-        for chunk_num in range(len(steps)):
-    #                 t0 = time()
-            if chunk_num + 1 <= len(steps)-1:
-                print(chunk_num)
-                chunkstart = steps[chunk_num]
-                chunkend = steps[chunk_num + 1]
-                chunk = np.array(data[:,:,:,chunkstart:chunkend]).astype(np.float)
-                warps_chunk = apply_ants_trans(chunk, moving_resolution, fixed, transforms)
-    #             print(np.shape(warps_chunk))
-                warps_chunk = np.moveaxis(np.array(warps_chunk),0,-1)
-                warps[..., chunkstart:chunkend] = np.nan_to_num(warps_chunk)
-    #                     print(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
-        return warps
-    def warp_ts(data, fixed, func_path):
-        moving_resolution = (2.611, 2.611, 5)
-        ###########################
-        ### Organize Transforms ###
-        ###########################
-        warp_directory = os.path.join(func_path,'warp')
-        warp_sub_dir = 'func-to-anat_fwdtransforms_2umiso'
-        affine_file = os.listdir(os.path.join(warp_directory, warp_sub_dir))[0]
-        affine_path = os.path.join(warp_directory, warp_sub_dir, affine_file)
-        warp_sub_dir = 'anat-to-meanbrain_fwdtransforms_2umiso'
-        syn_files = os.listdir(os.path.join(warp_directory, warp_sub_dir))
-        syn_linear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.mat' in x][0])
-        syn_nonlinear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.nii.gz' in x][0])
-        ####transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
-        transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
-        #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
-                
-        data = np.array(data).astype(np.float)
-        warps = apply_ants_trans(data, moving_resolution, fixed, transforms)
-    #     warps = np.nan_to_num(data_warp)
-        return warps
+    warp_dims=[314, 146, 91, np.shape(data)[-1]]#this probs shouldn't be hard coded but idk what else to do here
+    warps = np.zeros(warp_dims)
+    ### Warp timeponts
+#     with h5py.File(save_dir, 'w') as f:
+#             dset = f.create_dataset('warps', warp_dims, dtype='float16', chunks=True) 
+            
+    for chunk_num in range(len(steps)):
+#                 t0 = time()
+        if chunk_num + 1 <= len(steps)-1:
+            print(chunk_num)
+            chunkstart = steps[chunk_num]
+            chunkend = steps[chunk_num + 1]
+            chunk = np.array(data[:,:,:,chunkstart:chunkend]).astype(np.float)
+            warps_chunk = apply_ants_trans(chunk, moving_resolution, fixed, transforms)
+#             print(np.shape(warps_chunk))
+            warps_chunk = np.moveaxis(np.array(warps_chunk),0,-1)
+            warps[..., chunkstart:chunkend] = np.nan_to_num(warps_chunk)
+#                     print(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
+    return warps
+def warp_ts(data, fixed, func_path):
+    moving_resolution = (2.611, 2.611, 5)
+    ###########################
+    ### Organize Transforms ###
+    ###########################
+    warp_directory = os.path.join(func_path,'warp')
+    warp_sub_dir = 'func-to-anat_fwdtransforms_2umiso'
+    affine_file = os.listdir(os.path.join(warp_directory, warp_sub_dir))[0]
+    affine_path = os.path.join(warp_directory, warp_sub_dir, affine_file)
+    warp_sub_dir = 'anat-to-meanbrain_fwdtransforms_2umiso'
+    syn_files = os.listdir(os.path.join(warp_directory, warp_sub_dir))
+    syn_linear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.mat' in x][0])
+    syn_nonlinear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.nii.gz' in x][0])
+    ####transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
+    transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
+    #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
+            
+    data = np.array(data).astype(np.float)
+    warps = apply_ants_trans(data, moving_resolution, fixed, transforms)
+#     warps = np.nan_to_num(data_warp)
+    return warps
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
