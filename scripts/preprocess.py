@@ -660,6 +660,7 @@ def main(args):
                 #global_resources=True, 
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
+    
     if h5_to_nii:
 
         #################
