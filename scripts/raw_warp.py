@@ -47,7 +47,7 @@ def main(args):
         plt.figure(figsize=(10,10))
         plt.imshow(np.mean(data[:,:,z_rand,:],axis=-1).T, cmap='bone')
         plt.axis('off')
-        plt.title('Raw Brain, z='+z_rand, ha='center', va='bottom')
+        # plt.title('Raw Brain, z='+z_rand, ha='center', va='bottom')
         save_file = os.path.join(load_directory, 'raw_brain.png')
         plt.savefig(save_file,dpi=300,bbox_inches='tight')
         
