@@ -9,6 +9,7 @@ import brainsss
 import h5py
 import ants
 import matplotlib.pyplot as plt
+import psutil
 
 
 
@@ -40,7 +41,8 @@ def main(args):
         dims = np.shape(data)
 
         printlog("Data shape is {}".format(dims))
-        
+        printlog('RAM memory used:', psutil.virtual_memory()[2])
+        printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
         #QC fig of raw data
         z_rand=20
         plt.rcParams.update({'font.size': 24})
@@ -60,8 +62,10 @@ def main(args):
         fixed = brainsss.load_fda_meanbrain()
         
         #Warp the brain
-        warped = warp_raw_brain(data=data, steps=steps, fixed=fixed, func_path=fly_directory)
+        warped = warp_raw(data=data, steps=steps, fixed=fixed, func_path=fly_directory)
         printlog("Warped brain shape is {}".format(np.shape(warped)))
+        printlog('RAM memory used:', psutil.virtual_memory()[2])
+        printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
     
     #Timestamps need to be warped as well, load them here    
     timestamps = brainsss.load_timestamps(os.path.join(fly_directory,'func_0', 'imaging'))    
@@ -86,9 +90,11 @@ def main(args):
     ts_xl=np.array(ts_xl)
     ts_xl=np.moveaxis(ts_xl,0,-1)
     printlog("Timestamp shape is {}".format(np.shape(ts_xl)))
+    printlog('RAM memory used:', psutil.virtual_memory()[2])
+    printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
     
     #Warp this extra large timestamp matrix
-    warped_ts = warp_ts(data=ts_xl, fixed=fixed, func_path=fly_directory)
+    warped_ts = warp_raw(data=ts_xl, steps=steps, fixed=fixed, func_path=fly_directory)
     
     #Add the relative timestamps to the warped timestamps to get the absolute timestamps
     total_ts=[]
@@ -98,7 +104,9 @@ def main(args):
         total_ts.append(temp_ts)
     total_ts=np.array(total_ts)
     total_ts=np.moveaxis(total_ts,0,-1)
-    printlog("Warped brain shape is {}".format(np.shape(total_ts)))
+    printlog("Warped timestamp shape is {}".format(np.shape(total_ts)))
+    printlog('RAM memory used:', psutil.virtual_memory()[2])
+    printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
     
     #QC fig of warped data
     plt.rcParams.update({'font.size': 24})
@@ -115,6 +123,9 @@ def main(args):
     with h5py.File(save_file, "w") as data_file:
         data_file.create_dataset("data", data=warped.astype('float32'))
         data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
+    printlog('RAM memory used:', psutil.virtual_memory()[2])
+    printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
+    
     
 def apply_ants_trans(array, moving_resolution, fixed, transforms):
     if array.ndim>3:
@@ -132,7 +143,7 @@ def apply_ants_trans(array, moving_resolution, fixed, transforms):
         warpst = moco.numpy()
     return warpst
 
-def warp_raw_brain(data, steps, fixed, func_path):
+def warp_raw(data, steps, fixed, func_path):
     moving_resolution = (2.611, 2.611, 5)
     ###########################
     ### Organize Transforms ###
@@ -149,45 +160,29 @@ def warp_raw_brain(data, steps, fixed, func_path):
     transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
     #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
 
-    warp_dims=[314, 146, 91, np.shape(data)[-1]]#this probs shouldn't be hard coded but idk what else to do here
-    warps = np.zeros(warp_dims)
-    ### Warp timeponts
-#     with h5py.File(save_dir, 'w') as f:
-#             dset = f.create_dataset('warps', warp_dims, dtype='float16', chunks=True) 
-            
-    for chunk_num in range(len(steps)):
-#                 t0 = time()
-        if chunk_num + 1 <= len(steps)-1:
-            print(chunk_num)
-            chunkstart = steps[chunk_num]
-            chunkend = steps[chunk_num + 1]
-            chunk = np.array(data[:,:,:,chunkstart:chunkend]).astype(np.float)
-            warps_chunk = apply_ants_trans(chunk, moving_resolution, fixed, transforms)
-#             print(np.shape(warps_chunk))
-            warps_chunk = np.moveaxis(np.array(warps_chunk),0,-1)
-            warps[..., chunkstart:chunkend] = np.nan_to_num(warps_chunk)
-#                     print(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
-    return warps
-def warp_ts(data, fixed, func_path):
-    moving_resolution = (2.611, 2.611, 5)
-    ###########################
-    ### Organize Transforms ###
-    ###########################
-    warp_directory = os.path.join(func_path,'warp')
-    warp_sub_dir = 'func-to-anat_fwdtransforms_2umiso'
-    affine_file = os.listdir(os.path.join(warp_directory, warp_sub_dir))[0]
-    affine_path = os.path.join(warp_directory, warp_sub_dir, affine_file)
-    warp_sub_dir = 'anat-to-meanbrain_fwdtransforms_2umiso'
-    syn_files = os.listdir(os.path.join(warp_directory, warp_sub_dir))
-    syn_linear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.mat' in x][0])
-    syn_nonlinear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.nii.gz' in x][0])
-    ####transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
-    transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
-    #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
-            
-    data = np.array(data).astype(np.float)
-    warps = apply_ants_trans(data, moving_resolution, fixed, transforms)
-#     warps = np.nan_to_num(data_warp)
+    
+    if np.array(data).ndim==4: #if warping brain
+        warp_dims=[314, 146, 91, np.shape(data)[-1]]#this probs shouldn't be hard coded but idk what else to do here
+        warps = np.zeros(warp_dims)
+        ### Warp timeponts
+    #     with h5py.File(save_dir, 'w') as f:
+    #             dset = f.create_dataset('warps', warp_dims, dtype='float16', chunks=True)         
+
+        for chunk_num in range(len(steps)):
+    #                 t0 = time()
+            if chunk_num + 1 <= len(steps)-1:
+                print(chunk_num)
+                chunkstart = steps[chunk_num]
+                chunkend = steps[chunk_num + 1]
+                chunk = np.array(data[:,:,:,chunkstart:chunkend]).astype(np.float)
+                warps_chunk = apply_ants_trans(chunk, moving_resolution, fixed, transforms)
+    #             print(np.shape(warps_chunk))
+                warps_chunk = np.moveaxis(np.array(warps_chunk),0,-1)
+                warps[..., chunkstart:chunkend] = np.nan_to_num(warps_chunk)
+    #                     print(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
+    else: #if warping timestamps
+        data = np.array(data).astype(np.float)
+        warps = apply_ants_trans(data, moving_resolution, fixed, transforms)
     return warps
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
