@@ -41,8 +41,8 @@ def main(args):
         dims = np.shape(data)
 
         printlog("Data shape is {}".format(dims))
-        printlog('RAM memory used:', psutil.virtual_memory()[2])
-        printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
+        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         #QC fig of raw data
         z_rand=20
         plt.rcParams.update({'font.size': 24})
@@ -64,8 +64,8 @@ def main(args):
         #Warp the brain
         warped = warp_raw(data=data, steps=steps, fixed=fixed, func_path=fly_directory)
         printlog("Warped brain shape is {}".format(np.shape(warped)))
-        printlog('RAM memory used:', psutil.virtual_memory()[2])
-        printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
+        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #Timestamps need to be warped as well, load them here    
     timestamps = brainsss.load_timestamps(os.path.join(fly_directory,'func_0', 'imaging'))    
@@ -90,8 +90,8 @@ def main(args):
     ts_xl=np.array(ts_xl)
     ts_xl=np.moveaxis(ts_xl,0,-1)
     printlog("Timestamp shape is {}".format(np.shape(ts_xl)))
-    printlog('RAM memory used:', psutil.virtual_memory()[2])
-    printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
+    printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+    printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #Warp this extra large timestamp matrix
     warped_ts = warp_raw(data=ts_xl, steps=steps, fixed=fixed, func_path=fly_directory)
@@ -105,8 +105,8 @@ def main(args):
     total_ts=np.array(total_ts)
     total_ts=np.moveaxis(total_ts,0,-1)
     printlog("Warped timestamp shape is {}".format(np.shape(total_ts)))
-    printlog('RAM memory used:', psutil.virtual_memory()[2])
-    printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
+    printlog('RAM memory used:{}'.format(psutil.virtual_memory()[2]))
+    printlog('RAM Used (GB):{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #QC fig of warped data
     plt.rcParams.update({'font.size': 24})
@@ -123,8 +123,8 @@ def main(args):
     with h5py.File(save_file, "w") as data_file:
         data_file.create_dataset("data", data=warped.astype('float32'))
         data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
-    printlog('RAM memory used:', psutil.virtual_memory()[2])
-    printlog('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
+    printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+    printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     
 def apply_ants_trans(array, moving_resolution, fixed, transforms):
