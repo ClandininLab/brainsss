@@ -71,7 +71,6 @@ def main(args):
         #Save the warped brain
         with h5py.File(save_file, "w") as data_file:
             data_file.create_dataset("data", data=warped.astype('float32'))
-            data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
         printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
