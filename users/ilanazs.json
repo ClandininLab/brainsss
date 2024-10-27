@@ -8,6 +8,7 @@
     "temporal_mean_brain_post": "True", 
     "background_subtraction": "True",
     "raw_warp": "True",
+    "timestamp_warp": "True",
     "h5_to_nii": "False",
     "clean_anat": "True",
     "func2anat": "True",

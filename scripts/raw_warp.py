@@ -10,6 +10,7 @@ import h5py
 import ants
 import matplotlib.pyplot as plt
 import psutil
+from brainsss.brain_utils import warp_raw
 
 
 
@@ -43,11 +44,11 @@ def main(args):
         printlog("Data shape is {}".format(dims))
         printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+        
         #QC fig of raw data
-        z_rand=20
         plt.rcParams.update({'font.size': 24})
-        plt.figure(figsize=(10,10))
-        plt.imshow(np.mean(data[:,:,z_rand,:],axis=-1).T, cmap='bone')
+        # plt.figure(figsize=(10,10))
+        plt.imshow(np.mean(data[:,:,20,:],axis=-1).T)
         plt.axis('off')
         # plt.title('Raw Brain, z='+z_rand, ha='center', va='bottom')
         save_file = os.path.join(load_directory, 'raw_brain.png')
@@ -67,123 +68,13 @@ def main(args):
         printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
-    #Timestamps need to be warped as well, load them here    
-    timestamps = brainsss.load_timestamps(os.path.join(fly_directory,'func_0', 'imaging'))    
+        #Save the warped brain
+        with h5py.File(save_file, "w") as data_file:
+            data_file.create_dataset("data", data=warped.astype('float32'))
+            data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
+        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
-    #Get the values of the differences between each timestamp to create a relative timestamp matrix
-    relative=timestamps[0]-timestamps[0][0]
-    
-    #Create a list of the relative timestamps
-    vals=[]
-    for ts in range(np.shape(timestamps)[0]):
-        val=timestamps[ts]-relative
-        vals.append(val[0])
-    
-    #Create a matrix of the relative timestamps for each frame, should be same shape as the data
-    x=dims[0]
-    y=dims[1]
-    ts_xl=[]
-    for val in relative:
-        fframe=np.zeros((x,y))
-        fframe.fill(val)
-        ts_xl.append(fframe)
-    ts_xl=np.array(ts_xl)
-    ts_xl=np.moveaxis(ts_xl,0,-1)
-    printlog("Timestamp shape is {}".format(np.shape(ts_xl)))
-    printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
-    
-    #Warp this extra large timestamp matrix
-    warped_ts = warp_raw(data=ts_xl, steps=steps, fixed=fixed, func_path=fly_directory)
-    
-    #Add the relative timestamps to the warped timestamps to get the absolute timestamps
-    total_ts=[]
-    for i in range(np.shape(vals)[0]):
-        temp_ts=warped_ts+vals[i]
-    #     print(np.shape(temp_ts))
-        total_ts.append(temp_ts)
-    total_ts=np.array(total_ts)
-    total_ts=np.moveaxis(total_ts,0,-1)
-    printlog("Warped timestamp shape is {}".format(np.shape(total_ts)))
-    printlog('RAM memory used:{}'.format(psutil.virtual_memory()[2]))
-    printlog('RAM Used (GB):{}'.format(psutil.virtual_memory()[3]/1000000000))
-    
-    #QC fig of warped data
-    plt.rcParams.update({'font.size': 24})
-    plt.figure(figsize=(10,10))
-    plt.subplot(2,1,1)
-    plt.imshow(np.mean(warped[:,:,z_rand,:],axis=-1).T)
-    plt.subplot(2,1,2)
-    plt.imshow(np.mean(total_ts[:,:,z_rand,:],axis=-1).T)
-    plt.axis('off')
-    save_file = os.path.join(save_directory, 'warped_data.png')
-    plt.savefig(save_file,dpi=300,bbox_inches='tight')
-    
-    #Save the warped brain and timestamps
-    with h5py.File(save_file, "w") as data_file:
-        data_file.create_dataset("data", data=warped.astype('float32'))
-        data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
-    printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
-    
-    
-def apply_ants_trans(array, moving_resolution, fixed, transforms):
-    if array.ndim>3:
-        warpst=[]
-        for i in range(np.shape(array)[-1]):
-            moving = ants.from_numpy(array[...,i])
-            moving.set_spacing(moving_resolution)
-            moco = ants.apply_transforms(fixed, moving, transforms)
-            warped = moco.numpy()
-            warpst.append(warped)
-    else:
-        moving = ants.from_numpy(array)
-        moving.set_spacing(moving_resolution)
-        moco = ants.apply_transforms(fixed, moving, transforms, interpolator='nearestNeighbor')
-        warpst = moco.numpy()
-    return warpst
-
-def warp_raw(data, steps, fixed, func_path):
-    moving_resolution = (2.611, 2.611, 5)
-    ###########################
-    ### Organize Transforms ###
-    ###########################
-    warp_directory = os.path.join(func_path,'warp')
-    warp_sub_dir = 'func-to-anat_fwdtransforms_2umiso'
-    affine_file = os.listdir(os.path.join(warp_directory, warp_sub_dir))[0]
-    affine_path = os.path.join(warp_directory, warp_sub_dir, affine_file)
-    warp_sub_dir = 'anat-to-meanbrain_fwdtransforms_2umiso'
-    syn_files = os.listdir(os.path.join(warp_directory, warp_sub_dir))
-    syn_linear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.mat' in x][0])
-    syn_nonlinear_path = os.path.join(warp_directory, warp_sub_dir, [x for x in syn_files if '.nii.gz' in x][0])
-    ####transforms = [affine_path, syn_linear_path, syn_nonlinear_path]
-    transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
-    #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
-
-    
-    if np.array(data).ndim==4: #if warping brain
-        warp_dims=[314, 146, 91, np.shape(data)[-1]]#this probs shouldn't be hard coded but idk what else to do here
-        warps = np.zeros(warp_dims)
-        ### Warp timeponts
-    #     with h5py.File(save_dir, 'w') as f:
-    #             dset = f.create_dataset('warps', warp_dims, dtype='float16', chunks=True)         
-
-        for chunk_num in range(len(steps)):
-    #                 t0 = time()
-            if chunk_num + 1 <= len(steps)-1:
-                print(chunk_num)
-                chunkstart = steps[chunk_num]
-                chunkend = steps[chunk_num + 1]
-                chunk = np.array(data[:,:,:,chunkstart:chunkend]).astype(np.float)
-                warps_chunk = apply_ants_trans(chunk, moving_resolution, fixed, transforms)
-    #             print(np.shape(warps_chunk))
-                warps_chunk = np.moveaxis(np.array(warps_chunk),0,-1)
-                warps[..., chunkstart:chunkend] = np.nan_to_num(warps_chunk)
-    #                     print(F"vol: {chunkstart} to {chunkend} time: {time()-t0}")
-    else: #if warping timestamps
-        data = np.array(data).astype(np.float)
-        warps = apply_ants_trans(data, moving_resolution, fixed, transforms)
-    return warps
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
