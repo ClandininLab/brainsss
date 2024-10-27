@@ -700,9 +700,50 @@ def main(args):
                 mem=24,
                 nice=nice,
                 nodes=nodes,
-                #global_resources=True, 
+                global_resources=True, 
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
+            
+    # if dff:
+
+    # #################
+    # ### Delta f/f ###
+    # #################
+
+    #    for fly in fly_dirs:
+    #         fly_directory = os.path.join(dataset_path, fly)
+            
+    #         load_directory = os.path.join(fly_directory, "warp")
+
+    #         save_directory = os.path.join(fly_directory, "dff")
+    #         if not os.path.exists(save_directory):
+    #             os.mkdir(save_directory)
+            
+    #         brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
+    #         timestamp_file = "timestamps_warp.h5"
+            
+    #         args = {
+    #             "logfile": logfile,
+    #             "fly_directory": fly_directory,
+    #             "load_directory": load_directory,
+    #             "save_directory": save_directory,
+    #             "brain_file": brain_file,
+    #             "timestamp_file": timestamp_file,
+    #         }
+    #         script = "dff.py"
+    #         job_id = brainsss.sbatch(
+    #             jobname="dff",
+    #             script=os.path.join(scripts_path, script),
+    #             modules=modules,
+    #             args=args,
+    #             logfile=logfile,
+    #             time=24,
+    #             mem=24,
+    #             nice=nice,
+    #             nodes=nodes,
+    #             #global_resources=True, 
+    #         )
+    #         brainsss.wait_for_job(job_id, logfile, com_path)
     
     if h5_to_nii:
 
