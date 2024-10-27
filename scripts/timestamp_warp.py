@@ -43,7 +43,9 @@ def main(args):
     printlog("Timestamp shape is {}".format(np.shape(timestamps)))
     printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
     printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
-    
+
+    #Load mean brain
+    fixed = brainsss.load_fda_meanbrain()
     
     #Get the values of the differences between each timestamp to create a relative timestamp matrix
     relative=timestamps[0]-timestamps[0][0]
@@ -55,8 +57,8 @@ def main(args):
         vals.append(val[0])
     
     #Create a matrix of the relative timestamps for each frame, should be same shape as the data
-    x=dims[0]
-    y=dims[1]
+    x=256 #I know I shouldn't hard code this but it seems a waste of mem to load the brain just to get this....
+    y=128
     ts_xl=[]
     for val in relative:
         fframe=np.zeros((x,y))
@@ -69,7 +71,7 @@ def main(args):
     printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #Warp this extra large timestamp matrix
-    warped_ts = warp_raw(data=ts_xl, steps=steps, fixed=fixed, func_path=fly_directory)
+    warped_ts = warp_raw(data=ts_xl, steps=None, fixed=fixed, func_path=fly_directory)
     
     #Add the relative timestamps to the warped timestamps to get the absolute timestamps
     total_ts=[]
