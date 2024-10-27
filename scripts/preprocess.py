@@ -69,6 +69,7 @@ def main(args):
         )
         background_subtraction = brainsss.parse_true_false(settings.get("background_subtraction", False))
         raw_warp = brainsss.parse_true_false(settings.get("raw_warp", False))
+        timestamp_warp = brainsss.parse_true_false(settings.get("timestamp_warp", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
@@ -85,6 +86,7 @@ def main(args):
         temporal_mean_brain_post = False
         background_subtraction = False
         raw_warp = False
+        timestamp_warp = False
         h5_to_nii = False
         clean_anat = False
         func2anat = False
@@ -127,6 +129,8 @@ def main(args):
         background_subtraction = True	
     if args["RAW_WARP"] != "":
         raw_warp = True	
+    if args["TIMESTAMP_WARP"] != "":
+        timestamp_warp = True	
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
     if args["CLEAN_ANAT"] != "":
@@ -654,6 +658,45 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=24,
+                mem=24,
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+    
+    if timestamp_warp:
+
+        #######################
+        ### Warp timestamps ###
+        #######################
+
+       for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            
+            load_directory = os.path.join(fly_directory, "func_0", "imaging")
+
+            save_directory = os.path.join(fly_directory, "warp")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+            
+            brain_file = "timestamps.h5"
+            
+            args = {
+                "logfile": logfile,
+                "fly_directory": fly_directory,
+                "load_directory": load_directory,
+                "save_directory": save_directory,
+                "brain_file": brain_file,
+            }
+            script = "timestamp_warp.py"
+            job_id = brainsss.sbatch(
+                jobname="timestamp_warp",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=8,
                 mem=24,
                 nice=nice,
                 nodes=nodes,
