@@ -11,6 +11,7 @@ import ants
 import matplotlib.pyplot as plt
 import psutil
 from brainsss.brain_utils import warp_raw
+from brainsss.utils import save_qc_png
 
 
 
@@ -46,15 +47,9 @@ def main(args):
         # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         
         #QC fig of raw data
-        save_img = os.path.join(save_directory, 'raw_brain.nii')
-        nib.Nifti1Image(data, np.eye(4)).to_filename(save_img)
-        printlog("Saved {}".format(save_img))
-        brain_img = np.asarray(nib.load(save_img).get_data().squeeze(), dtype='float32')
-        plt.figure(figsize=(10,4))
-        plt.imshow(np.max(brain_img[:,:,20,:],axis=-1).T,cmap='gray')
-        plt.axis('off')
-        save_img_f = save_img[:-3] + 'png'
-        plt.savefig(save_img_f, bbox_inches='tight', dpi=300)
+        save_img = os.path.join(load_directory, 'raw_brain.nii')
+        save_file=save_qc_png(data, save_img)
+        printlog("Raw data QC figure saved in {}".format(save_file))
         
         #Warp in chunks so we don't run out of memory, this is creating the stepsize of chunks
         stepsize = 100
