@@ -46,13 +46,15 @@ def main(args):
         printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         
         #QC fig of raw data
-        plt.rcParams.update({'font.size': 24})
-        # plt.figure(figsize=(10,10))
-        plt.imshow(np.mean(data[:,:,20,:],axis=-1).T)
+        save_file = os.path.join(save_directory, 'raw_brain.nii')
+        nib.Nifti1Image(data, np.eye(4)).to_filename(save_file)
+        printlog("Saved {}".format(save_file))
+        brain_img = np.asarray(nib.load(save_file).get_data().squeeze(), dtype='float32')
+        plt.figure(figsize=(10,4))
+        plt.imshow(np.max(brain_img[:,:,20,:],axis=-1).T,cmap='gray')
         plt.axis('off')
-        # plt.title('Raw Brain, z='+z_rand, ha='center', va='bottom')
-        save_file = os.path.join(load_directory, 'raw_brain.png')
-        plt.savefig(save_file,dpi=300,bbox_inches='tight')
+        save_file_f = save_file[:-3] + 'png'
+        plt.savefig(save_file_f, bbox_inches='tight', dpi=300)
         
         #Warp in chunks so we don't run out of memory, this is creating the stepsize of chunks
         stepsize = 100
