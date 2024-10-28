@@ -11,8 +11,7 @@ import ants
 import matplotlib.pyplot as plt
 import psutil
 from brainsss.brain_utils import warp_raw
-
-
+from brainsss.utils import save_h5_chunks
 
 def main(args):
     fly_directory = args['fly_directory']
@@ -94,10 +93,12 @@ def main(args):
     plt.savefig(save_file,dpi=300,bbox_inches='tight')
     
     #Save the warped brain and timestamps
-    with h5py.File(save_file, "w") as data_file:
-        data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
-    printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+    # with h5py.File(save_file, "w") as data_file:
+    #     data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
+    # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+    # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+    
+    save_h5_chunks(save_file, total_ts, stepsize)
     
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
