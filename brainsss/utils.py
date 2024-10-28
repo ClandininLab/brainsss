@@ -410,3 +410,19 @@ def save_qc_png(data, save_path):
     save_img = save_path[:-3] + 'png'
     plt.savefig(save_img, bbox_inches='tight', dpi=300)
     return save_img
+
+def save_h5_chunks(save_path, data, stepsize):
+    dims=np.shape(data)
+    if stepsize!=None:
+        steps = list(range(0,dims[-1],stepsize))
+        steps.append(dims[-1])
+        with h5py.File(save_path, 'w') as f:
+            dset = f.create_dataset('data', dims, dtype='float32', chunks=True) 
+            
+            for chunk_num in range(len(steps)):
+                if chunk_num + 1 <= len(steps)-1:
+                    chunkstart = steps[chunk_num]
+                    chunkend = steps[chunk_num + 1]
+                    data_chunk = data[...,chunkstart:chunkend]
+                    f['data'][...,chunkstart:chunkend] = np.nan_to_num(data_chunk) ### Added nan to num because if a pixel is a constant value (over saturated) will divide by 0
+                    # printlog(F"vol: {chunkstart} to {chunkend}")

@@ -265,7 +265,7 @@ def apply_ants_trans(array, moving_resolution, fixed, transforms):
         warpst = moco.numpy()
     return warpst
 
-def warp_raw(data, steps, fixed, func_path):
+def warp_raw(data, stepsize, fixed, func_path):
     moving_resolution = (2.611, 2.611, 5)
     ###########################
     ### Organize Transforms ###
@@ -282,16 +282,19 @@ def warp_raw(data, steps, fixed, func_path):
     transforms = [syn_nonlinear_path, syn_linear_path, affine_path] ### INVERTED ORDER ON 20220503!!!!
     #ANTS DOCS ARE SHIT. THIS IS PROBABLY CORRECT, AT LEAST IT NOW WORKS FOR THE FLY(134) THAT WAS FAILING
 
+    dims=np.shape(data)
+    
+    steps = list(range(0,dims[-1],stepsize))
+    steps.append(dims[-1])
     
     if np.array(data).ndim==4: #if warping brain
-        warp_dims=[314, 146, 91, np.shape(data)[-1]]#this probs shouldn't be hard coded but idk what else to do here
+        warp_dims=[314, 146, 91, dims[-1]]#this probs shouldn't be hard coded but idk what else to do here
         warps = np.zeros(warp_dims)
         ### Warp timeponts
     #     with h5py.File(save_dir, 'w') as f:
     #             dset = f.create_dataset('warps', warp_dims, dtype='float16', chunks=True)         
 
         for chunk_num in range(len(steps)):
-    #                 t0 = time()
             if chunk_num + 1 <= len(steps)-1:
                 print(chunk_num)
                 chunkstart = steps[chunk_num]
