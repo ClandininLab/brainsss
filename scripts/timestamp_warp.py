@@ -70,7 +70,7 @@ def main(args):
     printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #Warp this extra large timestamp matrix
-    warped_ts = warp_raw(data=ts_xl, steps=None, fixed=fixed, func_path=fly_directory)
+    warped_ts = warp_raw(data=ts_xl, stepsize=None, fixed=fixed, func_path=fly_directory)
     
     #Add the relative timestamps to the warped timestamps to get the absolute timestamps
     total_ts=[]
