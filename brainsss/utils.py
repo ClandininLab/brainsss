@@ -399,10 +399,10 @@ def print_footer(logfile,  width):
 
 def save_qc_png(data, save_path):
     nib.Nifti1Image(data, np.eye(4)).to_filename(save_path)
-    brain_img = np.asarray(nib.load(save_path).get_data().squeeze(), dtype='float32')
+    brain_img = np.asarray(nib.load(save_path).get_fdata().squeeze(), dtype='float32')
     plt.figure(figsize=(10,4))
     #if number of dims > 3, take the max of the 4th dim and set 3 dim to rand value
-    if np.array(data).ndim==4:
+    if np.array(brain_img).ndim==4:
         plt.imshow(np.max(brain_img[:,:,20,:],axis=-1).T,cmap='gray')
     else:
         plt.imshow(np.max(brain_img,axis=-1).T,cmap='gray')   

@@ -98,7 +98,7 @@ def main(args):
     # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
     # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
-    save_h5_chunks(save_file, total_ts, stepsize)
+    save_h5_chunks(save_file, total_ts, stepsize=100)
     
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
