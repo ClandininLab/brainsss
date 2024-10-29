@@ -284,8 +284,9 @@ def warp_raw(data, stepsize, fixed, func_path):
 
     dims=np.shape(data)
     
-    steps = list(range(0,dims[-1],stepsize))
-    steps.append(dims[-1])
+    if stepsize!=None:    
+        steps = list(range(0,dims[-1],stepsize))
+        steps.append(dims[-1])
     
     if np.array(data).ndim==4: #if warping brain
         warp_dims=[314, 146, 91, dims[-1]]#this probs shouldn't be hard coded but idk what else to do here
