@@ -23,7 +23,7 @@ def main(args):
     stepsize = 100
 
     full_load_path = os.path.join(load_directory, brain_file)
-    save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_warp.h5')
+    save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_dff.h5')
 
     #####################
     ### SETUP LOGGING ###
