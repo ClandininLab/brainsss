@@ -85,7 +85,7 @@ def main(args):
     printlog('RAM Used (GB):{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #QC fig of warped data
-    save_file = os.path.join(save_directory, 'warped_timestamp_data.png')
+    save_file = os.path.join(save_directory, 'warped_timestamp_data.nii')
     save_fig = brainsss.utils.save_qc_png(total_ts, save_file)
     printlog("Warped timestamp data QC figure saved in {}".format(save_fig))
     
