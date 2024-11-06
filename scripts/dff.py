@@ -56,9 +56,9 @@ def main(args):
         warps_blur=np.moveaxis(warps_blur,0,-1)
         blur_dim=np.shape(warps_blur)
         printlog("Blurred data shape is {}".format(blur_dim))
-        save_img = os.path.join(load_directory, 'blurred_brain.nii')
-        save_img_file=utils.save_qc_png(warps_blur, save_img)
-        printlog("Raw data QC figure saved in {}".format(save_img_file))
+        # save_img = os.path.join(load_directory, 'blurred_brain.nii')
+        # save_img_file=utils.save_qc_png(warps_blur, save_img)
+        # printlog("Raw data QC figure saved in {}".format(save_img_file))
         
         #create high pass filter data
         hpf_total = []
@@ -83,13 +83,13 @@ def main(args):
         dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
         dff_dims = np.shape(dff)
         printlog("dff data shape is {}".format(dff_dims))
-        hpf_img = os.path.join(load_directory, 'hpf_brain.nii')
-        hpf_img_file=utils.save_qc_png(hpf_total, hpf_img)
-        lpf_img = os.path.join(load_directory, 'lpf_brain.nii')
-        lpf_img_file=utils.save_qc_png(lpf_total, lpf_img)
-        dff_img = os.path.join(load_directory, 'dff_brain.nii')
-        dff_img_file=utils.save_qc_png(dff, dff_img)
-        printlog("Raw data QC figure saved in {}{}{}".format(hpf_img_file, lpf_img_file, dff_img_file))
+        # hpf_img = os.path.join(load_directory, 'hpf_brain.nii')
+        # hpf_img_file=utils.save_qc_png(hpf_total, hpf_img)
+        # lpf_img = os.path.join(load_directory, 'lpf_brain.nii')
+        # lpf_img_file=utils.save_qc_png(lpf_total, lpf_img)
+        # dff_img = os.path.join(load_directory, 'dff_brain.nii')
+        # dff_img_file=utils.save_qc_png(dff, dff_img)
+        # printlog("Raw data QC figure saved in {}{}{}".format(hpf_img_file, lpf_img_file, dff_img_file))
     
         #save dff data
         utils.save_h5_chunks(save_file, dff, stepsize=100)
