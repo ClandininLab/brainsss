@@ -180,3 +180,17 @@ def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, time
     np.nan_to_num(fictrac_interp, copy=False);
     
     return fictrac_interp
+  
+def extract_traces(fictrac, stim_times, pre_window, post_window, val=None):
+    traces = []
+    for i in range(len(stim_times)):
+        if val != None:
+            trace = fictrac[val][stim_times[i]-pre_window:stim_times[i]+post_window]
+        else:
+            trace = fictrac[stim_times[i]-pre_window:stim_times[i]+post_window]
+        if len(trace) == pre_window + post_window: # this handles fictrac that crashed or was aborted or some bullshit
+            traces.append(trace)
+    traces = np.asarray(traces)
+    mean_trace = np.mean(traces,axis=0)
+    sem_trace = scipy.stats.sem(traces,axis=0)
+    return traces, mean_trace, sem_trace
