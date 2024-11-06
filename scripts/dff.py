@@ -6,7 +6,6 @@ import numpy as np
 import argparse
 import subprocess
 import json
-import nibabel as nib
 import brainsss
 import h5py
 import ants
@@ -16,7 +15,6 @@ from scipy.ndimage import gaussian_filter
 
 
 def main(args):
-    fly_directory = args['fly_directory']
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']

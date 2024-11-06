@@ -704,7 +704,7 @@ def main(args):
                 mem=24,
                 nice=nice,
                 nodes=nodes,
-                global_resources=True, 
+                # global_resources=True, 
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
             
@@ -724,15 +724,12 @@ def main(args):
                 os.mkdir(save_directory)
             
             brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
-            timestamp_file = "timestamps_warp.h5"
             
             args = {
                 "logfile": logfile,
-                "fly_directory": fly_directory,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
                 "brain_file": brain_file,
-                "timestamp_file": timestamp_file,
             }
             script = "dff.py"
             job_id = brainsss.sbatch(
