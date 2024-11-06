@@ -311,6 +311,20 @@ def warp_raw(data, stepsize, fixed, func_path):
         warps = apply_ants_trans(data, moving_resolution, fixed, transforms)
     return warps
 
+def butter_highpass(cutoff, fs, order=5):
+    return butter(order, cutoff, fs=fs, btype='high', analog=False)
+
+def butter_highpass_filter(data, cutoff, fs, order=5):
+    b, a = butter_highpass(cutoff, fs, order=order)
+    y = filtfilt(b, a, data)
+    return y
+def apply_butter_highpass(data, z, cutoff, order, fs):
+
+    # Get the filter coefficients so we can check its frequency response.
+    b, a = butter_highpass(cutoff, fs, order)
+    hpf_data = butter_highpass_filter(data[:,:,z, :], cutoff, fs, order)
+    return hpf_data
+
 def load_roi_hemi_ids():
 
     roi_ids = {}

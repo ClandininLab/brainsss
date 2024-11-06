@@ -85,18 +85,9 @@ def main(args):
     printlog('RAM Used (GB):{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #QC fig of warped data
-    plt.rcParams.update({'font.size': 24})
-    # plt.figure(figsize=(10,10))
-    plt.imshow(np.mean(total_ts[:,:,20,:],axis=-1).T)
-    plt.axis('off')
     save_file = os.path.join(save_directory, 'warped_timestamp_data.png')
-    plt.savefig(save_file,dpi=300,bbox_inches='tight')
-    
-    #Save the warped brain and timestamps
-    # with h5py.File(save_file, "w") as data_file:
-    #     data_file.create_dataset("timestamps", data=total_ts.astype('float32'))
-    # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+    save_fig = brainsss.utils.save_qc_png(total_ts, save_file)
+    printlog("Warped timestamp data QC figure saved in {}".format(save_fig))
     
     save_h5_chunks(save_file, total_ts, stepsize=100)
     

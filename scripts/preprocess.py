@@ -70,6 +70,7 @@ def main(args):
         background_subtraction = brainsss.parse_true_false(settings.get("background_subtraction", False))
         raw_warp = brainsss.parse_true_false(settings.get("raw_warp", False))
         timestamp_warp = brainsss.parse_true_false(settings.get("timestamp_warp", False))
+        dff = brainsss.parse_true_false(settings.get("dff", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
@@ -87,6 +88,7 @@ def main(args):
         background_subtraction = False
         raw_warp = False
         timestamp_warp = False
+        dff = False
         h5_to_nii = False
         clean_anat = False
         func2anat = False
@@ -131,6 +133,8 @@ def main(args):
         raw_warp = True	
     if args["TIMESTAMP_WARP"] != "":
         timestamp_warp = True	
+    if args["DFF"] != "":
+        dff = True	
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
     if args["CLEAN_ANAT"] != "":
@@ -704,46 +708,46 @@ def main(args):
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
             
-    # if dff:
+    if dff:
 
-    # #################
-    # ### Delta f/f ###
-    # #################
+    #################
+    ### Delta f/f ###
+    #################
 
-    #    for fly in fly_dirs:
-    #         fly_directory = os.path.join(dataset_path, fly)
+       for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
             
-    #         load_directory = os.path.join(fly_directory, "warp")
+            load_directory = os.path.join(fly_directory, "warp")
 
-    #         save_directory = os.path.join(fly_directory, "dff")
-    #         if not os.path.exists(save_directory):
-    #             os.mkdir(save_directory)
+            save_directory = os.path.join(fly_directory, "dff")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
             
-    #         brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
-    #         timestamp_file = "timestamps_warp.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
+            timestamp_file = "timestamps_warp.h5"
             
-    #         args = {
-    #             "logfile": logfile,
-    #             "fly_directory": fly_directory,
-    #             "load_directory": load_directory,
-    #             "save_directory": save_directory,
-    #             "brain_file": brain_file,
-    #             "timestamp_file": timestamp_file,
-    #         }
-    #         script = "dff.py"
-    #         job_id = brainsss.sbatch(
-    #             jobname="dff",
-    #             script=os.path.join(scripts_path, script),
-    #             modules=modules,
-    #             args=args,
-    #             logfile=logfile,
-    #             time=24,
-    #             mem=24,
-    #             nice=nice,
-    #             nodes=nodes,
-    #             #global_resources=True, 
-    #         )
-    #         brainsss.wait_for_job(job_id, logfile, com_path)
+            args = {
+                "logfile": logfile,
+                "fly_directory": fly_directory,
+                "load_directory": load_directory,
+                "save_directory": save_directory,
+                "brain_file": brain_file,
+                "timestamp_file": timestamp_file,
+            }
+            script = "dff.py"
+            job_id = brainsss.sbatch(
+                jobname="dff",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=24,
+                mem=24,
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
     
     if h5_to_nii:
 
