@@ -72,7 +72,7 @@ def main(args):
                 ce=chunk+stepsize
                 if ce<=steps[-1]:
                     hpf_warps = brain_utils.apply_butter_highpass(warps_blur[...,cs:ce], z, cutoff, order, fs)
-                    hpf_total[...z,cs:ce]=hpf_warps
+                    hpf_total[...,z,cs:ce]=hpf_warps
         hpf_total = np.array(hpf_total)
         dims_hpfw = np.shape(hpf_total)
         printlog("High Pass Filter Data shape is {}".format(dims_hpfw))
