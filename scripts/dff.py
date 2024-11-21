@@ -39,6 +39,8 @@ def main(args):
     with h5py.File(full_load_path, 'r') as hf:
         brain = hf['data'][:]
         dims = np.shape(brain)
+        stepsize=100
+
 
         printlog("Data shape is {}".format(dims))
         
@@ -61,12 +63,17 @@ def main(args):
         # printlog("Raw data QC figure saved in {}".format(save_img_file))
         
         #create high pass filter data
-        hpf_total = []
+        hpf_total = np.zeros(dims)
+        steps = list(range(0,dims[-1],stepsize))
+        steps.append(dims[-1])
         for z in range(dims[-2]):
-            hpf_warps = brain_utils.apply_butter_highpass(warps_blur, z, cutoff, order, fs)
-            hpf_total.append(hpf_warps)
+            for chunk in steps:
+                cs=chunk
+                ce=chunk+stepsize
+                if ce<=steps[-1]:
+                    hpf_warps = brain_utils.apply_butter_highpass(warps_blur[...,cs:ce], z, cutoff, order, fs)
+                    hpf_total[...z,cs:ce]=hpf_warps
         hpf_total = np.array(hpf_total)
-        hpf_total = np.transpose(hpf_total, (1,2,0,3))
         dims_hpfw = np.shape(hpf_total)
         printlog("High Pass Filter Data shape is {}".format(dims_hpfw))
         
@@ -92,7 +99,7 @@ def main(args):
         # printlog("Raw data QC figure saved in {}{}{}".format(hpf_img_file, lpf_img_file, dff_img_file))
     
         #save dff data
-        utils.save_h5_chunks(save_file, dff, stepsize=100)
+        utils.save_h5_chunks(save_file, dff, stepsize=stepsize)
     printlog("dff done. Data saved in {}".format(save_file))
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
