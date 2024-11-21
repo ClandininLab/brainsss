@@ -67,13 +67,14 @@ def main(args):
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])
         for z in range(dims[-2]):
+            printlog("where error?!?!?!?!")
             for chunk in steps:
                 cs=chunk
                 ce=chunk+stepsize
                 if ce<=steps[-1]:
                     hpf_warps = brain_utils.apply_butter_highpass(warps_blur[...,cs:ce], z, cutoff, order, fs)
                     hpf_total[...,z,cs:ce]=hpf_warps
-        # hpf_total = np.array(hpf_total)
+        hpf_total = np.array(hpf_total)
         dims_hpfw = np.shape(hpf_total)
         printlog("High Pass Filter Data shape is {}".format(dims_hpfw))
         
