@@ -67,7 +67,7 @@ def main(args):
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])
         for z in range(dims[-2]):
-            printlog("where error?!?!?!?!")
+            printlog(z)
             for chunk in steps:
                 cs=chunk
                 ce=chunk+stepsize
