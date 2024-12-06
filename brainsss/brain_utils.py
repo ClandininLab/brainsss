@@ -297,7 +297,7 @@ def warp_raw(data, stepsize, fixed, func_path):
 
         for chunk_num in range(len(steps)):
             if chunk_num + 1 <= len(steps)-1:
-                print(chunk_num)
+                # print(chunk_num)
                 chunkstart = steps[chunk_num]
                 chunkend = steps[chunk_num + 1]
                 chunk = np.array(data[:,:,:,chunkstart:chunkend]).astype(np.float)
