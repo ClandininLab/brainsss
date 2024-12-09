@@ -71,7 +71,7 @@ def main(args):
                 if chunk_num + 1 <= len(steps)-1:
                     chunkstart = steps[chunk_num]
                     chunkend = steps[chunk_num + 1]
-                    chunk = data[:,:,chunkstart:chunkend,:]
+                    chunk = warps_blur[:,:,chunkstart:chunkend,:]
                     chunk_mean = np.mean(chunk,axis=-1)
 
                     ### SMOOTH ###
