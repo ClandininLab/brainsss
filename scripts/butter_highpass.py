@@ -69,8 +69,11 @@ def main(args):
         #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
         lpf_total = brain-hpf_total
         
-        utils.save_h5_chunks(save_file_h, hpf_total, stepsize=stepsize)
-        utils.save_h5_chunks(save_file_l, lpf_total, stepsize=stepsize)
+        with h5py.File(save_file_h, "w") as data_file:
+            data_file.create_dataset("hpf", data=hpf_total.astype('float32'))
+            data_file.create_dataset("lpf", data=lpf_total.astype('float32'))
+        # utils.save_h5_chunks(save_file_h, hpf_total, stepsize=stepsize)
+        # utils.save_h5_chunks(save_file_l, lpf_total, stepsize=stepsize)
         printlog("Butter high pass done")
 
 if __name__ == '__main__':
