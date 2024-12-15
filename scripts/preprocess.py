@@ -200,7 +200,7 @@ def main(args):
             args=args,
             logfile=logfile,
             time=3,
-            mem=1,
+            cpus=1,
             nice=nice,
             nodes=nodes,
         )
@@ -257,7 +257,7 @@ def main(args):
                     args=args,
                     logfile=logfile,
                     time=1,
-                    mem=1,
+                    cpus=1,
                     nice=nice,
                     nodes=nodes,
                 )
@@ -286,7 +286,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=1,
-                mem=4,
+                cpus=4,
                 nice=nice,
                 nodes=nodes,
             )
@@ -315,7 +315,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=1,
-                mem=2,
+                cpus=2,
                 nice=nice,
                 nodes=nodes,
             )
@@ -354,7 +354,7 @@ def main(args):
             #     mem = 4
             global_resources = False
             dur = 48
-            mem = 8
+            cpus = 8
             job_id = brainsss.sbatch(
                 jobname="moco",
                 script=os.path.join(scripts_path, script),
@@ -362,7 +362,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=dur,
-                mem=mem,
+                cpus=cpus,
                 nice=nice,
                 nodes=nodes,
                 global_resources=global_resources,
@@ -393,7 +393,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=3,
-                mem=12,
+                cpus=12,
                 nice=nice,
                 nodes=nodes,
                 global_resources=False,
@@ -417,7 +417,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=1,
-                mem=1,
+                cpus=1,
                 nice=nice,
                 nodes=nodes,
             )
@@ -498,7 +498,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=8,
-                mem=4,
+                cpus=4,
                 nice=nice,
                 nodes=nodes,
             )  # 2 to 1
@@ -586,7 +586,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=8,
-                mem=8,
+                cpus=8,
                 nice=nice,
                 nodes=nodes,
             )
@@ -623,7 +623,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=2,
-                mem=24,
+                cpus=24,
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
@@ -662,7 +662,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=24,
-                mem=24,
+                cpus=24,
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
@@ -701,7 +701,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=8,
-                mem=24,
+                cpus=24,
                 nice=nice,
                 nodes=nodes,
                 # global_resources=True, 
@@ -739,7 +739,8 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=24,
-                mem=24,
+                cpus=24,
+                mem='200GB',
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 

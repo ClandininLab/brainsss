@@ -73,7 +73,7 @@ class Printlog():
             f.write('\n')
             fcntl.flock(f, fcntl.LOCK_UN)
 
-def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=False, silence_print=False, nodes=2, begin='now',global_resources=False):
+def sbatch(jobname, script, modules, args, logfile, time=1, cpus=1, mem='50GB', dep='', nice=False, silence_print=False, nodes=2, begin='now',global_resources=False, mail='BEGIN,END'):
     if dep != '':
         dep = '--dependency=afterok:{} --kill-on-invalid-dep=yes '.format(dep)
  
@@ -93,9 +93,9 @@ def sbatch(jobname, script, modules, args, logfile, time=1, mem=1, dep='', nice=
     print_big_header(logfile, script_name, width)
 
     if global_resources:
-        sbatch_command = "sbatch -J {} -o ./com/%j.out -e {} -t {}:00:00 --nice={} {}--open-mode=append --cpus-per-task={} --begin={} --wrap='{}' {}".format(jobname, logfile, time, nice, node_cmd, mem, begin, command, dep)
+        sbatch_command = "sbatch -J {} -o ./com/%j.out -e {} -t {}:00:00 --nice={} {}--open-mode=append --cpus-per-task={}, --mem={} --begin={} --wrap='{}' {} --mail-type={}".format(jobname, logfile, time, nice, node_cmd, cpus, mem, begin, command, dep, mail)
     else:
-        sbatch_command = "sbatch -J {} -o ./com/%j.out -e {} -t {}:00:00 --nice={} --partition=trc {}--open-mode=append --cpus-per-task={} --begin={} --wrap='{}' {}".format(jobname, logfile, time, nice, node_cmd, mem, begin, command, dep)
+        sbatch_command = "sbatch -J {} -o ./com/%j.out -e {} -t {}:00:00 --nice={} --partition=trc {}--open-mode=append --cpus-per-task={} --mem={} --begin={} --wrap='{}' {} --mail-type={}".format(jobname, logfile, time, nice, node_cmd, cpus, mem, begin, command, dep, mail)
     sbatch_response = subprocess.getoutput(sbatch_command)
     
     if not silence_print:
