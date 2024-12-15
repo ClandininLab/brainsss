@@ -61,8 +61,8 @@ def main(args):
         #             hpf_total[...,z,cs:ce]=hpf_warps
         for z in range(dims[-2]):
             hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
-            printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-            printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+            # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+            # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
             hpf_total[...,z,:]=hpf_warps
         hpf_total = np.array(hpf_total)
         dims_hpfw = np.shape(hpf_total)
@@ -72,7 +72,7 @@ def main(args):
         lpf_total = brain-hpf_total
         printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
-        
+        del brain
         with h5py.File(save_file_h, "w") as data_file:
             data_file.create_dataset("hpf", data=hpf_total.astype('float32'))
             data_file.create_dataset("lpf", data=lpf_total.astype('float32'))
