@@ -136,7 +136,7 @@ def main(args):
     if args["TIMESTAMP_WARP"] != "":
         timestamp_warp = True	
     if args["BLUR"] != "":
-        dff = True	
+        blur = True	
     if args["DFF"] != "":
         dff = True	
     if args["H5_TO_NII"] != "":
@@ -751,6 +751,43 @@ def main(args):
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
 
+    # if butter_highpass:
+
+    # ##############################
+    # ### BUTTER HIGHPASS FILTER ###
+    # ##############################
+
+    #    for fly in fly_dirs:
+    #         fly_directory = os.path.join(dataset_path, fly)
+            
+    #         load_directory = os.path.join(fly_directory, "dff")
+
+    #         save_directory = os.path.join(fly_directory, "dff")
+            
+    #         brain_file = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
+            
+    #         args = {
+    #             "logfile": logfile,
+    #             "load_directory": load_directory,
+    #             "save_directory": save_directory,
+    #             "brain_file": brain_file,
+    #         }
+    #         script = "butter_highpass.py"
+    #         job_id = brainsss.sbatch(
+    #             jobname="butter_highpass",
+    #             script=os.path.join(scripts_path, script),
+    #             modules=modules,
+    #             args=args,
+    #             logfile=logfile,
+    #             time=4,
+    #             cpus=24,
+    #             mem='200GB',
+    #             nice=nice,
+    #             nodes=nodes,
+    #             #global_resources=True, 
+    #         )
+    #         brainsss.wait_for_job(job_id, logfile, com_path)
+    
     if dff:
 
     #################
