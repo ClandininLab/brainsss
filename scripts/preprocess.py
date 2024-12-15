@@ -739,7 +739,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=24,
-                cpus=24,
+                cpus=12,
                 mem='300GB',
                 nice=nice,
                 nodes=nodes,
