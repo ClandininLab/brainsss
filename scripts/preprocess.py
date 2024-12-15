@@ -71,6 +71,7 @@ def main(args):
         raw_warp = brainsss.parse_true_false(settings.get("raw_warp", False))
         timestamp_warp = brainsss.parse_true_false(settings.get("timestamp_warp", False))
         blur = brainsss.parse_true_false(settings.get("blur", False))
+        butter_highpass = brainsss.parse_true_false(settings.get("butter_highpass", False))
         dff = brainsss.parse_true_false(settings.get("dff", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
@@ -90,6 +91,7 @@ def main(args):
         raw_warp = False
         timestamp_warp = False
         blur = False
+        butter_highpass = False
         dff = False
         h5_to_nii = False
         clean_anat = False
@@ -137,6 +139,8 @@ def main(args):
         timestamp_warp = True	
     if args["BLUR"] != "":
         blur = True	
+    if args["HPF"] != "":
+        butter_highpass = True
     if args["DFF"] != "":
         dff = True	
     if args["H5_TO_NII"] != "":
@@ -751,42 +755,42 @@ def main(args):
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
 
-    # if butter_highpass:
+    if butter_highpass:
 
-    # ##############################
-    # ### BUTTER HIGHPASS FILTER ###
-    # ##############################
+    ##############################
+    ### BUTTER HIGHPASS FILTER ###
+    ##############################
 
-    #    for fly in fly_dirs:
-    #         fly_directory = os.path.join(dataset_path, fly)
+       for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
             
-    #         load_directory = os.path.join(fly_directory, "dff")
+            load_directory = os.path.join(fly_directory, "dff")
 
-    #         save_directory = os.path.join(fly_directory, "dff")
+            save_directory = os.path.join(fly_directory, "dff")
             
-    #         brain_file = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
             
-    #         args = {
-    #             "logfile": logfile,
-    #             "load_directory": load_directory,
-    #             "save_directory": save_directory,
-    #             "brain_file": brain_file,
-    #         }
-    #         script = "butter_highpass.py"
-    #         job_id = brainsss.sbatch(
-    #             jobname="butter_highpass",
-    #             script=os.path.join(scripts_path, script),
-    #             modules=modules,
-    #             args=args,
-    #             logfile=logfile,
-    #             time=4,
-    #             cpus=24,
-    #             mem='200GB',
-    #             nice=nice,
-    #             nodes=nodes,
-    #             #global_resources=True, 
-    #         )
-    #         brainsss.wait_for_job(job_id, logfile, com_path)
+            args = {
+                "logfile": logfile,
+                "load_directory": load_directory,
+                "save_directory": save_directory,
+                "brain_file": brain_file,
+            }
+            script = "butter_highpass.py"
+            job_id = brainsss.sbatch(
+                jobname="butter_highpass",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=4,
+                cpus=24,
+                mem='200GB',
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
     
     if dff:
 
