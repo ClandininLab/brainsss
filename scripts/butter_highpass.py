@@ -46,17 +46,22 @@ def main(args):
         cutoff =0.01 #desired cutoff frequency of the filter, Hz
 
         #create high pass filter data
-        hpf_total = np.zeros(dims)
+        hpf_total = np.zeros_like(brain)
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])
+        # for z in range(dims[-2]):
+        #     printlog("z is {}".format(z))
+        #     for chunk in steps:
+        #         cs=chunk
+        #         ce=chunk+stepsize
+        #         if ce<=steps[-1]:
+        #             hpf_warps = brain_utils.apply_butter_highpass(brain[...,cs:ce], z, cutoff, order, fs)
+        #             hpf_total[...,z,cs:ce]=hpf_warps
         for z in range(dims[-2]):
             printlog("z is {}".format(z))
-            for chunk in steps:
-                cs=chunk
-                ce=chunk+stepsize
-                if ce<=steps[-1]:
-                    hpf_warps = brain_utils.apply_butter_highpass(brain[...,cs:ce], z, cutoff, order, fs)
-                    hpf_total[...,z,cs:ce]=hpf_warps
+            hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
+            printlog(f"hpf is: {np.shape(hpf_warps)}")
+            hpf_total[...,z,:]=hpf_warps
         hpf_total = np.array(hpf_total)
         dims_hpfw = np.shape(hpf_total)
         printlog(f"High Pass Filter Data shape is {dims_hpfw}")
