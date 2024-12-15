@@ -807,13 +807,15 @@ def main(args):
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
+            brain_file_h = f"functional_channel_{ch_num}_moco_warp_blurred_hpf.h5"
+            brain_file_l = f"functional_channel_{ch_num}_moco_warp_blurred_lpf.h5"
             
             args = {
                 "logfile": logfile,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
-                "brain_file": brain_file,
+                "brain_file_h": brain_file_h,
+                "brain_file_l": brain_file_l,
             }
             script = "dff.py"
             job_id = brainsss.sbatch(

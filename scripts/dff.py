@@ -17,11 +17,13 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
-    brain_file = args['brain_file']
+    brain_hpf = args['brain_file_h']
+    brain_lpf = args['brain_file_l']
     stepsize = 100
 
-    full_load_path = os.path.join(load_directory, brain_file)
-    save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_dff.h5')
+    full_load_path_h = os.path.join(load_directory, brain_hpf)
+    full_load_path_l = os.path.join(load_directory, brain_lpf)
+    save_file = os.path.join(save_directory, brain_hpf.split('.')[0] + '_dff.h5')
 
     #####################
     ### SETUP LOGGING ###
@@ -31,94 +33,33 @@ def main(args):
     logfile = args['logfile']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
-    ################
-    ### RAW WARP ###
-    ################
-
+    ###########
+    ### DFF ###
+    ###########
+    stepsize=100
     printlog("Beginning DFF")
-    with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data'][:]
-        dims = np.shape(brain)
-        stepsize=100
+    with h5py.File(full_load_path_h, 'r') as hf:
+        hpf = hf['data'][:]
+        dimsh = np.shape(hpf)
 
-
-        printlog("Data shape is {}".format(dims))
+        printlog(f"Highpass filter shape is {dimsh}")
         
-        #filter requirements
-        order = 2
-        fs = 1.8 #sample rate, Hz
-        cutoff =0.01 #desired cutoff frequency of the filter, Hz
-
-        #gaussian blur data for less noise
-        warps_blur=[]
-        for i in range(np.shape(brain)[-1]):
-            warps_temp = gaussian_filter(brain[...,i], sigma=2)
-            warps_blur.append(warps_temp)
-        warps_blur=np.asarray(warps_blur)
-        warps_blur=np.moveaxis(warps_blur,0,-1)
-        blur_dim=np.shape(warps_blur)
-        printlog("Blurred data shape is {}".format(blur_dim))
-        # save_img = os.path.join(load_directory, 'blurred_brain.nii')
-        # save_img_file=utils.save_qc_png(warps_blur, save_img)
-        # printlog("Raw data QC figure saved in {}".format(save_img_file))
-        
-        #create high pass filter data
-        hpf_total = np.zeros(dims)
-        steps = list(range(0,dims[-1],stepsize))
-        steps.append(dims[-1])
-        #testing gaussian from bella's code
-        # for chunk_num in range(len(steps)):
-        #         if chunk_num + 1 <= len(steps)-1:
-        #             chunkstart = steps[chunk_num]
-        #             chunkend = steps[chunk_num + 1]
-        #             chunk = warps_blur[:,:,chunkstart:chunkend,:]
-        #             chunk_mean = np.mean(chunk,axis=-1)
-
-        #             ### SMOOTH ###
-        #             smoothed_chunk = gaussian_filter1d(chunk,sigma=200,axis=-1,truncate=1)
-
-        #             ### Apply Smooth Correction ###
-        #             chunk_high_pass = chunk - smoothed_chunk + chunk_mean[:,:,:,None] #need to add back in mean to preserve offset
-
-        #             ### Save ###
-        #             # f['data'][:,:,chunkstart:chunkend,:] = chunk_high_pass
-        #             hpf_total[:,:,chunkstart:chunkend]=chunk_high_pass
-        # dims_gw = np.shape(hpf_total)
-        # printlog("Gaussian Filter Data shape is {}".format(dims_gw))
-        
-        for z in range(dims[-2]):
-            printlog("z is {}".format(z))
-            for chunk in steps:
-                cs=chunk
-                ce=chunk+stepsize
-                if ce<=steps[-1]:
-                    hpf_warps = brain_utils.apply_butter_highpass(warps_blur[...,cs:ce], z, cutoff, order, fs)
-                    hpf_total[...,z,cs:ce]=hpf_warps
-        hpf_total = np.array(hpf_total)
-        dims_hpfw = np.shape(hpf_total)
-        printlog("High Pass Filter Data shape is {}".format(dims_hpfw))
-        
-        #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
-        lpf_total = warps_blur-hpf_total
+    with h5py.File(full_load_path_l, 'r') as lf:
+        lpf = lf['data'][:]
+        dimsl = np.shape(lpf)
+        printlog(f"Lowpass filter shape is {dimsl}")
         
         #load the mean brain
         fixed = brainsss.load_fda_meanbrain()
         
         #do dff
-        dff=hpf_total/(lpf_total-lpf_total.min()+100) #end is to get normalized numbers
+        dff=hpf/(lpf-lpf.min()+100) #end is to get normalized numbers
         
         #mask brain
         dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
         dff_dims = np.shape(dff)
         printlog("dff data shape is {}".format(dff_dims))
-        # hpf_img = os.path.join(load_directory, 'hpf_brain.nii')
-        # hpf_img_file=utils.save_qc_png(hpf_total, hpf_img)
-        # lpf_img = os.path.join(load_directory, 'lpf_brain.nii')
-        # lpf_img_file=utils.save_qc_png(lpf_total, lpf_img)
-        # dff_img = os.path.join(load_directory, 'dff_brain.nii')
-        # dff_img_file=utils.save_qc_png(dff, dff_img)
-        # printlog("Raw data QC figure saved in {}{}{}".format(hpf_img_file, lpf_img_file, dff_img_file))
-    
+        
         #save dff data
         utils.save_h5_chunks(save_file, dff, stepsize=stepsize)
     printlog("dff done. Data saved in {}".format(save_file))
