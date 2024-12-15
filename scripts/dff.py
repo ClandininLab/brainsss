@@ -67,36 +67,36 @@ def main(args):
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])
         #testing gaussian from bella's code
-        for chunk_num in range(len(steps)):
-                if chunk_num + 1 <= len(steps)-1:
-                    chunkstart = steps[chunk_num]
-                    chunkend = steps[chunk_num + 1]
-                    chunk = warps_blur[:,:,chunkstart:chunkend,:]
-                    chunk_mean = np.mean(chunk,axis=-1)
+        # for chunk_num in range(len(steps)):
+        #         if chunk_num + 1 <= len(steps)-1:
+        #             chunkstart = steps[chunk_num]
+        #             chunkend = steps[chunk_num + 1]
+        #             chunk = warps_blur[:,:,chunkstart:chunkend,:]
+        #             chunk_mean = np.mean(chunk,axis=-1)
 
-                    ### SMOOTH ###
-                    smoothed_chunk = gaussian_filter1d(chunk,sigma=200,axis=-1,truncate=1)
+        #             ### SMOOTH ###
+        #             smoothed_chunk = gaussian_filter1d(chunk,sigma=200,axis=-1,truncate=1)
 
-                    ### Apply Smooth Correction ###
-                    chunk_high_pass = chunk - smoothed_chunk + chunk_mean[:,:,:,None] #need to add back in mean to preserve offset
+        #             ### Apply Smooth Correction ###
+        #             chunk_high_pass = chunk - smoothed_chunk + chunk_mean[:,:,:,None] #need to add back in mean to preserve offset
 
-                    ### Save ###
-                    # f['data'][:,:,chunkstart:chunkend,:] = chunk_high_pass
-                    hpf_total[:,:,chunkstart:chunkend]=chunk_high_pass
-        dims_gw = np.shape(hpf_total)
-        printlog("Gaussian Filter Data shape is {}".format(dims_gw))
+        #             ### Save ###
+        #             # f['data'][:,:,chunkstart:chunkend,:] = chunk_high_pass
+        #             hpf_total[:,:,chunkstart:chunkend]=chunk_high_pass
+        # dims_gw = np.shape(hpf_total)
+        # printlog("Gaussian Filter Data shape is {}".format(dims_gw))
         
-        # for z in range(dims[-2]):
-        #     printlog("z is {}".format(z))
-        #     for chunk in steps:
-        #         cs=chunk
-        #         ce=chunk+stepsize
-        #         if ce<=steps[-1]:
-        #             hpf_warps = brain_utils.apply_butter_highpass(warps_blur[...,cs:ce], z, cutoff, order, fs)
-        #             hpf_total[...,z,cs:ce]=hpf_warps
-        # hpf_total = np.array(hpf_total)
-        # dims_hpfw = np.shape(hpf_total)
-        # printlog("High Pass Filter Data shape is {}".format(dims_hpfw))
+        for z in range(dims[-2]):
+            printlog("z is {}".format(z))
+            for chunk in steps:
+                cs=chunk
+                ce=chunk+stepsize
+                if ce<=steps[-1]:
+                    hpf_warps = brain_utils.apply_butter_highpass(warps_blur[...,cs:ce], z, cutoff, order, fs)
+                    hpf_total[...,z,cs:ce]=hpf_warps
+        hpf_total = np.array(hpf_total)
+        dims_hpfw = np.shape(hpf_total)
+        printlog("High Pass Filter Data shape is {}".format(dims_hpfw))
         
         #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
         lpf_total = warps_blur-hpf_total
