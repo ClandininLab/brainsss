@@ -32,7 +32,7 @@ def main(args):
 
     printlog("Beginning blurring")
     with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data'][:]
+        brain = hf['data']
         dims = np.shape(brain)
         stepsize=100
 
