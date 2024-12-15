@@ -740,7 +740,7 @@ def main(args):
                 logfile=logfile,
                 time=24,
                 cpus=24,
-                mem='200GB',
+                mem='300GB',
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
