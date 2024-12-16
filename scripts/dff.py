@@ -39,15 +39,12 @@ def main(args):
     stepsize=100
     printlog("Beginning DFF")
     with h5py.File(full_load_path_h, 'r') as hf:
-        hpf = hf['data'][:]
+        hpf = hf['hpf']
+        lpf = hf['lpf']
         dimsh = np.shape(hpf)
-
-        printlog(f"Highpass filter shape is {dimsh}")
-        
-    with h5py.File(full_load_path_l, 'r') as lf:
-        lpf = lf['data'][:]
         dimsl = np.shape(lpf)
-        printlog(f"Lowpass filter shape is {dimsl}")
+
+        printlog(f"Highpass filter shape is {dimsh}, lowpass filter shape is {dimsl}")
         
         #load the mean brain
         fixed = brainsss.load_fda_meanbrain()
