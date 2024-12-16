@@ -320,16 +320,11 @@ def butter_highpass_filter(data, cutoff, fs, order=5):
     b, a = butter_highpass(cutoff, fs, order=order)
     y = filtfilt(b, a, data)
     return y
-def apply_butter_highpass(data, z, cutoff, order, fs,logfile):
+def apply_butter_highpass(data, z, cutoff, order, fs):
 
     # Get the filter coefficients so we can check its frequency response.
     # b, a = butter_highpass(cutoff, fs, order)
-    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
-    printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     hpf_data = butter_highpass_filter(data[:,:,z, :], cutoff, fs, order)
-    printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     return hpf_data
 
 def load_roi_hemi_ids():

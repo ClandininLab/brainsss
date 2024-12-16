@@ -37,8 +37,8 @@ def main(args):
         brain = hf['data']
         dims = np.shape(brain)
         stepsize=100
-        # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
 
         printlog("Data shape is {}".format(dims))
         
@@ -50,7 +50,11 @@ def main(args):
         #create high pass filter data
         hpf_total = np.zeros_like(brain)
         steps = list(range(0,dims[-1],stepsize))
+        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         steps.append(dims[-1])
+        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         # for z in range(dims[-2]):
         #     printlog("z is {}".format(z))
         #     for chunk in steps:
@@ -60,7 +64,9 @@ def main(args):
         #             hpf_warps = brain_utils.apply_butter_highpass(brain[...,cs:ce], z, cutoff, order, fs)
         #             hpf_total[...,z,cs:ce]=hpf_warps
         for z in range(dims[-2]):
-            hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs, logfile)
+            printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+            printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+            hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
             # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
             # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
             hpf_total[...,z,:]=hpf_warps
