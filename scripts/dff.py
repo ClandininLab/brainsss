@@ -50,7 +50,8 @@ def main(args):
         fixed = brainsss.load_fda_meanbrain()
         
         #do dff
-        dff=hpf/(lpf-lpf.min()+100) #end is to get normalized numbers
+        min_val = np.min(lpf)
+        dff=hpf/(lpf-min_val+100) #end is to get normalized numbers
         
         #mask brain
         dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
