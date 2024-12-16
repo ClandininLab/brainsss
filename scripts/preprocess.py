@@ -801,7 +801,7 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             
-            load_directory = os.path.join(fly_directory, "warp")
+            load_directory = os.path.join(fly_directory, "dff")
 
             save_directory = os.path.join(fly_directory, "dff")
             if not os.path.exists(save_directory):
@@ -825,8 +825,8 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=24,
-                cpus=24,
-                mem='250GB',
+                cpus=10,
+                mem='200GB',
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
