@@ -37,8 +37,8 @@ def main(args):
         brain = hf['data']
         dims = np.shape(brain)
         stepsize=100
-        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+        # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
 
         printlog("Data shape is {}".format(dims))
         
@@ -60,7 +60,7 @@ def main(args):
         #             hpf_warps = brain_utils.apply_butter_highpass(brain[...,cs:ce], z, cutoff, order, fs)
         #             hpf_total[...,z,cs:ce]=hpf_warps
         for z in range(dims[-2]):
-            hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
+            hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs, logfile)
             # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
             # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
             hpf_total[...,z,:]=hpf_warps
@@ -70,16 +70,16 @@ def main(args):
         
         #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
         lpf_total = brain-hpf_total
-        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+        # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         del brain
         with h5py.File(save_file_h, "w") as data_file:
             data_file.create_dataset("hpf", data=hpf_total.astype('float32'))
             data_file.create_dataset("lpf", data=lpf_total.astype('float32'))
         # utils.save_h5_chunks(save_file_h, hpf_total, stepsize=stepsize)
         # utils.save_h5_chunks(save_file_l, lpf_total, stepsize=stepsize)
-        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+        # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+        # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         printlog("Butter high pass done")
 
 if __name__ == '__main__':
