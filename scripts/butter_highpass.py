@@ -37,9 +37,6 @@ def main(args):
         brain = hf['data']
         dims = np.shape(brain)
         stepsize=100
-        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
-
         printlog("Data shape is {}".format(dims))
         
         #filter requirements
@@ -52,8 +49,6 @@ def main(args):
         printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         steps = list(range(0,dims[-1],stepsize))
-        printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         steps.append(dims[-1])
         # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
@@ -66,6 +61,8 @@ def main(args):
         #             hpf_warps = brain_utils.apply_butter_highpass(brain[...,cs:ce], z, cutoff, order, fs)
         #             hpf_total[...,z,cs:ce]=hpf_warps
         for z in range(dims[-2]):
+            printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
+            printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
             hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
             hpf_total[...,z,:]=hpf_warps
         hpf_total = np.array(hpf_total)
