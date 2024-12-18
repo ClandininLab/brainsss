@@ -39,7 +39,7 @@ def main(args):
 
     printlog("Beginning RAW WARP")
     with h5py.File(full_load_path, 'r') as hf:
-        data = hf['data'][:]
+        data = hf['data']
         dims = np.shape(data)
 
         printlog("Data shape is {}".format(dims))
@@ -78,11 +78,11 @@ def main(args):
         #             f['data'][:,:,:,chunkstart:chunkend] = np.nan_to_num(data_chunk) ### Added nan to num because if a pixel is a constant value (over saturated) will divide by 0
         #             printlog(F"vol: {chunkstart} to {chunkend}")
         
-        save_h5_chunks(save_file, warped, stepsize=100)
+        # save_h5_chunks(save_file, warped, stepsize=100)
             
         #Save the warped brain
-        # with h5py.File(save_file, "w") as data_file:
-        #     data_file.create_dataset("data", data=warped.astype('float32'))
+        with h5py.File(save_file, "w") as data_file:
+            data_file.create_dataset("data", data=warped.astype('float32'))
         # # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         # # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     printlog("Warp done. Data saved in {}".format(save_file))
