@@ -17,13 +17,12 @@ from scipy.ndimage import gaussian_filter, gaussian_filter1d
 def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
-    brain_hpf = args['brain_file_h']
-    brain_lpf = args['brain_file_l']
+    brain_file = args['brain_file']
     stepsize = 100
 
-    full_load_path_h = os.path.join(load_directory, brain_hpf)
-    full_load_path_l = os.path.join(load_directory, brain_lpf)
-    save_file = os.path.join(save_directory, brain_hpf.split('.')[0] + '_dff.h5')
+    full_load_path = os.path.join(load_directory, brain_file)
+    # full_load_path_l = os.path.join(load_directory, brain_lpf)
+    save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_dff.h5')
 
     #####################
     ### SETUP LOGGING ###
@@ -38,7 +37,7 @@ def main(args):
     ###########
     stepsize=100
     printlog("Beginning DFF")
-    with h5py.File(full_load_path_h, 'r') as hf:
+    with h5py.File(full_load_path, 'r') as hf:
         hpf = hf['hpf']
         lpf = hf['lpf']
         dimsh = np.shape(hpf)

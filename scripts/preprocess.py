@@ -632,6 +632,7 @@ def main(args):
                 logfile=logfile,
                 time=2,
                 cpus=24,
+                mem='128GB',
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
@@ -670,7 +671,8 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=24,
-                cpus=24,
+                cpus=32,
+                mem='256GB',
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
@@ -709,7 +711,8 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=8,
-                cpus=24,
+                cpus=32,
+                meme='256GB',
                 nice=nice,
                 nodes=nodes,
                 # global_resources=True, 
@@ -747,7 +750,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=4,
-                cpus=24,
+                cpus=10,
                 mem='200GB',
                 nice=nice,
                 nodes=nodes,
@@ -807,15 +810,14 @@ def main(args):
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file_h = f"functional_channel_{ch_num}_moco_warp_blurred_hpf.h5"
-            brain_file_l = f"functional_channel_{ch_num}_moco_warp_blurred_lpf.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf.h5"
+            # brain_file_l = f"functional_channel_{ch_num}_moco_warp_blurred_lpf.h5"
             
             args = {
                 "logfile": logfile,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
-                "brain_file_h": brain_file_h,
-                "brain_file_l": brain_file_l,
+                "brain_file": brain_file,
             }
             script = "dff.py"
             job_id = brainsss.sbatch(
@@ -840,7 +842,7 @@ def main(args):
         #################
 
         for func in funcs:
-            name = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
+            name = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             args = {
                 "logfile": logfile,
                 "h5_path": os.path.join(
@@ -863,7 +865,7 @@ def main(args):
 
     if make_supervoxels:
         for func in funcs:
-            brain_file = f"functional_channel_{ch_num}_moco_zscore_highpass.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             args = {"logfile": logfile, "func_path": func, 'brain_file': brain_file, 'ch_num': ch_num}
             script = "make_supervoxels.py"
             job_id = brainsss.sbatch(

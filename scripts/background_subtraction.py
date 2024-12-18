@@ -118,7 +118,7 @@ class BgRemover3D:
         elif '.h5' in self.path:
             save_name = os.path.join(self.saving_dir, self.file_head+'.h5')
             with h5py.File(save_name, "w") as data_file:
-                data_file.create_dataset("data", data=np.round(self.out).astype('int16'))
+                data_file.create_dataset("data", data=np.round(self.out).astype('float32'))
             
 
 def main(args):

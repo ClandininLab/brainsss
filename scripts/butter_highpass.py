@@ -18,7 +18,7 @@ def main(args):
 
     full_load_path = os.path.join(load_directory, brain_file)
     save_file_h = os.path.join(save_directory, brain_file.split('.')[0] + '_hpf.h5')
-    save_file_l = os.path.join(save_directory, brain_file.split('.')[0] + '_lpf.h5')
+    # save_file_l = os.path.join(save_directory, brain_file.split('.')[0] + '_lpf.h5')
 
     #####################
     ### SETUP LOGGING ###
@@ -45,7 +45,7 @@ def main(args):
         cutoff =0.01 #desired cutoff frequency of the filter, Hz
 
         #create high pass filter data
-        hpf_total = np.zeros(np.shape(brain))
+        hpf_total = np.zeros_like(brain)
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])
         # for z in range(dims[-2]):
@@ -56,14 +56,9 @@ def main(args):
         #         if ce<=steps[-1]:
         #             hpf_warps = brain_utils.apply_butter_highpass(brain[...,cs:ce], z, cutoff, order, fs)
         #             hpf_total[...,z,cs:ce]=hpf_warps
-        # for z in range(dims[-2]):
-        for z in range(2):
-            # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-            # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
+        for z in range(dims[-2]):
             hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
-            printlog(f"hpf warps shape is {np.shape(hpf_warps)}")
             hpf_total[...,z,:]=hpf_warps
-            printlog(f"hpf total shape is {np.shape(hpf_total)}")
         hpf_total = np.array(hpf_total)
         dims_hpfw = np.shape(hpf_total)
         printlog(f"High Pass Filter Data shape is {dims_hpfw}")
