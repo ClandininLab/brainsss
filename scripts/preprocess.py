@@ -73,6 +73,7 @@ def main(args):
         blur = brainsss.parse_true_false(settings.get("blur", False))
         butter_highpass = brainsss.parse_true_false(settings.get("butter_highpass", False))
         dff = brainsss.parse_true_false(settings.get("dff", False))
+        temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
@@ -93,6 +94,7 @@ def main(args):
         blur = False
         butter_highpass = False
         dff = False
+        temp_filter = False
         h5_to_nii = False
         clean_anat = False
         func2anat = False
@@ -143,6 +145,8 @@ def main(args):
         butter_highpass = True
     if args["DFF"] != "":
         dff = True	
+    if args["TEMP_FILTER"] != "":
+        temp_filter = True
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
     if args["CLEAN_ANAT"] != "":
@@ -630,8 +634,8 @@ def main(args):
                 modules=modules,
                 args=args,
                 logfile=logfile,
-                time=2,
-                cpus=24,
+                time=1,
+                cpus=10,
                 mem='150GB',
                 nice=nice,
                 nodes=nodes,
@@ -712,7 +716,7 @@ def main(args):
                 logfile=logfile,
                 time=8,
                 cpus=32,
-                meme='200GB',
+                mem='200GB',
                 nice=nice,
                 nodes=nodes,
                 # global_resources=True, 
@@ -827,6 +831,41 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=24,
+                cpus=10,
+                mem='200GB',
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+        
+    if temp_filter:
+
+    #######################
+    ### Temporal Filter ###
+    #######################
+
+       for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            load_directory = os.path.join(fly_directory, "dff")
+            save_directory = os.path.join(fly_directory, "dff")
+            
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
+            
+            args = {
+                "logfile": logfile,
+                "load_directory": load_directory,
+                "save_directory": save_directory,
+                "brain_file": brain_file,
+            }
+            script = "temp_filter.py"
+            job_id = brainsss.sbatch(
+                jobname="temp filter",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=4,
                 cpus=10,
                 mem='200GB',
                 nice=nice,
