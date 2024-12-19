@@ -56,6 +56,10 @@ while [[ $# -gt 0 ]]; do
       DFF=True
       shift
       ;;
+    -tf|--temp_filter)
+      TEMPORAL_FILTER=True
+      shift
+      ;;
     --fictrac_qc)
       FICTRAC_QC=True
       shift
@@ -104,7 +108,7 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 \"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"DFF\":\"$DFF\",\
 \"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"H5_TO_NII\":\"$H5_TO_NII\",\
 \"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
-\"FUNC2ANAT\":\"$FUNC2ANAT\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
+\"FUNC2ANAT\":\"$FUNC2ANAT\",\"TEMPORAL_FILTER\":\"$TEMPORAL_FILTER\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
 
 ml python/3.6
 date
