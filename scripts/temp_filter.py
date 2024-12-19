@@ -39,19 +39,12 @@ def main(args):
     ### TEMPORAL FILTER ###
     #######################
 
-    printlog("Beginning DFF")
+    printlog("Beginning temporal filter")
     #load brain
     with h5py.File(brain_load_path, 'r') as hf:
-        brain = hf['data'][:]
-        dims = np.shape(brain)
-
-        printlog("Data shape is {}".format(dims))
-    #load timestamps
-    with h5py.File(ts_load_path, 'r') as tf:
-        ts = tf['data'][:]
-        dims_ts = np.shape(ts)
-
-        printlog("Timestamp shape is {}".format(dims_ts))
+        brain = hf['data']
+        with h5py.File(ts_load_path, 'r') as hf:
+            ts = hf['data']
         
     ###########################
     ### PREP VISUAL STIMULI ###
@@ -151,9 +144,9 @@ def main(args):
     within_bin_brain_np = within_bin_brain_flat_np.reshape(*static_brain_shape, max_len)
     within_bin_ts_rel_np = within_bin_ts_rel_flat_np.reshape(*static_brain_shape, max_len)    
     
-    brain_shape=within_bin_brain_np.shape
-    ts_shape=within_bin_ts_rel_np.shape
-    printlog("Temporal filtered data shape is {} and timestamp shape is {}".format(brain_shape, ts_shape))
+    brain_shape=within_bin_brain_np.shape()
+    ts_shape=within_bin_ts_rel_np.shape()
+    printlog(f"Temporal filtered data shape is {brain_shape} and timestamp shape is {ts_shape}")
     
     
     printlog("Temporal filtering done. Data saved in {}".format(save_file))
