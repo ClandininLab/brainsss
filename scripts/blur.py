@@ -41,12 +41,19 @@ def main(args):
 
         #gaussian blur data for less noise
         warps_blur=[]
+        printlog("here 1")
         for i in range(np.shape(brain)[-1]):
+            printlog("here 2")
             warps_temp = gaussian_filter(brain[...,i], sigma=2)
+            printlog("here 3")
             warps_blur.append(warps_temp)
+            printlog("here 4")
         warps_blur=np.asarray(warps_blur)
+        printlog("here 5")
         warps_blur=np.moveaxis(warps_blur,0,-1)
+        printlog("here 6")
         blur_dim=np.shape(warps_blur)
+        printlog("here 7")
         printlog("Blurred data shape is {}".format(blur_dim))
         # save_img = os.path.join(load_directory, 'blurred_brain.nii')
         # save_img_file=utils.save_qc_png(warps_blur, save_img)
