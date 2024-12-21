@@ -42,7 +42,7 @@ def main(args):
         #gaussian blur data for less noise
         warps_blur=[]
         printlog("here 1")
-        for i in range(dims[-1]):
+        for i in range(dims[-2]):
             warps_temp = gaussian_filter(brain[...,i], sigma=2)
             warps_blur.append(warps_temp)
         warps_blur=np.asarray(warps_blur)
