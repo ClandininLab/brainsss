@@ -44,6 +44,7 @@ def main(args):
         for i in range(dims[-1]):
             warps_temp = gaussian_filter(brain[...,i], sigma=2)
             warps_blur[...,i]=warps_temp
+            del warps_temp
         # warps_blur=np.asarray(warps_blur)
         blur_dim=np.shape(warps_blur)
         printlog("Blurred data shape is {}".format(blur_dim))
