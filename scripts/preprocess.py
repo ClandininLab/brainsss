@@ -754,8 +754,8 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 time=2,
-                cpus=10,
-                mem='200GB',
+                cpus=2,
+                mem='20GB',
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
@@ -848,7 +848,9 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             load_directory = os.path.join(fly_directory, "dff")
-            save_directory = os.path.join(fly_directory, "dff")
+            save_directory = os.path.join(fly_directory, "filtered")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             

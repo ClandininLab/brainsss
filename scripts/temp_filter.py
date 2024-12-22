@@ -1,17 +1,12 @@
 import os
 import sys
-import brainsss.brain_utils as brain_utils
-import brainsss.utils as utils
 import brainsss.fictrac as fictrac
 import numpy as np
-import argparse
-import subprocess
 import json
 import brainsss
 import h5py
 import ants
 import psutil
-from scipy.ndimage import gaussian_filter
 
 
 
