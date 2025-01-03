@@ -58,7 +58,9 @@ def main(args):
         printlog("dff data shape is {}".format(dff_dims))
         
         #save dff data
-        utils.save_h5_chunks(save_file, dff, stepsize=stepsize)
+        # utils.save_h5_chunks(save_file, dff, stepsize=stepsize)
+        with h5py.File(save_file, "w") as data_file:
+            data_file.create_dataset("data", data=dff.astype('float32'))
     printlog("dff done. Data saved in {}".format(save_file))
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))

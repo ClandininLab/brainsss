@@ -89,7 +89,8 @@ def main(args):
     # save_fig = brainsss.utils.save_qc_png(total_ts, save_file)
     # printlog("Warped timestamp data QC figure saved in {}".format(save_fig))
     
-    save_h5_chunks(save_file, total_ts, stepsize=100)
+    with h5py.File(save_file, "w") as data_file:
+            data_file.create_dataset("data", data=total_ts.astype('float32'))
     
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))

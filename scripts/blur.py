@@ -55,8 +55,9 @@ def main(args):
         # save_img_file=utils.save_qc_png(warps_blur, save_img)
         # printlog("Raw data QC figure saved in {}".format(save_img_file))
 
-        
-        utils.save_h5_chunks(save_file, warps_blur, stepsize=stepsize)
+        with h5py.File(save_file, "w") as data_file:
+            data_file.create_dataset("data", data=warps_blur.astype('float32'))
+        # utils.save_h5_chunks(save_file, warps_blur, stepsize=stepsize)
         printlog("Blurring done")
 
 if __name__ == '__main__':
