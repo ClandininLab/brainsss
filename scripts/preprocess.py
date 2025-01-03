@@ -848,21 +848,23 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             load_directory = os.path.join(fly_directory, "dff")
-            save_directory = os.path.join(fly_directory, "filtered")
+            save_directory = os.path.join(fly_directory, "temp_filter")
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
-            
+            timestamp_file = "warp/timestamps_warp.h5"
             args = {
                 "logfile": logfile,
+                "fly_directory": fly_directory,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
                 "brain_file": brain_file,
+                "timestamp_file": timestamp_file,
             }
             script = "temp_filter.py"
             job_id = brainsss.sbatch(
-                jobname="temp filter",
+                jobname="temp_filter",
                 script=os.path.join(scripts_path, script),
                 modules=modules,
                 args=args,

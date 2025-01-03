@@ -19,7 +19,7 @@ def main(args):
     stepsize = 100
 
     brain_load_path = os.path.join(load_directory, brain_file)
-    ts_load_path = os.path.join(load_directory, timestamp_file)
+    ts_load_path = os.path.join(fly_directory, timestamp_file)
     save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered.h5')
 
     #####################
@@ -40,7 +40,10 @@ def main(args):
         brain = hf['data']
         with h5py.File(ts_load_path, 'r') as hf:
             ts = hf['data']
-        
+            dimsb = np.shape(brain)
+            dimst = np.shape(ts)
+            printlog(f"Brain shape is {dimsb} and timestamp shape is {dimst}")
+            
             ###########################
             ### PREP VISUAL STIMULI ###
             ###########################
@@ -52,33 +55,11 @@ def main(args):
             stimulus_start_times = brainsss.extract_stim_times_from_pd(pd2, t)
 
             # *100 puts in units of 10ms, which will match fictrac
-            st_10ms = [int(stimulus_start_times[i]*100) for i in range(len(stimulus_start_times))]
-
-            # get 1ms version to match neural timestamps
-            starts_loom = st_10ms
-
-            ####################
-            ### Prep Fictrac ###
-            ####################
-
-            fictrac_path = os.path.join(fly_directory, 'func_0', 'fictrac')
-            fictrac_raw = brainsss.load_fictrac(fictrac_path)
-
-            fps = 100
-            resolution = 10 #desired resolution in ms
-            expt_len = fictrac_raw.shape[0]/fps*1000
-            behaviors = ['dRotLabY', 'dRotLabZ', 'dRotLabX', 'speed']
-            fictrac = {}
-            for behavior in behaviors:
-                if behavior == 'dRotLabY': short = 'Y'
-                elif behavior == 'dRotLabZ': short = 'Z'
-                elif behavior == 'dRotLabX': short = 'X'
-                fictrac[short] = brainsss.smooth_and_interp_fictrac(fictrac_raw, fps, resolution, expt_len, behavior)
+            starts_loom  = [int(stimulus_start_times[i]*100) for i in range(len(stimulus_start_times))]
             starts_loom_ms=[n*10 for n in starts_loom]
             
             bin_start = -500; bin_end = 2000; bin_size = 100 #ms
-            # neural_bins = np.arange(bin_start,bin_end,bin_size)
-            
+            # neural_bins = np.arange(bin_start,bin_end,bin_size) 
             
             #if loom starts are outside of the neural data, remove them
             bool_starts=(starts_loom_ms>=(np.min(ts))) & (starts_loom_ms<=(np.max(ts)))
