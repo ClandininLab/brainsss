@@ -8,7 +8,9 @@ import h5py
 import ants
 import psutil
 
-
+###################################################
+### FAILED CHECK 20250102-175148.txt FOR ERRORS ###
+###################################################
 
 def main(args):
     fly_directory = args['fly_directory']
@@ -79,11 +81,13 @@ def main(args):
             bins_shape=np.shape(bins_array)
             printlog("Bins shape is {}".format(bins_shape))
             
+            del t, ft_triggers, pd1, pd2, stimulus_start_times, starts_loom, bool_starts, bin_start, bin_end, bin_size
+            
             bin_idx = np.digitize(ts, bins_array)
 
             # make loom-relative version of ts
             ts_rel = ts.copy()
-
+            
             # Loop through each loom-containing bin_idx and subtract starts_loom_ms
             for i in range(len(starts_loom_ms)):
                 # subtract loom onset time for corresponding timestamps
