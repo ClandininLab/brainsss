@@ -68,7 +68,7 @@ class BgRemover3D:
         io.imsave(save_name, np.round(show_bg).astype('int16'))
         
 
-    def remove_bg(self, offset=300):
+    def remove_bg(self, offset=500):
         bg_ind = self.bg_ind
         img = np.moveaxis(self.img, (0,1,2,3), (3,1,2,0))
         out = np.zeros_like(img)
@@ -80,6 +80,7 @@ class BgRemover3D:
                 patch = patch-bg[None].T
                 out[:, ind_y, ind_z, :] = patch
         self.out = np.moveaxis(out, (0,1,2,3), (3,1,2,0))
+        self.out+=offset
 
     def show_spectrum(self, fs=180):
         half_wid = 5
