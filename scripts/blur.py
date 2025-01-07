@@ -8,6 +8,10 @@ import brainsss
 import h5py
 import ants
 from scipy.ndimage import gaussian_filter
+from multiprocessing import Pool
+
+def apply_gaussian_filter(slice_data):
+    return gaussian_filter(slice_data, sigma=2)
 
 def main(args):
     load_directory = args['load_directory']
@@ -40,8 +44,11 @@ def main(args):
         printlog("Data shape is {}".format(dims))
 
         #gaussian blur data for less noise
-        warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
-        warps_blur = np.moveaxis(warps_blur, 0, -1) 
+        # warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
+        with Pool() as pool:
+            warps_blur = pool.map(apply_gaussian_filter, [brain[..., i] for i in range(dims[-1])])
+        
+        warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
         # warps_blur=np.zeros_like(brain)
         # for i in range(dims[-1]):
         #     warps_temp = gaussian_filter(brain[...,i], sigma=2)
