@@ -13,6 +13,17 @@ from multiprocessing import Pool
 def apply_gaussian_filter(slice_data):
     return gaussian_filter(slice_data, sigma=2)
 
+def single_vol_blur(vol):
+    return gaussian_filter(vol, sigma=2)
+
+def parallel_vol_blur(vol_stack, n_proc=20):
+    with Pool(processes=n_proc) as p:
+        res = p.imap(single_vol_blur, vol_stack, 128)
+        blur = []
+        for r in res:
+            blur.append(r)
+    return blur
+
 def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
@@ -31,7 +42,7 @@ def main(args):
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
     ################
-    ### RAW WARP ###
+    ### BLURRRRR ###
     ################
 
     printlog("Beginning blurring")
@@ -45,8 +56,12 @@ def main(args):
 
         #gaussian blur data for less noise
         # warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
-        with Pool(processes=24) as pool:
-            warps_blur = pool.map(apply_gaussian_filter, [brain[..., i] for i in range(dims[-1])])
+        # with Pool(processes=24) as pool:
+        #     warps_blur = pool.map(apply_gaussian_filter, [brain[..., i] for i in range(dims[-1])])
+        
+        brain = np.moveaxis(brain, [0,3], [3, 0])
+        
+        warps_blur = parallel_vol_blur(brain, n_proc=24)
         
         warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
         # warps_blur=np.zeros_like(brain)
@@ -57,7 +72,7 @@ def main(args):
         #     # del warps_temp
         # # warps_blur=np.asarray(warps_blur)
         blur_dim=np.shape(warps_blur)
-        printlog("Blurred data shape is {}".format(blur_dim))
+        printlog(f"Blurred data shape is {blur_dim}")
         # save_img = os.path.join(load_directory, 'blurred_brain.nii')
         # save_img_file=utils.save_qc_png(warps_blur, save_img)
         # printlog("Raw data QC figure saved in {}".format(save_img_file))
