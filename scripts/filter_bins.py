@@ -70,7 +70,21 @@ def main(args):
         bins_shape=np.shape(bins_array)
         printlog(f"Bins shape is {bins_shape}")
         
-        bin_idx = np.digitize(ts, bins_array)
+        stepsize=100
+        dims=np.shape(ts)
+        steps = list(range(0,dims[-1],stepsize))
+        steps.append(dims[-1])
+        
+        bin_idx = np.zeros(dims, dtype=int)
+        
+        for chunk_num in range(len(steps)):
+                if chunk_num + 1 <= len(steps)-1:
+                    chunkstart = steps[chunk_num]
+                    chunkend = steps[chunk_num + 1]
+                    ts_chunk = ts[...,chunkstart:chunkend]
+                    bin_idx[...,chunkstart:chunkend] = np.digitize(ts_chunk, bins_array) ### Added nan to num because if a pixel is a constant value (over saturated) will divide by 0
+                    # printlog(F"vol: {chunkstart} to {chunkend}")
+        # bin_idx = np.digitize(ts, bins_array)
 
         filter_needs = {}
         filter_needs['bin_idx'] = bin_idx
