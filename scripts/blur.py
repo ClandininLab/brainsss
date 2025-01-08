@@ -61,6 +61,8 @@ def main(args):
         
         brain = np.moveaxis(brain, [0,3], [3, 0])
         
+        printlog(os.cpu_count())
+        
         warps_blur = parallel_vol_blur(brain, n_proc=24)
         
         warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
