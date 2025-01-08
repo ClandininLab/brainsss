@@ -28,7 +28,7 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']
-    stepsize = 100
+    # stepsize = 100
 
     full_load_path = os.path.join(load_directory, brain_file)
     save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_blurred.h5')
@@ -47,14 +47,15 @@ def main(args):
 
     printlog("Beginning blurring")
     with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data']
+        brain = hf['data'][:]
         dims = np.shape(brain)
         stepsize=100
 
 
-        printlog("Data shape is {}".format(dims))
+        printlog(f"Data shape is {dims}")
 
         #gaussian blur data for less noise
+        
         # warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
         # with Pool(processes=24) as pool:
         #     warps_blur = pool.map(apply_gaussian_filter, [brain[..., i] for i in range(dims[-1])])
@@ -64,7 +65,7 @@ def main(args):
         cpu=os.cpu_count()
         printlog(f"cpus {cpu}")
         
-        warps_blur = parallel_vol_blur(brain, n_proc=24)
+        warps_blur = parallel_vol_blur(brain, n_proc=cpu)
         
         warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
         # warps_blur=np.zeros_like(brain)
