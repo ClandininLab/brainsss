@@ -56,16 +56,16 @@ def main(args):
 
         #gaussian blur data for less noise
         
-        # warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
+        warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
         # with Pool(processes=24) as pool:
         #     warps_blur = pool.map(apply_gaussian_filter, [brain[..., i] for i in range(dims[-1])])
         
-        brain = np.moveaxis(brain, [0,3], [3, 0])
+        # brain = np.moveaxis(brain, [0,3], [3, 0])
         
-        cpu=os.cpu_count()
-        printlog(f"cpus {cpu}")
+        # cpu=os.cpu_count()
+        # printlog(f"cpus {cpu}")
         
-        warps_blur = parallel_vol_blur(brain, n_proc=cpu)
+        # warps_blur = parallel_vol_blur(brain, n_proc=cpu)
         
         warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
         # warps_blur=np.zeros_like(brain)
