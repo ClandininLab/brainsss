@@ -1,0 +1,85 @@
+import os
+import sys
+import brainsss.fictrac as fictrac
+import numpy as np
+import json
+import brainsss
+
+
+def main(args):
+    fly_directory = args['fly_directory']
+    save_directory = args['save_directory']
+    timestamp_file = args['timestamp_file']
+
+    load_path = os.path.join(fly_directory, timestamp_file)
+
+    #####################
+    ### SETUP LOGGING ###
+    #####################
+
+    width = 120
+    logfile = args['logfile']
+    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+
+    #######################
+    ### BINS BINS BABYY ###
+    #######################
+
+    printlog("Beginning bin creation")
+    #load timestamp data
+    with h5py.File(load_path, 'r') as hf:
+        ts = hf['data']
+        dimst = np.shape(ts)
+        printlog(f"Timestamp shape is {dimst}")
+        
+        ###########################
+        ### PREP VISUAL STIMULI ###
+        ###########################
+
+        vision_path = os.path.join(fly_directory,'func_0', 'visual')
+
+        ### Load Photodiode ###
+        t, ft_triggers, pd1, pd2 = brainsss.load_photodiode(vision_path)
+        stimulus_start_times = brainsss.extract_stim_times_from_pd(pd2, t)
+        if stimulus_start_times.shape[0]<100:
+            stimulus_start_times = brainsss.extract_stim_times_from_pd(pd1, t)
+
+        # *100 puts in units of 10ms, which will match fictrac
+        starts_loom  = [int(stimulus_start_times[i]*100) for i in range(len(stimulus_start_times))]
+        starts_loom_ms=[n*10 for n in starts_loom]
+        
+        bin_start = -500; bin_end = 2000; bin_size = 100 #ms
+        # neural_bins = np.arange(bin_start,bin_end,bin_size) 
+        
+        #if loom starts are outside of the neural data, remove them
+        bool_starts=(starts_loom_ms>=(np.min(ts))) & (starts_loom_ms<=(np.max(ts)))
+        starts_loom_ms=np.array(starts_loom_ms)
+        starts_loom_ms=starts_loom_ms[bool_starts]
+        
+        bins_array=[]
+        for loom in starts_loom_ms:
+        #     print(loom)
+            start=loom+bin_start
+            end=loom+bin_end-bin_size
+        #     edges=[start,end]
+            bins_array.append(start)
+            bins_array.append(end)
+        # bins_test=np.vstack(bins_test)
+        bins_array=np.array(bins_array)
+        bins_shape=np.shape(bins_array)
+        printlog(f"Bins shape is {bins_shape}")
+        
+        bin_idx = np.digitize(ts, bins_array)
+
+        filter_needs = {}
+        filter_needs['bin_idx'] = bin_idx
+        filter_needs['starts_loom_ms'] = starts_loom_ms
+        
+        #save filter_needs
+        filter_needs_file = os.path.join(save_directory, 'filter_needs.npy')
+        np.save(filter_needs_file, filter_needs)
+        
+        printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
+if __name__ == '__main__':
+    main(json.loads(sys.argv[1]))
+

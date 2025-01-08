@@ -8,10 +8,6 @@ import h5py
 import ants
 import psutil
 
-###################################################
-### FAILED CHECK 20250102-175148.txt FOR ERRORS ###
-###################################################
-
 def main(args):
     fly_directory = args['fly_directory']
     load_directory = args['load_directory']
@@ -42,63 +38,24 @@ def main(args):
         brain = hf['data']
         with h5py.File(ts_load_path, 'r') as hf:
             ts = hf['data']
-            dimsb = np.shape(brain)
-            dimst = np.shape(ts)
-            printlog(f"Brain shape is {dimsb} and timestamp shape is {dimst}")
             
-            ###########################
-            ### PREP VISUAL STIMULI ###
-            ###########################
-
-            vision_path = os.path.join(fly_directory,'func_0', 'visual')
-
-            ### Load Photodiode ###
-            t, ft_triggers, pd1, pd2 = brainsss.load_photodiode(vision_path)
-            stimulus_start_times = brainsss.extract_stim_times_from_pd(pd2, t)
-
-            # *100 puts in units of 10ms, which will match fictrac
-            starts_loom  = [int(stimulus_start_times[i]*100) for i in range(len(stimulus_start_times))]
-            starts_loom_ms=[n*10 for n in starts_loom]
-            
-            bin_start = -500; bin_end = 2000; bin_size = 100 #ms
-            # neural_bins = np.arange(bin_start,bin_end,bin_size) 
-            
-            #if loom starts are outside of the neural data, remove them
-            bool_starts=(starts_loom_ms>=(np.min(ts))) & (starts_loom_ms<=(np.max(ts)))
-            starts_loom_ms=np.array(starts_loom_ms)
-            starts_loom_ms=starts_loom_ms[bool_starts]
-            
-            bins_array=[]
-            for loom in starts_loom_ms:
-            #     print(loom)
-                start=loom+bin_start
-                end=loom+bin_end-bin_size
-            #     edges=[start,end]
-                bins_array.append(start)
-                bins_array.append(end)
-            # bins_test=np.vstack(bins_test)
-            bins_array=np.array(bins_array)
-            bins_shape=np.shape(bins_array)
-            printlog("Bins shape is {}".format(bins_shape))
-            
-            del t, ft_triggers, pd1, pd2, stimulus_start_times, starts_loom, bool_starts, bin_start, bin_end, bin_size
-            
-            bin_idx = np.digitize(ts, bins_array)
-
-            # make loom-relative version of ts
-            ts_rel = ts.copy()
+            # Load filter_needs
+            filter_needs_file = os.path.join(save_directory, 'filter_needs.npy')
+            filter_needs = np.load(filter_needs_file, allow_pickle=True).item()
+            bin_idx = filter_needs['bin_idx']
+            starts_loom_ms = filter_needs['starts_loom_ms']
             
             # Loop through each loom-containing bin_idx and subtract starts_loom_ms
             for i in range(len(starts_loom_ms)):
                 # subtract loom onset time for corresponding timestamps
-                ts_rel[bin_idx == i*2 + 1] -= starts_loom_ms[i]
+                ts[bin_idx == i*2 + 1] -= starts_loom_ms[i]
 
             # boolean mask of where bin_idx is odd
             odd_mask = bin_idx % 2 == 1
 
             # Create flattened (xyz X time) 
-            n_timesteps = ts_rel.shape[-1]
-            ts_rel_flat = ts_rel.reshape(-1, n_timesteps)
+            n_timesteps = ts.shape[-1]
+            ts_rel_flat = ts.reshape(-1, n_timesteps)
             brain_flat = brain.reshape(-1, n_timesteps)
             odd_mask_flat = odd_mask.reshape(-1, n_timesteps)
 
@@ -124,8 +81,8 @@ def main(args):
             within_bin_brain_np = within_bin_brain_flat_np.reshape(*static_brain_shape, max_len)
             within_bin_ts_rel_np = within_bin_ts_rel_flat_np.reshape(*static_brain_shape, max_len)    
             
-            brain_shape=within_bin_brain_np.shape()
-            ts_shape=within_bin_ts_rel_np.shape()
+            brain_shape=within_bin_brain_np.shape
+            ts_shape=within_bin_ts_rel_np.shape
             printlog(f"Temporal filtered data shape is {brain_shape} and timestamp shape is {ts_shape}")
             
             with h5py.File(save_file, "w") as data_file:
