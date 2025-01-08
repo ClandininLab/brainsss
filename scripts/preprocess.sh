@@ -56,6 +56,10 @@ while [[ $# -gt 0 ]]; do
       DFF=True
       shift
       ;;
+     -fb|--filter_bins)
+      FILTER_BINS=True
+      shift
+      ;;
     -tf|--temp_filter)
       TEMP_FILTER=True
       shift
@@ -104,7 +108,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
-\"MOCO\":\"$MOCO\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\
+\"MOCO\":\"$MOCO\",\"FILTER_BINS\":\"$FILTER_BINS\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\
 \"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"DFF\":\"$DFF\",\
 \"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"H5_TO_NII\":\"$H5_TO_NII\",\
 \"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\

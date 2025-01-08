@@ -73,6 +73,7 @@ def main(args):
         blur = brainsss.parse_true_false(settings.get("blur", False))
         butter_highpass = brainsss.parse_true_false(settings.get("butter_highpass", False))
         dff = brainsss.parse_true_false(settings.get("dff", False))
+        filter_bins = brainsss.parse_true_false(settings.get("filter_bins", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
@@ -94,6 +95,7 @@ def main(args):
         blur = False
         butter_highpass = False
         dff = False
+        filter_bins = False
         temp_filter = False
         h5_to_nii = False
         clean_anat = False
@@ -145,6 +147,8 @@ def main(args):
         butter_highpass = True
     if args["DFF"] != "":
         dff = True	
+    if args["FILTER_BINS"] != "":
+        filter_bins = True
     if args["TEMP_FILTER"] != "":
         temp_filter = True
     if args["H5_TO_NII"] != "":
@@ -839,6 +843,41 @@ def main(args):
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
         
+    if filter_bins:
+
+    #######################
+    ### Temporal Filter ###
+    #######################
+
+       for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            save_directory = os.path.join(fly_directory, "temp_filter")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+            
+            timestamp_file = "warp/timestamps_warp.h5"
+            args = {
+                "logfile": logfile,
+                "fly_directory": fly_directory,
+                "save_directory": save_directory,
+                "timestamp_file": timestamp_file,
+            }
+            script = "filter_bins.py"
+            job_id = brainsss.sbatch(
+                jobname="filter_bins",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=10,
+                cpus=32,
+                mem='200GB',
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
     if temp_filter:
 
     #######################
