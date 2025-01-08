@@ -85,14 +85,13 @@ def main(args):
                     bin_idx[...,chunkstart:chunkend] = np.digitize(ts_chunk, bins_array) ### Added nan to num because if a pixel is a constant value (over saturated) will divide by 0
                     # printlog(F"vol: {chunkstart} to {chunkend}")
         # bin_idx = np.digitize(ts, bins_array)
-
-        filter_needs = {}
-        filter_needs['bin_idx'] = bin_idx
-        filter_needs['starts_loom_ms'] = starts_loom_ms
         
         #save filter_needs
-        filter_needs_file = os.path.join(save_directory, 'filter_needs.npy')
-        np.save(filter_needs_file, filter_needs)
+        starts_loom_file = os.path.join(save_directory, 'starts_loom.npy')
+        np.save(starts_loom_file, starts_loom_ms)
+        filter_needs_file = os.path.join(save_directory, 'bins_idx.h5')
+        with h5py.File(filter_needs_file, "w") as data_file:
+                    data_file.create_dataset("bins", data=bin_idx.astype('int16'))
         
         printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
 if __name__ == '__main__':
