@@ -4,6 +4,7 @@ import brainsss.fictrac as fictrac
 import numpy as np
 import json
 import brainsss
+import h5py
 
 
 def main(args):
