@@ -47,7 +47,7 @@ def main(args):
         
         # #load the mean brain
         fixed = brainsss.load_fda_meanbrain()
-        
+        lpf_min=np.min(lpf)
         # #do dff
         # dff=hpf/lpf 
         
@@ -71,7 +71,7 @@ def main(args):
                 
                 # Avoid division by zero
                 with np.errstate(divide='ignore', invalid='ignore'):
-                    dff_chunk = np.true_divide(hpf_chunk, lpf_chunk-lpf.min())
+                    dff_chunk = np.true_divide(hpf_chunk, lpf_chunk-lpf_min)
                     # dff_chunk[~np.isfinite(dff_chunk)] = 0  # Replace inf and nan with 0
                 
                 # Mask brain
