@@ -71,7 +71,7 @@ def main(args):
                 
                 # Avoid division by zero
                 with np.errstate(divide='ignore', invalid='ignore'):
-                    dff_chunk = np.true_divide(hpf_chunk, lpf_chunk)
+                    dff_chunk = np.true_divide(hpf_chunk, lpf_chunk-lpf.min())
                     # dff_chunk[~np.isfinite(dff_chunk)] = 0  # Replace inf and nan with 0
                 
                 # Mask brain
