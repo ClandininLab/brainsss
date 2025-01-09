@@ -893,6 +893,7 @@ def main(args):
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             timestamp_file = "warp/timestamps_warp.h5"
+            filter_file = "filter_needs.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
@@ -900,6 +901,7 @@ def main(args):
                 "save_directory": save_directory,
                 "brain_file": brain_file,
                 "timestamp_file": timestamp_file,
+                "filter_file": filter_file,
             }
             script = "temp_filter.py"
             job_id = brainsss.sbatch(
