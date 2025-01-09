@@ -49,7 +49,6 @@ def main(args):
         fixed = brainsss.load_fda_meanbrain()
         
         #do dff
-        lpf[lpf==0]=np.nan #change 0s to nan so doesn't divide by 0
         dff=hpf/lpf 
         
         #mask brain
