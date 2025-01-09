@@ -35,9 +35,7 @@ def main(args):
 
 	### LOAD BRAIN ###
 
-	# brain_path = os.path.join(func_path, 'functional_channel_2_moco_zscore_highpass.h5')
 	brain_path = os.path.join(func_path, brain_file)
-	t0 = time.time()
 	with h5py.File(brain_path, 'r+') as h5_file:
 		brain = np.nan_to_num(h5_file.get("data")[:].astype('float32'))
 	printlog('brain shape: {}'.format(brain.shape))
@@ -50,14 +48,12 @@ def main(args):
 		os.mkdir(cluster_dir)
 
 	### FIT CLUSTERS ###
-
 	printlog('fitting clusters')
-	t0 = time.time()
-	connectivity = grid_to_graph(256,128)
+	shape= np.shape(brain)
+	connectivity = grid_to_graph(shape[0],shape[1])
 	cluster_labels = []
-	t_shape = np.shape(brain)[3]
-	for z in range(49): #THIS SHOULD NOT BE HARD CODED
-		neural_activity = brain[:,:,z,:].reshape(-1, t_shape)
+	for z in range(shape[-2]): #THIS SHOULD NOT BE HARD CODED
+		neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
 		cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
 									memory=cluster_dir,
 									linkage='ward',
@@ -67,15 +63,13 @@ def main(args):
 	cluster_labels = np.asarray(cluster_labels)
 	save_file = os.path.join(cluster_dir, 'cluster_labels_{}.npy'.format(ch_num))
 	np.save(save_file,cluster_labels)
-	printlog('cluster fit duration: {} sec'.format(time.time()-t0))
 
 	### GET CLUSTER AVERAGE SIGNAL ###
 
 	printlog('getting cluster averages')
-	t0 = time.time()
 	all_signals = []
-	for z in range(49):
-		neural_activity = brain[:,:,z,:].reshape(-1, t_shape)
+	for z in range(shape[-2]):
+		neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
 		signals = []
 		for cluster_num in range(n_clusters):
 			cluster_indicies = np.where(cluster_labels[z,:]==cluster_num)[0]
@@ -86,7 +80,8 @@ def main(args):
 	all_signals = np.asarray(all_signals)
 	save_file = os.path.join(cluster_dir, 'cluster_signals_{}.npy'.format(ch_num))
 	np.save(save_file, all_signals)
-	printlog('cluster average duration: {} sec'.format(time.time()-t0))
+	printlog('Clustering done bitches')
+	printlog(f'Saved in {cluster_dir}')
 
 if __name__ == '__main__':
 	main(json.loads(sys.argv[1]))
