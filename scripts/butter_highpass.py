@@ -65,7 +65,7 @@ def main(args):
         
         #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
         lpf_total = brain-hpf_total
-        lpf_total[lpf_total==0]=np.nan #change 0s to nan so doesn't divide by 0
+        # lpf_total[lpf_total==0]=np.nan #change 0s to nan so doesn't divide by 0
         # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
         # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         del brain
