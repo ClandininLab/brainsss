@@ -834,7 +834,7 @@ def main(args):
                 modules=modules,
                 args=args,
                 logfile=logfile,
-                time=8,
+                time=2,
                 cpus=32,
                 mem='250GB',
                 nice=nice,

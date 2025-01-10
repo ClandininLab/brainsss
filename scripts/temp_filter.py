@@ -17,7 +17,7 @@ def main(args):
     filter_file = args['filter_file']
     stepsize = 100
 
-    filter_load_path=os.path.join(load_directory, filter_file)
+    filter_load_path=os.path.join(save_directory, filter_file)
     brain_load_path = os.path.join(load_directory, brain_file)
     ts_load_path = os.path.join(fly_directory, timestamp_file)
     save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered.h5')
