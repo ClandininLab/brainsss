@@ -35,8 +35,7 @@ def main(args):
     #######################
 
     printlog("Beginning temporal filter")
-    brain_final=[]
-    ts_final=[]
+   
     #load brain
     with h5py.File(brain_load_path, 'r') as hf, \
         h5py.File(ts_load_path, 'r') as tf, \
@@ -51,7 +50,9 @@ def main(args):
         stepsize=100
         dims=np.shape(brain_all)
         steps = list(range(0,dims[-1],stepsize))
-        steps.append(dims[-1])    
+        steps.append(dims[-1])   
+        brain_final=[]
+        ts_final=[] 
         for chunk_num in range(len(steps)):
             if chunk_num + 1 <= len(steps)-1:
                 chunkstart = steps[chunk_num]
@@ -99,15 +100,15 @@ def main(args):
                 brain_final.append(within_bin_brain_np)
                 within_bin_ts_rel_np = within_bin_ts_rel_flat_np.reshape(*static_brain_shape, max_len)    
                 ts_final.append(within_bin_ts_rel_np)
-        brain_final = np.array(brain_all)
-        ts_final=np.array(ts_all)
+        brain_final = np.array(brain_final)
+        ts_final=np.array(ts_final)
         brain_shape=np.shape(brain_final)
         ts_shape=np.shape(ts_final)
         printlog(f"Temporal filtered data shape is {brain_shape} and timestamp shape is {ts_shape}")
         
         with h5py.File(save_file, "w") as data_file:
-                data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
-                data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
+                data_file.create_dataset("brain", data=brain_final.astype('float32'))
+                data_file.create_dataset("time_stamps", data=ts_final.astype('float32'))
             
         printlog(f"Temporal filtering done. Data saved in {save_file}")
 if __name__ == '__main__':
