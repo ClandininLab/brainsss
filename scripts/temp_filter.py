@@ -109,7 +109,7 @@ def main(args):
                 data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
                 data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
             
-            printlog(f"Temporal filtering done. Data saved in {save_file}")
+        printlog(f"Temporal filtering done. Data saved in {save_file}")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
