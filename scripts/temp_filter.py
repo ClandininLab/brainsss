@@ -97,8 +97,12 @@ def main(args):
                 # unflatten
                 static_brain_shape = brain.shape[:-1]
                 within_bin_brain_np = within_bin_brain_flat_np.reshape(*static_brain_shape, max_len)
+                brain_size=np.shape(within_bin_brain_np)
+                printlog(f"Brain shape {brain_size}")
                 brain_final.append(within_bin_brain_np)
-                within_bin_ts_rel_np = within_bin_ts_rel_flat_np.reshape(*static_brain_shape, max_len)    
+                within_bin_ts_rel_np = within_bin_ts_rel_flat_np.reshape(*static_brain_shape, max_len) 
+                ts_size=np.shape(within_bin_brain_np)
+                printlog(f"Ts shape {ts_size}")   
                 ts_final.append(within_bin_ts_rel_np)
         brain_final = np.array(brain_final)
         ts_final=np.array(ts_final)
