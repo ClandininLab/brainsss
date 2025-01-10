@@ -51,37 +51,14 @@ def main(args):
         #do dff
         with np.errstate(divide='ignore', invalid='ignore'):
             dff = np.true_divide(hpf, lpf-lpf_min)
-        # dff=hpf/lpf 
         
         #mask brain
         dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
         dff_dims = np.shape(dff)
         printlog("dff data shape is {}".format(dff_dims))
         # save dff data
-        # utils.save_h5_chunks(save_file, dff, stepsize=stepsize)
         with h5py.File(save_file, "w") as data_file:
             data_file.create_dataset("data", data=dff.astype('float32')) 
-        # with h5py.File(save_file, "w") as data_file:
-        #     dff_dataset = data_file.create_dataset("data", shape=dimsh, dtype='float32')
-            
-        #     # Process in chunks
-        #     chunk_size = 100  # Adjust this based on your memory constraints
-        #     for i in range(0, dimsh[-1], chunk_size):
-        #         end = i + chunk_size if i + chunk_size < dimsh[-1] else dimsh[-1]
-        #         hpf_chunk = hpf[...,i:end]
-        #         lpf_chunk = lpf[...,i:end]
-                
-        #         # Avoid division by zero
-        #         with np.errstate(divide='ignore', invalid='ignore'):
-        #             dff_chunk = np.true_divide(hpf_chunk, lpf_chunk-lpf_min)
-        #             # dff_chunk[~np.isfinite(dff_chunk)] = 0  # Replace inf and nan with 0
-                
-        #         # Mask brain
-        #         dff_chunk = np.where(fixed[..., None] > 0.1, dff_chunk, 0)
-                
-        #         # Write the chunk to the output dataset
-        #         dff_dataset[...,i:end] = dff_chunk.astype('float32')
-        
       
     printlog(f"Df/f done. Data saved in {save_file}")
 if __name__ == '__main__':
