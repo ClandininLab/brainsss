@@ -47,7 +47,7 @@ def main(args):
         loom_all = ff['loom_starts']    
                 
         # loop through sections of the matricies
-        stepsize=100
+        stepsize=500
         dims=np.shape(brain_all)
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])   
@@ -57,6 +57,7 @@ def main(args):
             if chunk_num + 1 <= len(steps)-1:
                 chunkstart = steps[chunk_num]
                 chunkend = steps[chunk_num + 1]
+                printlog(F"vol: {chunkstart} to {chunkend}")
                 brain = brain_all[...,chunkstart:chunkend]
                 ts = ts_all[...,chunkstart:chunkend]
                 bin_idx = bin_all[...,chunkstart:chunkend]
@@ -98,11 +99,10 @@ def main(args):
                 static_brain_shape = brain.shape[:-1]
                 within_bin_brain_np = within_bin_brain_flat_np.reshape(*static_brain_shape, max_len)
                 brain_size=np.shape(within_bin_brain_np)
-                printlog(f"Brain shape {brain_size}")
                 brain_final.append(within_bin_brain_np)
                 within_bin_ts_rel_np = within_bin_ts_rel_flat_np.reshape(*static_brain_shape, max_len) 
                 ts_size=np.shape(within_bin_brain_np)
-                printlog(f"Ts shape {ts_size}")   
+                printlog(f"Ts shape {ts_size}. Brain shape {brain_size}")   
                 ts_final.append(within_bin_ts_rel_np)
         brain_final = np.array(brain_final)
         ts_final=np.array(ts_final)
