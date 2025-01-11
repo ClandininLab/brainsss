@@ -41,10 +41,10 @@ def main(args):
         h5py.File(ts_load_path, 'r') as tf, \
         h5py.File(filter_load_path, 'r') as ff:
             
-        brain = hf['data'][:]
-        ts = tf['data'][:]
-        bin_idx = ff['bins'][:]
-        starts_loom_ms = ff['loom_starts']    
+        brain_all = hf['data'][:]
+        ts_all = tf['data'][:]
+        bin_all = ff['bins'][:]
+        loom_all = ff['loom_starts']    
                 
         # loop through sections of the matricies
         dims=np.shape(brain_all)
