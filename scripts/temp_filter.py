@@ -41,10 +41,10 @@ def main(args):
         h5py.File(ts_load_path, 'r') as tf, \
         h5py.File(filter_load_path, 'r') as ff:
             
-        brain_all = hf['data']
-        ts_all = tf['data']
-        bin_all = ff['bins']
-        loom_all = ff['loom_starts']    
+        brain = hf['data'][:]
+        ts = tf['data'][:]
+        bin_idx = ff['bins'][:]
+        starts_loom_ms = ff['loom_starts']    
                 
         # loop through sections of the matricies
         dims=np.shape(brain_all)
@@ -118,8 +118,8 @@ def main(args):
         printlog(f"Temporal filtered data shape is {brain_shape} and timestamp shape is {ts_shape}")
         
         with h5py.File(save_file, "w") as data_file:
-                data_file.create_dataset("brain", data=brain_final.astype('float32'))
-                data_file.create_dataset("time_stamps", data=ts_final.astype('float32'))
+                data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
+                data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
             
         printlog(f"Temporal filtering done. Data saved in {save_file}")
 if __name__ == '__main__':
