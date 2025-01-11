@@ -42,15 +42,13 @@ def main(args):
         h5py.File(filter_load_path, 'r') as ff:
             
         brain = hf['data']
-        ts = tf['data']
+        ts = tf['data'][:]
         bin_idx = ff['bins']
         starts_loom_ms = ff['loom_starts']    
                 
         # loop through sections of the matricies
         dims=np.shape(brain)
-        printlog(F"Brain data shape is {dims}")
-        
-        ts_rel = ts.copy()
+        printlog(F"Brain data shape is {dims}, ts shape is {np.shape(ts)} bin_idx shape is {np.shape(bin_idx)} and looms are {np.shape(starts_loom_ms)}")
         # brain_final=[]
         # ts_final=[] 
         # chunk_size = 500  # Adjust this based on your memory constraints
