@@ -89,8 +89,8 @@ def main(args):
         #save filter_needs
         filter_needs_file = os.path.join(save_directory, 'filter_needs.h5')
         with h5py.File(filter_needs_file, "w") as data_file:
-                    data_file.create_dataset("bins", data=bin_idx.astype('int16'))
-                    data_file.create_dataset("loom_starts", data=starts_loom_ms.astype('int16'))
+                    data_file.create_dataset("bins", data=bin_idx))
+                    data_file.create_dataset("loom_starts", data=starts_loom_ms)
         
         printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
 if __name__ == '__main__':
