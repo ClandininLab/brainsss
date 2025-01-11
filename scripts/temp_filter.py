@@ -64,14 +64,14 @@ def main(args):
         # Loop through each loom-containing bin_idx and subtract starts_loom_ms
         for i in range(len(starts_loom_ms)):
             # subtract loom onset time for corresponding timestamps
-            ts_rel[bin_idx == i*2 + 1] -= starts_loom_ms[i]
+            ts[bin_idx == i*2 + 1] -= starts_loom_ms[i]
 
         # boolean mask of where bin_idx is odd
         odd_mask = bin_idx % 2 == 1
 
         # Create flattened (xyz X time) 
-        n_timesteps = ts_rel.shape[-1]
-        ts_rel_flat = ts_rel.reshape(-1, n_timesteps)
+        n_timesteps = ts.shape[-1]
+        ts_rel_flat = ts.reshape(-1, n_timesteps)
         brain_flat = brain.reshape(-1, n_timesteps)
         odd_mask_flat = odd_mask.reshape(-1, n_timesteps)
 
