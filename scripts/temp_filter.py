@@ -41,9 +41,9 @@ def main(args):
         h5py.File(ts_load_path, 'r') as tf, \
         h5py.File(filter_load_path, 'r') as ff:
             
-        brain_all = hf['data'][:]
-        ts_all = tf['data'][:]
-        bin_all = ff['bins'][:]
+        brain_all = hf['data']
+        ts_all = tf['data']
+        bin_all = ff['bins']
         loom_all = ff['loom_starts']    
                 
         # loop through sections of the matricies
@@ -52,7 +52,7 @@ def main(args):
         
         fs = 1.8 #sample rate, Hz
         bin_start = -500; bin_end = 2000
-        max_len=int((((bin_end-bin_start)/1000)*fs)*np.shape(loom_all)[0])
+        max_len=int((((bin_end-bin_start)/1000)*fs)*np.shape(loom_all)[0])+100
         filter_dims=np.append(np.shape(ts)[:-1], max_len)
         brain_final=np.full(filter_dims, np.nan)
         ts_final=np.full(filter_dims, np.nan) #create nan arrays of the biggest possible number of voxel collections 
