@@ -118,8 +118,8 @@ def main(args):
         printlog(f"Temporal filtered data shape is {brain_shape} and timestamp shape is {ts_shape}")
         
         with h5py.File(save_file, "w") as data_file:
-                data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
-                data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
+                data_file.create_dataset("brain", data=brain_final.astype('float32'))
+                data_file.create_dataset("time_stamps", data=ts_final.astype('float32'))
             
         printlog(f"Temporal filtering done. Data saved in {save_file}")
 if __name__ == '__main__':
