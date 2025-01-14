@@ -44,15 +44,15 @@ def main(args):
         brain_all = hf['data']
         ts_all = tf['data']
         bin_all = ff['bins']
-        loom_all = ff['loom_starts']    
+        loom_all = ff['loom_starts'] 
+        bin_shape = ff['bin_shape']    
                 
         # loop through sections of the matricies
         dims=np.shape(brain_all)
         printlog(F"Brain data shape is {dims}")
         
         fs = 1.8 #sample rate, Hz
-        bin_start = -500; bin_end = 2000
-        max_len=int((((bin_end-bin_start)/1000)*fs)*np.shape(loom_all)[0])+100
+        max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
         filter_dims=np.append(np.shape(ts_all)[:-1], max_len)
         brain_final=np.full(filter_dims, np.nan)
         ts_final=np.full(filter_dims, np.nan) #create nan arrays of the biggest possible number of voxel collections 

@@ -82,15 +82,15 @@ def main(args):
                     chunkstart = steps[chunk_num]
                     chunkend = steps[chunk_num + 1]
                     ts_chunk = ts[...,chunkstart:chunkend]
-                    bin_idx[...,chunkstart:chunkend] = np.digitize(ts_chunk, bins_array) ### Added nan to num because if a pixel is a constant value (over saturated) will divide by 0
-                    # printlog(F"vol: {chunkstart} to {chunkend}")
-        # bin_idx = np.digitize(ts, bins_array)
+                    bin_idx[...,chunkstart:chunkend] = np.digitize(ts_chunk, bins_array) 
+        bin_shape = [bin_start, bin_end]
         
         #save filter_needs
         filter_needs_file = os.path.join(save_directory, 'filter_needs.h5')
         with h5py.File(filter_needs_file, "w") as data_file:
                     data_file.create_dataset("bins", data=bin_idx)
                     data_file.create_dataset("loom_starts", data=starts_loom_ms)
+                    data_file.create_dataset("bin_shape", data=bin_shape)
         
         printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
 if __name__ == '__main__':
