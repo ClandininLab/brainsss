@@ -48,14 +48,6 @@ def main(args):
         hpf_total = np.zeros_like(brain)
         steps = list(range(0,dims[-1],stepsize))
         steps.append(dims[-1])
-        # for z in range(dims[-2]):
-        #     printlog("z is {}".format(z))
-        #     for chunk in steps:
-        #         cs=chunk
-        #         ce=chunk+stepsize
-        #         if ce<=steps[-1]:
-        #             hpf_warps = brain_utils.apply_butter_highpass(brain[...,cs:ce], z, cutoff, order, fs)
-        #             hpf_total[...,z,cs:ce]=hpf_warps
         for z in range(dims[-2]):
             hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
             hpf_total[...,z,:]=hpf_warps
@@ -65,17 +57,10 @@ def main(args):
         
         #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
         lpf_total = brain-hpf_total
-        # lpf_total[lpf_total==0]=np.nan #change 0s to nan so doesn't divide by 0
-        # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         del brain
         with h5py.File(save_file_h, "w") as data_file:
             data_file.create_dataset("hpf", data=hpf_total.astype('float32'))
             data_file.create_dataset("lpf", data=lpf_total.astype('float32'))
-        # utils.save_h5_chunks(save_file_h, hpf_total, stepsize=stepsize)
-        # utils.save_h5_chunks(save_file_l, lpf_total, stepsize=stepsize)
-        # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-        # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
         printlog("Butter high pass done")
 
 if __name__ == '__main__':

@@ -57,30 +57,11 @@ def main(args):
         #gaussian blur data for less noise
         
         warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
-        # with Pool(processes=24) as pool:
-        #     warps_blur = pool.map(apply_gaussian_filter, [brain[..., i] for i in range(dims[-1])])
-        
-        # brain = np.moveaxis(brain, [0,3], [3, 0])
-        
-        # cpu=os.cpu_count()
-        # printlog(f"cpus {cpu}")
-        
-        # warps_blur = parallel_vol_blur(brain, n_proc=cpu)
         
         warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
-        # warps_blur=np.zeros_like(brain)
-        # for i in range(dims[-1]):
-        #     warps_temp = gaussian_filter(brain[...,i], sigma=2)
-        #     # printlog(f"Array {i} is {warps_temp[100:105, 100:105, 20:25]}")
-        #     warps_blur[...,i]=warps_temp
-        #     # del warps_temp
-        # # warps_blur=np.asarray(warps_blur)
         blur_dim=np.shape(warps_blur)
         printlog(f"Blurred data shape is {blur_dim}")
-        # save_img = os.path.join(load_directory, 'blurred_brain.nii')
-        # save_img_file=utils.save_qc_png(warps_blur, save_img)
-        # printlog("Raw data QC figure saved in {}".format(save_img_file))
-
+        
         del brain
         
         with h5py.File(save_file, "w") as data_file:
