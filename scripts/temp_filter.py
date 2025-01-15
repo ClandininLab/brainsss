@@ -51,7 +51,8 @@ def main(args):
         dims=np.shape(brain_all)
         printlog(F"Brain data shape is {dims}")
         
-        fs = 1.8 #sample rate, Hz
+        T=(ts[0,0,0,1]-ts[0,0,0,0])/1000
+        fs=1/T #sample rate, Hz
         max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
         filter_dims=np.append(np.shape(ts_all)[:-1], max_len)
         brain_final=np.full(filter_dims, np.nan)
