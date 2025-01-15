@@ -40,9 +40,7 @@ def main(args):
     #Timestamps need to be warped as well, load them here    
     timestamps = brainsss.load_timestamps(load_directory)    
     printlog("Timestamp shape is {}".format(np.shape(timestamps)))
-    # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
-
+    
     #Load mean brain
     fixed = brainsss.load_fda_meanbrain()
     
@@ -66,8 +64,6 @@ def main(args):
     ts_xl=np.array(ts_xl)
     ts_xl=np.moveaxis(ts_xl,0,-1)
     printlog("New timestamp shape is {}".format(np.shape(ts_xl)))
-    # printlog('RAM memory used::{}'.format(psutil.virtual_memory()[2]))
-    # printlog('RAM Used (GB)::{}'.format(psutil.virtual_memory()[3]/1000000000))
     
     #Warp this extra large timestamp matrix
     warped_ts = warp_raw(data=ts_xl, stepsize=None, fixed=fixed, func_path=fly_directory)
@@ -81,13 +77,6 @@ def main(args):
     total_ts=np.array(total_ts)
     total_ts=np.moveaxis(total_ts,0,-1)
     printlog("Warped timestamp shape is {}".format(np.shape(total_ts)))
-    # printlog('RAM memory used:{}'.format(psutil.virtual_memory()[2]))
-    # printlog('RAM Used (GB):{}'.format(psutil.virtual_memory()[3]/1000000000))
-    
-    # #QC fig of warped data
-    # save_file = os.path.join(save_directory, 'warped_timestamp_data.nii')
-    # save_fig = brainsss.utils.save_qc_png(total_ts, save_file)
-    # printlog("Warped timestamp data QC figure saved in {}".format(save_fig))
     
     with h5py.File(save_file, "w") as data_file:
             data_file.create_dataset("data", data=total_ts.astype('float32'))
