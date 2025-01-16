@@ -59,14 +59,24 @@ def main(args):
         # ts_final=np.full(filter_dims, np.nan) #create nan arrays of the biggest possible number of voxel collections 
 
         #### Loop over z planes (io access is done nz times!!)
+        chunk_size = 500
+        odd_mask = np.zeros(dims, dtype=bool)
+        ts_rel = np.zeros(dims)
+        for i in range(0, dims[-1], chunk_size):
+            end = i + chunk_size if i + chunk_size < dims[-1] else dims[-1]
+        #     print(F"vol: {i} to {end}")
+            ts_chunk = ts_all[...,i:end]
+            bin_chunk = bin_all[...,i:end]
+            bool_starts=(loom_all>=(np.min(ts_chunk))) & (loom_all<=(np.max(ts_chunk)))
+            ls=np.array(loom_all[bool_starts])
+            for l in range(len(ls)):
+                # subtract loom onset time for corresponding timestamps
+                ts_chunk[bin_chunk == l*2 + 1] -= ls[l]
+            ts_rel[...,i:end]=ts_chunk
 
-        ts_rel=ts_all[:]
-        for i in range(len(loom_all)):
-            # subtract loom onset time for corresponding timestamps
-            ts_rel[bin_all == i*2 + 1] -= loom_all[i]
-
-        # boolean mask of where bin_idx is odd
-        odd_mask = bin_all[:] % 2 == 1
+            # boolean mask of where bin_idx is odd
+            odd_mask_temp = bin_chunk % 2 == 1
+            odd_mask[...,i:end] = odd_mask_temp
 
         nx, ny, nz, nt = brain_all.shape
         # n_voxels = nx * ny * nz
