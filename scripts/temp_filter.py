@@ -60,7 +60,7 @@ def main(args):
 
         #### Loop over z planes (io access is done nz times!!)
 
-        ts_rel=ts_all
+        ts_rel=ts_all[:,:,:,:]
         for i in range(len(loom_all)):
             # subtract loom onset time for corresponding timestamps
             ts_rel[bin_all == i*2 + 1] -= loom_all[i]
