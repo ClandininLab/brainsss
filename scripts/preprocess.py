@@ -901,6 +901,7 @@ def main(args):
                 "fly_directory": fly_directory,
                 "save_directory": save_directory,
                 "timestamp_file": timestamp_file,
+                "filter_file": filter_file,
             }
             script = "relative_ts.py"
             job_id = brainsss.sbatch(
