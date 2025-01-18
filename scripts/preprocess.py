@@ -74,7 +74,7 @@ def main(args):
         butter_highpass = brainsss.parse_true_false(settings.get("butter_highpass", False))
         dff = brainsss.parse_true_false(settings.get("dff", False))
         filter_bins = brainsss.parse_true_false(settings.get("filter_bins", False))
-        relative_time = brainsss.parse_true_false(settings.get("relative_time", False))
+        relative_ts = brainsss.parse_true_false(settings.get("relative_ts", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
@@ -97,7 +97,7 @@ def main(args):
         butter_highpass = False
         dff = False
         filter_bins = False
-        relative_time = False
+        relative_ts = False
         temp_filter = False
         h5_to_nii = False
         clean_anat = False
@@ -151,8 +151,8 @@ def main(args):
         dff = True	
     if args["FILTER_BINS"] != "":
         filter_bins = True
-    if args["RELATIVE_TIME"] != "":
-        relative_time = True
+    if args["RELATIVE_TS"] != "":
+        relative_ts = True
     if args["TEMP_FILTER"] != "":
         temp_filter = True
     if args["H5_TO_NII"] != "":
@@ -882,7 +882,7 @@ def main(args):
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
 
-    if relative_time:
+    if relative_ts:
 
     ######################################
     ### Relative timestamps & odd mask ###
