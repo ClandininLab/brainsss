@@ -74,6 +74,7 @@ def main(args):
         butter_highpass = brainsss.parse_true_false(settings.get("butter_highpass", False))
         dff = brainsss.parse_true_false(settings.get("dff", False))
         filter_bins = brainsss.parse_true_false(settings.get("filter_bins", False))
+        relative_time = brainsss.parse_true_false(settings.get("relative_time", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
@@ -96,6 +97,7 @@ def main(args):
         butter_highpass = False
         dff = False
         filter_bins = False
+        relative_time = False
         temp_filter = False
         h5_to_nii = False
         clean_anat = False
@@ -149,6 +151,8 @@ def main(args):
         dff = True	
     if args["FILTER_BINS"] != "":
         filter_bins = True
+    if args["RELATIVE_TIME"] != "":
+        relative_time = True
     if args["TEMP_FILTER"] != "":
         temp_filter = True
     if args["H5_TO_NII"] != "":
@@ -842,7 +846,7 @@ def main(args):
                 #global_resources=True, 
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
-        
+
     if filter_bins:
 
     #######################
@@ -878,6 +882,43 @@ def main(args):
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
 
+    if relative_time:
+
+    ######################################
+    ### Relative timestamps & odd mask ###
+    ######################################
+
+       for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            save_directory = os.path.join(fly_directory, "temp_filter")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+            
+            timestamp_file = "warp/timestamps_warp.h5"
+            filter_file = "filter_needs.h5"
+            args = {
+                "logfile": logfile,
+                "fly_directory": fly_directory,
+                "save_directory": save_directory,
+                "timestamp_file": timestamp_file,
+            }
+            script = "relative_ts.py"
+            job_id = brainsss.sbatch(
+                jobname="relative_ts",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=10,
+                cpus=32,
+                mem='250GB',
+                nice=nice,
+                nodes=nodes,
+                #global_resources=True, 
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+        
+    
     if temp_filter:
 
     #######################
@@ -894,6 +935,7 @@ def main(args):
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             timestamp_file = "warp/timestamps_warp.h5"
             filter_file = "filter_needs.h5"
+            ts_rel_file = "'ts_rel_odd_mask.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
@@ -902,6 +944,7 @@ def main(args):
                 "brain_file": brain_file,
                 "timestamp_file": timestamp_file,
                 "filter_file": filter_file,
+                "ts_rel_file": ts_rel_file,
             }
             script = "temp_filter.py"
             job_id = brainsss.sbatch(
