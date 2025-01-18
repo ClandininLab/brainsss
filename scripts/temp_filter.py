@@ -13,11 +13,13 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']
+    ts_rel_file = args['ts_rel_file']
     timestamp_file = args['timestamp_file']
     filter_file = args['filter_file']
     stepsize = 100
 
     filter_load_path=os.path.join(save_directory, filter_file)
+    ts_rel_load_path=os.path.join(save_directory, ts_rel_file)
     brain_load_path = os.path.join(load_directory, brain_file)
     ts_load_path = os.path.join(fly_directory, timestamp_file)
     save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered.h5')
@@ -39,13 +41,15 @@ def main(args):
     #load brain
     with h5py.File(brain_load_path, 'r') as hf, \
         h5py.File(ts_load_path, 'r') as tf, \
+        h5py.File(ts_rel_load_path, 'r') as of, \
         h5py.File(filter_load_path, 'r') as ff:
             
         brain_all = hf['data']
         ts_all = tf['data']
-        bin_all = ff['bins']
         loom_all = ff['loom_starts'] 
-        bin_shape = ff['bin_shape']    
+        bin_shape = ff['bin_shape']
+        odd_mask = of['odd_mask']   
+        ts_rel = of['ts_rel']     
                 
         # loop through sections of the matricies
         dims=np.shape(brain_all)
@@ -54,29 +58,7 @@ def main(args):
         T=(ts_all[0,0,0,1]-ts_all[0,0,0,0])/1000
         fs=1/T #sample rate, Hz
         max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
-        # filter_dims=np.append(np.shape(ts_all)[:-1], max_len)
-        # brain_final=np.full(filter_dims, np.nan)
-        # ts_final=np.full(filter_dims, np.nan) #create nan arrays of the biggest possible number of voxel collections 
-
-        #### Loop over z planes (io access is done nz times!!)
-        chunk_size = 500
-        odd_mask = np.zeros(dims, dtype=bool)
-        ts_rel = np.zeros(dims)
-        for i in range(0, dims[-1], chunk_size):
-            end = i + chunk_size if i + chunk_size < dims[-1] else dims[-1]
-        #     print(F"vol: {i} to {end}")
-            ts_chunk = ts_all[...,i:end]
-            bin_chunk = bin_all[...,i:end]
-            bool_starts=(loom_all>=(np.min(ts_chunk))) & (loom_all<=(np.max(ts_chunk)))
-            ls=np.array(loom_all[bool_starts])
-            for l in range(len(ls)):
-                # subtract loom onset time for corresponding timestamps
-                ts_chunk[bin_chunk == l*2 + 1] -= ls[l]
-            ts_rel[...,i:end]=ts_chunk
-
-            # boolean mask of where bin_idx is odd
-            odd_mask_temp = bin_chunk % 2 == 1
-            odd_mask[...,i:end] = odd_mask_temp
+        printlog(F"Max length of filtered data is {max_len}")
 
         nx, ny, nz, nt = brain_all.shape
         # n_voxels = nx * ny * nz
@@ -84,6 +66,7 @@ def main(args):
         within_bin_brain_np = np.full((nx, ny, nz, max_len), np.nan)
         within_bin_ts_rel_np = np.full((nx, ny, nz, max_len), np.nan)
 
+        #### Loop over z planes (io access is done nz times!!)
         for z in (range(nz)):
 
             # Read in z plane
