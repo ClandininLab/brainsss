@@ -55,7 +55,7 @@ def main(args):
         ts_shape=np.shape(ts)
         om_shape=np.shape(odd_mask)
         
-        printlog(f"Relative time shape is {ts_shape} and timestamp shape is {om_shape}")
+        printlog(f"Relative time shape is {ts_shape} and odd mask shape is {om_shape}")
         
         with h5py.File(save_file, "w") as data_file:
                 data_file.create_dataset("odd_mask", data=odd_mask.astype('bool'))

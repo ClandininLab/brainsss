@@ -912,7 +912,7 @@ def main(args):
                 logfile=logfile,
                 time=10,
                 cpus=32,
-                mem='250GB',
+                mem='200GB',
                 nice=nice,
                 nodes=nodes,
                 #global_resources=True, 
@@ -936,7 +936,7 @@ def main(args):
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             timestamp_file = "warp/timestamps_warp.h5"
             filter_file = "filter_needs.h5"
-            ts_rel_file = "'ts_rel_odd_mask.h5"
+            ts_rel_file = "ts_rel_odd_mask.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
