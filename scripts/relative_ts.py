@@ -37,9 +37,10 @@ def main(args):
     with h5py.File(ts_load_path, 'r') as tf, \
         h5py.File(filter_load_path, 'r') as ff:
 
-        ts = tf['data'][:]
-        bins = ff['bins'][:]
-        looms = ff['loom_starts'][:]  
+        ts = tf['data'][:].astype('float32')
+        bins = ff['bins'][:].astype('int32')
+        looms = ff['loom_starts'][:].astype('float32')
+    
     
         
         for i in range(len(looms)):
