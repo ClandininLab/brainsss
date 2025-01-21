@@ -46,14 +46,14 @@ def main(args):
         printlog(f"Highpass filter shape is {dimsh}, lowpass filter shape is {dimsl}")
         
         # #load the mean brain
-        fixed = brainsss.load_fda_meanbrain()
+        # fixed = brainsss.load_fda_meanbrain()
         lpf_min=np.min(lpf)
         #do dff
         with np.errstate(divide='ignore', invalid='ignore'):
             dff = np.true_divide(hpf, lpf-lpf_min)
         
         #mask brain
-        dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
+        # dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
         dff_dims = np.shape(dff)
         printlog("dff data shape is {}".format(dff_dims))
         # save dff data
