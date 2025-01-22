@@ -1029,9 +1029,16 @@ def main(args):
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if make_supervoxels:
+        fly_directory = os.path.join(dataset_path, fly)
+        load_directory = os.path.join(fly_directory, "temp_filter")
         for func in funcs:
-            brain_file = f"temp_filter/functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
-            args = {"logfile": logfile, "func_path": func, 'brain_file': brain_file, 'ch_num': ch_num}
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
+            args = {"logfile": logfile, 
+                    "func_path": func, 
+                    'brain_file': brain_file, 
+                    'ch_num': ch_num,
+                    "load_directory": load_directory,
+                    }
             script = "make_supervoxels.py"
             job_id = brainsss.sbatch(
                 jobname="supervox",
