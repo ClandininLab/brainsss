@@ -6,7 +6,7 @@ import json
 import brainsss
 import h5py
 import ants
-import psutil
+import scipy
 
 def interp_wholebrain(brain,ts, range_start, range_end, steps):
     nx, ny, nz, nt = brain.shape
