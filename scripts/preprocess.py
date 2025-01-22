@@ -1030,7 +1030,7 @@ def main(args):
 
     if make_supervoxels:
         for func in funcs:
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
+            brain_file = f"temp_filter/functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
             args = {"logfile": logfile, "func_path": func, 'brain_file': brain_file, 'ch_num': ch_num}
             script = "make_supervoxels.py"
             job_id = brainsss.sbatch(
@@ -1039,8 +1039,8 @@ def main(args):
                 modules=modules,
                 args=args,
                 logfile=logfile,
-                time=2,
-                mem=12,
+                cpus=32,
+                mem='250GB',
                 nice=nice,
                 nodes=nodes,
             )
