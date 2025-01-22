@@ -76,6 +76,7 @@ def main(args):
         filter_bins = brainsss.parse_true_false(settings.get("filter_bins", False))
         relative_ts = brainsss.parse_true_false(settings.get("relative_ts", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
+        whole_brain_interp = brainsss.parse_true_false(settings.get("whole_brain_interp", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
@@ -99,6 +100,7 @@ def main(args):
         filter_bins = False
         relative_ts = False
         temp_filter = False
+        whole_brain_interp = False
         h5_to_nii = False
         clean_anat = False
         func2anat = False
@@ -155,6 +157,8 @@ def main(args):
         relative_ts = True
     if args["TEMP_FILTER"] != "":
         temp_filter = True
+    if args["WHOLE_BRAIN_INTERP"] != "":
+        whole_brain_interp = True
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
     if args["CLEAN_ANAT"] != "":
@@ -962,7 +966,40 @@ def main(args):
                 #global_resources=True, 
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
-    
+    if whole_brain_interp:
+
+    ##########################
+    ### Whole brain interp ###
+    ##########################
+
+        for fly in fly_dirs:
+                fly_directory = os.path.join(dataset_path, fly)
+                load_directory = os.path.join(fly_directory, "temp_filter")
+                save_directory = os.path.join(fly_directory, "temp_filter")
+                
+                tf_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
+                args = {
+                    "logfile": logfile,
+                    "fly_directory": fly_directory,
+                    "load_directory": load_directory,
+                    "save_directory": save_directory,
+                    "tf_file": tf_file,
+                }
+                script = "whole_brain_interp.py"
+                job_id = brainsss.sbatch(
+                    jobname="interp",
+                    script=os.path.join(scripts_path, script),
+                    modules=modules,
+                    args=args,
+                    logfile=logfile,
+                    time=10,
+                    cpus=32,
+                    mem='250GB',
+                    nice=nice,
+                    nodes=nodes,
+                    #global_resources=True, 
+                )
+                brainsss.wait_for_job(job_id, logfile, com_path)
     if h5_to_nii:
 
         #################
