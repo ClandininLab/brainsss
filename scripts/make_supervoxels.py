@@ -29,13 +29,14 @@ def main(args):
 	func_path = args['func_path']
 	logfile = args['logfile']
 	brain_file = args['brain_file']
+	load_directory = args['load_directory']
 	ch_num = args['ch_num']
 	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 	n_clusters = 2000
 
 	### LOAD BRAIN ###
 
-	brain_path = os.path.join(func_path, brain_file)
+	brain_path = os.path.join(load_directory, brain_file)
 	with h5py.File(brain_path, 'r+') as h5_file:
 		brain = np.nan_to_num(h5_file.get("data")[:].astype('float32'))
 	printlog('brain shape: {}'.format(brain.shape))
