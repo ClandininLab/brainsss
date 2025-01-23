@@ -1029,28 +1029,29 @@ def main(args):
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if make_supervoxels:
-        fly_directory = os.path.join(dataset_path, fly)
-        load_directory = os.path.join(fly_directory, "temp_filter")
-        for func in funcs:
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
-            args = {"logfile": logfile, 
-                    "func_path": func, 
-                    'brain_file': brain_file, 
-                    'ch_num': ch_num,
-                    "load_directory": load_directory,
-                    }
-            script = "make_supervoxels.py"
-            job_id = brainsss.sbatch(
-                jobname="supervox",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                cpus=32,
-                mem='250GB',
-                nice=nice,
-                nodes=nodes,
-            )
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            load_directory = os.path.join(fly_directory, "temp_filter")
+            for func in funcs:
+                brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
+                args = {"logfile": logfile, 
+                        "func_path": func, 
+                        'brain_file': brain_file, 
+                        'ch_num': ch_num,
+                        "load_directory": load_directory,
+                        }
+                script = "make_supervoxels.py"
+                job_id = brainsss.sbatch(
+                    jobname="supervox",
+                    script=os.path.join(scripts_path, script),
+                    modules=modules,
+                    args=args,
+                    logfile=logfile,
+                    cpus=32,
+                    mem='250GB',
+                    nice=nice,
+                    nodes=nodes,
+                )
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
