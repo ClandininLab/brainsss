@@ -38,7 +38,7 @@ def main(args):
 
 	brain_path = os.path.join(load_directory, brain_file)
 	with h5py.File(brain_path, 'r+') as hf:
-		brain = np.nan_to_num(hf['data'][:].astype('float32'))
+		brain = np.nan_to_num(hf['brain'][:].astype('float32'))
 		dims=np.shape
 		printlog(f'brain shape: {dims}')
 
