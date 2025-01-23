@@ -37,10 +37,10 @@ def main(args):
 	### LOAD BRAIN ###
 
 	brain_path = os.path.join(load_directory, brain_file)
-	with h5py.File(brain_path, 'r+') as h5_file:
-		brain = np.nan_to_num(h5_file("brain")[:].astype('float32'))
-	printlog('brain shape: {}'.format(brain.shape))
-	printlog('load duration: {} sec'.format(time.time()-t0))
+	with h5py.File(brain_path, 'r+') as hf:
+		brain = np.nan_to_num(hf['data'][:].astype('float32'))
+		dims=np.shape
+		printlog(f'brain shape: {dims}')
 
 	### MAKE CLUSTER DIRECTORY ###
 
