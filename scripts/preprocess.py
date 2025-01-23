@@ -1047,8 +1047,8 @@ def main(args):
                     modules=modules,
                     args=args,
                     logfile=logfile,
-                    cpus=32,
-                    mem='250GB',
+                    cpus=5,
+                    mem='50GB',
                     nice=nice,
                     nodes=nodes,
                 )
