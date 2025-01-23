@@ -38,7 +38,7 @@ def main(args):
 
 	brain_path = os.path.join(load_directory, brain_file)
 	with h5py.File(brain_path, 'r+') as h5_file:
-		brain = np.nan_to_num(h5_file.get("data")[:].astype('float32'))
+		brain = np.nan_to_num(h5_file("brain")[:].astype('float32'))
 	printlog('brain shape: {}'.format(brain.shape))
 	printlog('load duration: {} sec'.format(time.time()-t0))
 
