@@ -1081,7 +1081,7 @@ def main(args):
                 args=args,
                 logfile=logfile,
                 cpus=20,
-                mem='100GB',
+                mem='200GB',
                 nice=nice,
                 nodes=nodes,
             )
