@@ -77,6 +77,7 @@ def main(args):
         relative_ts = brainsss.parse_true_false(settings.get("relative_ts", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
         whole_brain_interp = brainsss.parse_true_false(settings.get("whole_brain_interp", False))
+        build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
@@ -101,6 +102,7 @@ def main(args):
         relative_ts = False
         temp_filter = False
         whole_brain_interp = False
+        build_STA = False
         h5_to_nii = False
         clean_anat = False
         func2anat = False
@@ -159,6 +161,8 @@ def main(args):
         temp_filter = True
     if args["WHOLE_BRAIN_INTERP"] != "":
         whole_brain_interp = True
+    if args["BUILD_STA"] != "":
+        build_STA = True
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
     if args["CLEAN_ANAT"] != "":
@@ -1052,6 +1056,35 @@ def main(args):
                     nice=nice,
                     nodes=nodes,
                 )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+            
+    if build_STA:
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            load_directory = os.path.join(fly_directory, "temp_filter")
+            save_directory = os.path.join(fly_directory, "STA")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+            tf_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
+            args = {"logfile": logfile, 
+                    "fly_directory": fly_directory, 
+                    'tf_file': tf_file, 
+                    'ch_num': ch_num,
+                    "load_directory": load_directory,
+                    "save_directory": save_directory,
+                    }
+            script = "build_STA.py"
+            job_id = brainsss.sbatch(
+                jobname="STA",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                cpus=20,
+                mem='100GB',
+                nice=nice,
+                nodes=nodes,
+            )
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
