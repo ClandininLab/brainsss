@@ -76,7 +76,7 @@ def main(args):
     printlog(label_name)
     printlog(signal_name)
     all_signals_new=np.moveaxis(all_signals,-1,1)
-    printlog(np.shape(all_signals_new))
+    printlog(str(np.shape(all_signals_new)))
     
     STA_brain = np.nan_to_num(all_signals_new)
     reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels)
