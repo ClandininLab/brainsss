@@ -78,7 +78,7 @@ def main(args):
     all_signals_new=np.moveaxis(all_signals,-1,1)
     printlog(str(np.shape(all_signals_new)))
     
-    STA_brain = np.nan_to_num(all_signals_new)
+    STA_brain = np.nan_to_num(all_signals_new, nan=0.0, posinf=np.finfo(np.float32).max, neginf=np.finfo(np.float32).min)
     reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels)
     STA_brain = gaussian_filter1d(reformed_STA_brain,sigma=1,axis=1,truncate=1)
     STA_brain_temp=np.moveaxis(STA_brain,0,-1).astype('float32')
