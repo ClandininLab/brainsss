@@ -1080,8 +1080,8 @@ def main(args):
                 modules=modules,
                 args=args,
                 logfile=logfile,
-                cpus=20,
-                mem='200GB',
+                cpus=32,
+                mem='250GB',
                 nice=nice,
                 nodes=nodes,
             )
