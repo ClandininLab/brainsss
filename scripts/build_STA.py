@@ -36,7 +36,7 @@ def main(args):
 
     tf_load_path = os.path.join(load_directory, tf_file)
     cluster_dir = os.path.join(fly_directory, 'func_0','clustering')
-    save_file = os.path.join(save_directory, 'stepsize_'+steps+'_STA.h5')
+    save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+'_STA.h5')
     #####################
     ### SETUP LOGGING ###
     #####################
