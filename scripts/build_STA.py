@@ -85,10 +85,11 @@ def main(args):
     STA_brain_final=np.moveaxis(STA_brain_temp,0,-1)
     range_start=-500; range_end=1900
     STA=[]  
-    masks = [(ts > i) & (ts < (i + steps if i + steps < range_end else range_end)) for i in range(range_start, range_end, steps)] 
-    printlog(str(np.shape(masks)))
-    for mask in masks:
-        result=np.mean(np.where(mask, STA_brain_final, 0), axis=-1)
+    
+    for i in range(range_start, range_end, steps):
+        end = i + steps if i + steps < range_end else range_end
+        mask = (ts > i) & (ts < end)
+        result = np.mean(np.where(mask, STA_brain_final, 0), axis=-1)
         STA.append(result)
     STA=np.asarray(STA)
     with h5py.File(save_file, "w") as data_file:
