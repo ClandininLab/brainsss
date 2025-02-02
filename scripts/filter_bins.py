@@ -9,10 +9,12 @@ import h5py
 
 def main(args):
     fly_directory = args['fly_directory']
+    dataset_path = args['dataset_path']
     save_directory = args['save_directory']
     timestamp_file = args['timestamp_file']
 
     load_path = os.path.join(fly_directory, timestamp_file)
+    event_times_path = os.path.join(dataset_path, 'later/event_times_split_dic.pkl')
 
     #####################
     ### SETUP LOGGING ###
@@ -48,6 +50,7 @@ def main(args):
         # *100 puts in units of 10ms, which will match fictrac
         starts_loom  = [int(stimulus_start_times[i]*100) for i in range(len(stimulus_start_times))]
         starts_loom_ms=[n*10 for n in starts_loom]
+        printlog(f"Stimulus start times are {starts_loom_ms}")
         
         bin_start = -500; bin_end = 2000; bin_size = 100 #ms
         # neural_bins = np.arange(bin_start,bin_end,bin_size) 
