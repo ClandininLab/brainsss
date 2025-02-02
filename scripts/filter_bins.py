@@ -40,8 +40,10 @@ def main(args):
         #load event times
         with open(event_times_path, 'rb') as file:
             event_times_struct = pickle.load(file)
+        printlog(f"Event times loaded from {event_times_path}")
         
         fly_name= fly[4:7]
+        printlog(f"Fly name is {fly_name}")
         starts_loom_ms = event_times_struct[fly_name]['total']
         
         bin_start = -500; bin_end = 2000; bin_size = 100 #ms
