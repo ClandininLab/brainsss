@@ -5,10 +5,12 @@ import numpy as np
 import json
 import brainsss
 import h5py
+import pickle
 
 
 def main(args):
     fly_directory = args['fly_directory']
+    fly= args['fly']
     dataset_path = args['dataset_path']
     save_directory = args['save_directory']
     timestamp_file = args['timestamp_file']
@@ -35,25 +37,14 @@ def main(args):
         dimst = np.shape(ts)
         printlog(f"Timestamp shape is {dimst}")
         
-        ###########################
-        ### PREP VISUAL STIMULI ###
-        ###########################
-
-        vision_path = os.path.join(fly_directory,'func_0', 'visual')
-
-        ### Load Photodiode ###
-        t, ft_triggers, pd1, pd2 = brainsss.load_photodiode(vision_path)
-        stimulus_start_times = brainsss.extract_stim_times_from_pd(pd2, t)
-        if stimulus_start_times.shape[0]<100:
-            stimulus_start_times = brainsss.extract_stim_times_from_pd(pd1, t)
-
-        # *100 puts in units of 10ms, which will match fictrac
-        starts_loom  = [int(stimulus_start_times[i]*100) for i in range(len(stimulus_start_times))]
-        starts_loom_ms=[n*10 for n in starts_loom]
-        printlog(f"Stimulus start times are {starts_loom_ms}")
+        #load event times
+        with open(event_times_path, 'rb') as file:
+            event_times_struct = pickle.load(file)
+        
+        fly_name= fly[4:7]
+        starts_loom_ms = event_times_struct[fly_name]['total']
         
         bin_start = -500; bin_end = 2000; bin_size = 100 #ms
-        # neural_bins = np.arange(bin_start,bin_end,bin_size) 
         
         #if loom starts are outside of the neural data, remove them
         bool_starts=(starts_loom_ms>=(np.min(ts))) & (starts_loom_ms<=(np.max(ts)))
