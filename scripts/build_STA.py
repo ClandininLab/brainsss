@@ -32,11 +32,12 @@ def main(args):
     save_directory = args['save_directory']
     tf_file = args['tf_file']
     ch_num = args['ch_num'] 
-    steps=10
+    behavior = args['behavior']
+    steps=100
 
     tf_load_path = os.path.join(load_directory, tf_file)
     cluster_dir = os.path.join(fly_directory, 'func_0','clustering')
-    save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+'_STA.h5')
+    save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+ f'_STA_{behavior}.h5')
     #####################
     ### SETUP LOGGING ###
     #####################
@@ -45,11 +46,11 @@ def main(args):
     logfile = args['logfile']
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
-    #######################
-    ### TEMPORAL FILTER ###
-    #######################
+    ###########
+    ### STA ###
+    ###########
 
-    printlog("Beginning temporal filter")
+    printlog("Beginning STA")
    
     #load brain
     with h5py.File(tf_load_path, 'r') as hf:    
@@ -60,9 +61,9 @@ def main(args):
     signal_name =''
 
     for x in sorted(os.listdir(cluster_dir)):
-        if 'label' in x and ch_num in x:
+        if 'label' in x and ch_num in x and behavior in x:
             label_name = x
-        if 'signals' in x and ch_num in x:
+        if 'signals' in x and ch_num in x and behavior in x:
             signal_name = x
         elif 'signals' in x:
             signal_name = x
