@@ -31,6 +31,7 @@ def main(args):
 	brain_file = args['brain_file']
 	load_directory = args['load_directory']
 	ch_num = args['ch_num']
+	behavior = args['behavior']
 	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 	n_clusters = 2000
 
@@ -62,7 +63,7 @@ def main(args):
 		cluster_model.fit(neural_activity)
 		cluster_labels.append(cluster_model.labels_)
 	cluster_labels = np.asarray(cluster_labels)
-	save_file = os.path.join(cluster_dir, 'cluster_labels_{}.npy'.format(ch_num))
+	save_file = os.path.join(cluster_dir, f'cluster_labels_{ch_num}_{behavior}.npy')
 	np.save(save_file,cluster_labels)
 
 	### GET CLUSTER AVERAGE SIGNAL ###
@@ -79,7 +80,7 @@ def main(args):
 		signals = np.asarray(signals)
 		all_signals.append(signals)
 	all_signals = np.asarray(all_signals)
-	save_file = os.path.join(cluster_dir, 'cluster_signals_{}.npy'.format(ch_num))
+	save_file = os.path.join(cluster_dir, f'cluster_signals_{ch_num}_{behavior}.npy')
 	np.save(save_file, all_signals)
 	printlog('Clustering done bitches')
 	printlog(f'Saved in {cluster_dir}')

@@ -56,6 +56,18 @@ while [[ $# -gt 0 ]]; do
       DFF=True
       shift
       ;;
+    --inc)
+      INC=True
+      shift
+      ;;
+    --dec)
+      DEC=True
+      shift
+      ;;
+    --flat)
+      FLAT=True
+      shift
+      ;;
      -fb|--filter_bins)
       FILTER_BINS=True
       shift
@@ -120,10 +132,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
-\"MOCO\":\"$MOCO\",\"FILTER_BINS\":\"$FILTER_BINS\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\
+\"MOCO\":\"$MOCO\",\"FILTER_BINS\":\"$FILTER_BINS\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\
 \"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\"DFF\":\"$DFF\",\
-\"BLEACHING_QC\":\"$BLEACHING_QC\",\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\"H5_TO_NII\":\"$H5_TO_NII\",\
+\"BLEACHING_QC\":\"$BLEACHING_QC\",\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
 \"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"BUILD_STA\":\"$BUILD_STA\",\"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
+\"INC\":\"$INC\",\"DEC\":\"$DEC\",\"FLAT\":\"$FLAT\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\"\"H5_TO_NII\":\"$H5_TO_NII\",\
 \"FUNC2ANAT\":\"$FUNC2ANAT\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
 
 ml python/3.6

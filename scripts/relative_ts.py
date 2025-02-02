@@ -13,11 +13,12 @@ def main(args):
     save_directory = args['save_directory']
     timestamp_file = args['timestamp_file']
     filter_file = args['filter_file']
+    behavior = args['behavior']  
     stepsize = 100
 
     filter_load_path=os.path.join(save_directory, filter_file)
     ts_load_path = os.path.join(fly_directory, timestamp_file)
-    save_file = os.path.join(save_directory, 'ts_rel_odd_mask.h5')
+    save_file = os.path.join(save_directory, f'ts_rel_odd_mask_{behavior}.h5')
 
     #####################
     ### SETUP LOGGING ###
