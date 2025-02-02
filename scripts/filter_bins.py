@@ -14,6 +14,7 @@ def main(args):
     dataset_path = args['dataset_path']
     save_directory = args['save_directory']
     timestamp_file = args['timestamp_file']
+    behavior = args['behavior']
 
     load_path = os.path.join(fly_directory, timestamp_file)
     event_times_path = os.path.join(dataset_path, 'later/event_times_split_dic.pkl')
@@ -43,8 +44,8 @@ def main(args):
         printlog(f"Event times loaded from {event_times_path}")
         
         fly_name= fly[4:7]
-        printlog(f"Fly name is {fly_name}")
-        starts_loom_ms = event_times_struct[fly_name]['total']
+        printlog(f"Fly name is {fly_name} and behavior is {behavior}")
+        starts_loom_ms = event_times_struct[fly_name][behavior]
         
         bin_start = -500; bin_end = 2000; bin_size = 100 #ms
         
@@ -82,7 +83,7 @@ def main(args):
         bin_shape = [bin_start, bin_end]
         
         #save filter_needs
-        filter_needs_file = os.path.join(save_directory, 'filter_needs.h5')
+        filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}.h5')
         with h5py.File(filter_needs_file, "w") as data_file:
                     data_file.create_dataset("bins", data=bin_idx)
                     data_file.create_dataset("loom_starts", data=starts_loom_ms)
