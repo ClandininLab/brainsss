@@ -871,6 +871,7 @@ def main(args):
             args = {
                 "logfile": logfile,
                 "dataset_path": dataset_path,
+                "fly": fly,
                 "fly_directory": fly_directory,
                 "save_directory": save_directory,
                 "timestamp_file": timestamp_file,
