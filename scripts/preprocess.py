@@ -870,6 +870,7 @@ def main(args):
             timestamp_file = "warp/timestamps_warp.h5"
             args = {
                 "logfile": logfile,
+                "dataset_path": dataset_path,
                 "fly_directory": fly_directory,
                 "save_directory": save_directory,
                 "timestamp_file": timestamp_file,
