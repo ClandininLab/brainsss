@@ -37,19 +37,18 @@ def main(args):
     behaviors = ['inc', 'dec', 'flat', 'total']
     
     #load timestamp data
-    with h5py.File(load_path, 'r') as hf:
-        ts = hf['data']
-        dimst = np.shape(ts)
-        printlog(f"Timestamp shape is {dimst}")
-        
-        #load event times
-        with open(event_times_path, 'rb') as file:
-            event_times_struct = pickle.load(file)
-        printlog(f"Event times loaded from {event_times_path}")
-        
 
-        for behavior in behaviors:
-            if f'filter_needs_{behavior}.h5' not in os.listdir(save_directory):
+    for behavior in behaviors:
+        if f'filter_needs_{behavior}.h5' not in os.listdir(save_directory):
+            with h5py.File(load_path, 'r') as hf:
+                ts = hf['data']
+                dimst = np.shape(ts)
+                printlog(f"Timestamp shape is {dimst}")
+                
+                #load event times
+                with open(event_times_path, 'rb') as file:
+                    event_times_struct = pickle.load(file)
+                printlog(f"Event times loaded from {event_times_path}")
                 fly_name= fly[4:7]
                 printlog(f"Fly name is {fly_name} and behavior is {behavior}")
                 starts_loom_ms = event_times_struct[fly_name][behavior]
@@ -97,15 +96,14 @@ def main(args):
                             data_file.create_dataset("bin_shape", data=bin_shape)
                 
                 printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
-                # Delete variables to free up memory
+            # Delete variables to free up memory
                 del ts, dimst, bins_array, starts_loom_ms, steps, bin_idx, bin_shape
                 
                 # Manually invoke the garbage collector
                 gc.collect()
-                
-                
-            else:
-                printlog(f"Filter bins for {behavior} already exists. Skipping...")
+                        
+        else:
+            printlog(f"Filter bins for {behavior} already exists. Skipping...")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
