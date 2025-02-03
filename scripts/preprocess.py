@@ -1032,11 +1032,9 @@ def main(args):
             fly_directory = os.path.join(dataset_path, fly)
             load_directory = os.path.join(fly_directory, "temp_filter")
             for func in funcs:
-                brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5"
                 args = {"logfile": logfile, 
                         "func_path": func, 
                         'brain_file': brain_file, 
-                        'behavior': behavior,
                         'ch_num': ch_num,
                         "load_directory": load_directory,
                         }
