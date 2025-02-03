@@ -7,6 +7,7 @@ import brainsss
 import h5py
 import ants
 import psutil
+import gc
 
 def main(args):
     fly_directory = args['fly_directory']
@@ -59,7 +60,11 @@ def main(args):
             with h5py.File(save_file, "w") as data_file:
                     data_file.create_dataset("odd_mask", data=odd_mask.astype('bool'))
                     data_file.create_dataset("ts_rel", data=ts.astype('float32'))
+            # Delete variables to free up memory
+            del ts, bins, looms, odd_mask, ts_shape, om_shape, save_file
             
+            # Manually invoke the garbage collector
+            gc.collect()
             printlog(f"Relative timestamps for {behavior} and odd mask creation done. Data saved in {save_file}")   
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
