@@ -94,12 +94,13 @@ def main(args):
                         data_file.create_dataset("bins", data=bin_idx)
                         data_file.create_dataset("loom_starts", data=starts_loom_ms)
                         data_file.create_dataset("bin_shape", data=bin_shape)
+            
             # Delete variables to free up memory
             del ts, dimst, bins_array, starts_loom_ms, steps, bin_idx, bin_shape
             
             # Manually invoke the garbage collector
             gc.collect()
-        printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
+            printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
