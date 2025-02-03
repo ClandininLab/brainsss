@@ -5,7 +5,6 @@ import re
 import sys
 import textwrap
 import time
-
 import brainsss
 import nibabel as nib
 
@@ -73,9 +72,6 @@ def main(args):
         blur = brainsss.parse_true_false(settings.get("blur", False))
         butter_highpass = brainsss.parse_true_false(settings.get("butter_highpass", False))
         dff = brainsss.parse_true_false(settings.get("dff", False))
-        inc = brainsss.parse_true_false(settings.get("inc", False))
-        dec = brainsss.parse_true_false(settings.get("dec", False))
-        flat = brainsss.parse_true_false(settings.get("flat", False))
         filter_bins = brainsss.parse_true_false(settings.get("filter_bins", False))
         relative_ts = brainsss.parse_true_false(settings.get("relative_ts", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
@@ -101,9 +97,6 @@ def main(args):
         blur = False
         butter_highpass = False
         dff = False
-        inc = False
-        dec = False
-        flat = False
         filter_bins = False
         relative_ts = False
         temp_filter = False
@@ -159,12 +152,6 @@ def main(args):
         butter_highpass = True
     if args["DFF"] != "":
         dff = True
-    if args["INC"] != "":
-        inc = True
-    if args["DEC"] != "":
-        dec = True
-    if args["FLAT"] != "":
-        flat = True
     if args["FILTER_BINS"] != "":
         filter_bins = True
     if args["RELATIVE_TS"] != "":
@@ -866,15 +853,6 @@ def main(args):
                 #global_resources=True, 
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
-
-    if inc:
-        behavior = 'inc'
-    elif dec:
-        behavior = 'dec'
-    elif flat:
-        behavior = 'flat'
-    else:
-        behavior = 'total'
     
     if filter_bins:
 
@@ -892,7 +870,6 @@ def main(args):
             args = {
                 "logfile": logfile,
                 "dataset_path": dataset_path,
-                "behavior": behavior,
                 "fly": fly,
                 "fly_directory": fly_directory,
                 "save_directory": save_directory,
@@ -927,14 +904,11 @@ def main(args):
                 os.mkdir(save_directory)
             
             timestamp_file = "warp/timestamps_warp.h5"
-            filter_file = f"filter_needs_{behavior}.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
-                "behavior": behavior,
                 "save_directory": save_directory,
                 "timestamp_file": timestamp_file,
-                "filter_file": filter_file,
             }
             script = "relative_ts.py"
             job_id = brainsss.sbatch(
@@ -968,18 +942,13 @@ def main(args):
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             timestamp_file = "warp/timestamps_warp.h5"
-            filter_file = f"filter_needs_{behavior}.h5"
-            ts_rel_file = f"ts_rel_odd_mask_{behavior}.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
-                "behavior": behavior,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
                 "brain_file": brain_file,
                 "timestamp_file": timestamp_file,
-                "filter_file": filter_file,
-                "ts_rel_file": ts_rel_file,
             }
             script = "temp_filter.py"
             job_id = brainsss.sbatch(
@@ -1092,11 +1061,8 @@ def main(args):
             save_directory = os.path.join(fly_directory, "STA")
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
-            tf_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
             args = {"logfile": logfile, 
                     "fly_directory": fly_directory, 
-                    'tf_file': tf_file, 
-                    'behavior': behavior,
                     'ch_num': ch_num,
                     "load_directory": load_directory,
                     "save_directory": save_directory,

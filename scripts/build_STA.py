@@ -32,12 +32,11 @@ def main(args):
     save_directory = args['save_directory']
     tf_file = args['tf_file']
     ch_num = args['ch_num'] 
-    behavior = args['behavior']
+    
     steps=100
 
-    tf_load_path = os.path.join(load_directory, tf_file)
     cluster_dir = os.path.join(fly_directory, 'func_0','clustering')
-    save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+ f'_STA_{behavior}.h5')
+    
     #####################
     ### SETUP LOGGING ###
     #####################
@@ -51,52 +50,55 @@ def main(args):
     ###########
 
     printlog("Beginning STA")
-   
+    behaviors = ['inc', 'dec', 'flat', 'total']
+    for behavior in behaviors:
     #load brain
-    with h5py.File(tf_load_path, 'r') as hf:    
-        ts = hf['time_stamps'][:]
-        dimst = np.shape(ts)
-    printlog(f"time stamp shape is {dimst}")
-    label_name =''
-    signal_name =''
+        tf_load_path = os.path.join(load_directory, f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5")
+        with h5py.File(tf_load_path, 'r') as hf:    
+            ts = hf['time_stamps'][:]
+            dimst = np.shape(ts)
+        printlog(f"time stamp shape is {dimst}")
+        label_name =''
+        signal_name =''
 
-    for x in sorted(os.listdir(cluster_dir)):
-        if 'label' in x and ch_num in x and behavior in x:
-            label_name = x
-        if 'signals' in x and ch_num in x and behavior in x:
-            signal_name = x
-        elif 'signals' in x:
-            signal_name = x
-        elif 'label' in x:
-            label_name = x
-    load_file_c = os.path.join(cluster_dir, label_name)
-    cluster_labels = np.load(load_file_c)
+        for x in sorted(os.listdir(cluster_dir)):
+            if 'label' in x and ch_num in x and behavior in x:
+                label_name = x
+            if 'signals' in x and ch_num in x and behavior in x:
+                signal_name = x
+            elif 'signals' in x:
+                signal_name = x
+            elif 'label' in x:
+                label_name = x
+        load_file_c = os.path.join(cluster_dir, label_name)
+        cluster_labels = np.load(load_file_c)
 
-    load_file_s = os.path.join(cluster_dir, signal_name)
-    all_signals = np.load(load_file_s)
-    printlog(label_name)
-    printlog(signal_name)
-    all_signals_new=np.moveaxis(all_signals,-1,1)
-    printlog(str(np.shape(all_signals_new)))
-    
-    STA_brain = np.nan_to_num(all_signals_new)
-    reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels)
-    STA_brain = gaussian_filter1d(reformed_STA_brain,sigma=1,axis=1,truncate=1)
-    STA_brain_temp=np.moveaxis(STA_brain,0,-1).astype('float32')
-    STA_brain_final=np.moveaxis(STA_brain_temp,0,-1)
-    range_start=-500; range_end=1900
-    STA=[]  
-    
-    for i in range(range_start, range_end, steps):
-        end = i + steps if i + steps < range_end else range_end
-        mask = (ts > i) & (ts < end)
-        result = np.mean(np.where(mask, STA_brain_final, 0), axis=-1)
-        STA.append(result)
-    STA=np.asarray(STA)
-    with h5py.File(save_file, "w") as data_file:
-            data_file.create_dataset("data", data=STA.astype('float32'))
-            
-    printlog(f"STA done. Data saved in {save_file}")
+        load_file_s = os.path.join(cluster_dir, signal_name)
+        all_signals = np.load(load_file_s)
+        printlog(label_name)
+        printlog(signal_name)
+        all_signals_new=np.moveaxis(all_signals,-1,1)
+        printlog(str(np.shape(all_signals_new)))
+        
+        STA_brain = np.nan_to_num(all_signals_new)
+        reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels)
+        STA_brain = gaussian_filter1d(reformed_STA_brain,sigma=1,axis=1,truncate=1)
+        STA_brain_temp=np.moveaxis(STA_brain,0,-1).astype('float32')
+        STA_brain_final=np.moveaxis(STA_brain_temp,0,-1)
+        range_start=-500; range_end=1900
+        STA=[]  
+        
+        for i in range(range_start, range_end, steps):
+            end = i + steps if i + steps < range_end else range_end
+            mask = (ts > i) & (ts < end)
+            result = np.mean(np.where(mask, STA_brain_final, 0), axis=-1)
+            STA.append(result)
+        STA=np.asarray(STA)
+        save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+ f'_STA_{behavior}.h5')
+        with h5py.File(save_file, "w") as data_file:
+                data_file.create_dataset("data", data=STA.astype('float32'))
+                
+        printlog(f"STA for {behavior} done. Data saved in {save_file}")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
