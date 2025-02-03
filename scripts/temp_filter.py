@@ -37,76 +37,80 @@ def main(args):
     for behavior in behaviors:
         filter_load_path=os.path.join(save_directory, f"filter_needs_{behavior}.h5")
         ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{behavior}.h5")
-    #load brain
-        with h5py.File(brain_load_path, 'r') as hf, \
-            h5py.File(ts_load_path, 'r') as tf, \
-            h5py.File(ts_rel_load_path, 'r') as of, \
-            h5py.File(filter_load_path, 'r') as ff:
-                
-            brain_all = hf['data']
-            ts_all = tf['data']
-            loom_all = ff['loom_starts'] 
-            bin_shape = ff['bin_shape']
-            odd_mask = of['odd_mask']   
-            ts_rel = of['ts_rel']     
+        save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
+        if os.path.exists(save_file)==False:
+            #load brain
+            with h5py.File(brain_load_path, 'r') as hf, \
+                h5py.File(ts_load_path, 'r') as tf, \
+                h5py.File(ts_rel_load_path, 'r') as of, \
+                h5py.File(filter_load_path, 'r') as ff:
                     
-            # loop through sections of the matricies
-            dims=np.shape(brain_all)
-            printlog(F"Brain data shape is {dims}")
-            
-            T=(ts_all[0,0,0,1]-ts_all[0,0,0,0])/1000
-            fs=1/T #sample rate, Hz
-            max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
-            printlog(F"Max length of filtered data is {max_len}")
-
-            nx, ny, nz, nt = brain_all.shape
-            # n_voxels = nx * ny * nz
-
-            within_bin_brain_np = np.full((nx, ny, nz, max_len), np.nan)
-            within_bin_ts_rel_np = np.full((nx, ny, nz, max_len), np.nan)
-
-            #### Loop over z planes (io access is done nz times!!)
-            for z in (range(nz)):
-
-                # Read in z plane
-                plane = brain_all[:,:,z,:]
-                plane_ts_rel = ts_rel[:,:,z,:]
-
-                for x in range(nx):
-                    for y in range(ny):
-                        within_bin_vox = plane[x, y, odd_mask[x,y,z,:]]
-                        within_bin_vox_ts_rel = plane_ts_rel[x, y, odd_mask[x,y,z,:]]
+                brain_all = hf['data']
+                ts_all = tf['data']
+                loom_all = ff['loom_starts'] 
+                bin_shape = ff['bin_shape']
+                odd_mask = of['odd_mask']   
+                ts_rel = of['ts_rel']     
                         
-                        # Get the sorted indices of the timestamp array and sort both arrays using the sorted indices
-                        sorted_indices = np.argsort(within_bin_vox_ts_rel)
-                        within_bin_vox = within_bin_vox[sorted_indices]
-                        within_bin_vox_ts_rel = within_bin_vox_ts_rel[sorted_indices]
-
-                        # populate the output array
-                        within_bin_brain_np[x,y,z,:len(within_bin_vox)] = within_bin_vox
-                        within_bin_ts_rel_np[x,y,z,:len(within_bin_vox)] = within_bin_vox_ts_rel
-
-            
-            # brain_final = np.array(brain_final)
-            # ts_final=np.array(ts_final)
-            brain_shape=np.shape(within_bin_brain_np)
-            ts_shape=np.shape(within_bin_ts_rel_np)
-            printlog(f"Temporal filtered data shape is {brain_shape} and timestamp shape is {ts_shape}")
-            
-            save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
-            
-            with h5py.File(save_file, "w") as data_file:
-                    data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
-                    data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
-             
-            # Delete variables to free up memory
-            del brain_all, ts_all, loom_all, bin_shape, odd_mask, ts_rel, within_bin_brain_np, within_bin_ts_rel_np
-            del dims, T, fs, max_len, nx, ny, nz, nt, plane, plane_ts_rel, within_bin_vox, within_bin_vox_ts_rel, sorted_indices
-            
-            # Manually invoke the garbage collector
-            gc.collect() 
+                # loop through sections of the matricies
+                dims=np.shape(brain_all)
+                printlog(F"Brain data shape is {dims}")
                 
-            printlog(f"Temporal filtering for {behavior} is done. Data saved in {save_file}")
+                T=(ts_all[0,0,0,1]-ts_all[0,0,0,0])/1000
+                fs=1/T #sample rate, Hz
+                max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
+                printlog(F"Max length of filtered data is {max_len}")
+
+                nx, ny, nz, nt = brain_all.shape
+                # n_voxels = nx * ny * nz
+
+                within_bin_brain_np = np.full((nx, ny, nz, max_len), np.nan)
+                within_bin_ts_rel_np = np.full((nx, ny, nz, max_len), np.nan)
+
+                #### Loop over z planes (io access is done nz times!!)
+                for z in (range(nz)):
+
+                    # Read in z plane
+                    plane = brain_all[:,:,z,:]
+                    plane_ts_rel = ts_rel[:,:,z,:]
+
+                    for x in range(nx):
+                        for y in range(ny):
+                            within_bin_vox = plane[x, y, odd_mask[x,y,z,:]]
+                            within_bin_vox_ts_rel = plane_ts_rel[x, y, odd_mask[x,y,z,:]]
+                            
+                            # Get the sorted indices of the timestamp array and sort both arrays using the sorted indices
+                            sorted_indices = np.argsort(within_bin_vox_ts_rel)
+                            within_bin_vox = within_bin_vox[sorted_indices]
+                            within_bin_vox_ts_rel = within_bin_vox_ts_rel[sorted_indices]
+
+                            # populate the output array
+                            within_bin_brain_np[x,y,z,:len(within_bin_vox)] = within_bin_vox
+                            within_bin_ts_rel_np[x,y,z,:len(within_bin_vox)] = within_bin_vox_ts_rel
+
+                
+                # brain_final = np.array(brain_final)
+                # ts_final=np.array(ts_final)
+                brain_shape=np.shape(within_bin_brain_np)
+                ts_shape=np.shape(within_bin_ts_rel_np)
+                printlog(f"Temporal filtered data shape is {brain_shape} and timestamp shape is {ts_shape}")
+                
+                
+                
+                with h5py.File(save_file, "w") as data_file:
+                        data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
+                        data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
+                
+                # Delete variables to free up memory
+                del brain_all, ts_all, loom_all, bin_shape, odd_mask, ts_rel, within_bin_brain_np, within_bin_ts_rel_np
+                del dims, T, fs, max_len, nx, ny, nz, nt, plane, plane_ts_rel, within_bin_vox, within_bin_vox_ts_rel, sorted_indices
+                
+                # Manually invoke the garbage collector
+                gc.collect() 
+                    
+                printlog(f"Temporal filtering for {behavior} is done. Data saved in {save_file}")
+        else:
+            printlog(f"Filtered data for {behavior} already exists. Skipping...")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
