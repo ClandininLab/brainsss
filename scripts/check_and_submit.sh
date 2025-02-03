@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Define the job name or ID you want to check
 JOB_NAME="prepro"
 
