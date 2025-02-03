@@ -1034,7 +1034,6 @@ def main(args):
             for func in funcs:
                 args = {"logfile": logfile, 
                         "func_path": func, 
-                        'brain_file': brain_file, 
                         'ch_num': ch_num,
                         "load_directory": load_directory,
                         }
