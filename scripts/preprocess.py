@@ -5,7 +5,6 @@ import re
 import sys
 import textwrap
 import time
-
 import brainsss
 import nibabel as nib
 
@@ -866,15 +865,6 @@ def main(args):
                 #global_resources=True, 
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
-
-    if inc:
-        behavior = 'inc'
-    elif dec:
-        behavior = 'dec'
-    elif flat:
-        behavior = 'flat'
-    else:
-        behavior = 'total'
     
     if filter_bins:
 
@@ -892,7 +882,6 @@ def main(args):
             args = {
                 "logfile": logfile,
                 "dataset_path": dataset_path,
-                "behavior": behavior,
                 "fly": fly,
                 "fly_directory": fly_directory,
                 "save_directory": save_directory,
@@ -927,14 +916,12 @@ def main(args):
                 os.mkdir(save_directory)
             
             timestamp_file = "warp/timestamps_warp.h5"
-            filter_file = f"filter_needs_{behavior}.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
                 "behavior": behavior,
                 "save_directory": save_directory,
                 "timestamp_file": timestamp_file,
-                "filter_file": filter_file,
             }
             script = "relative_ts.py"
             job_id = brainsss.sbatch(
@@ -968,18 +955,13 @@ def main(args):
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             timestamp_file = "warp/timestamps_warp.h5"
-            filter_file = f"filter_needs_{behavior}.h5"
-            ts_rel_file = f"ts_rel_odd_mask_{behavior}.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
-                "behavior": behavior,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
                 "brain_file": brain_file,
                 "timestamp_file": timestamp_file,
-                "filter_file": filter_file,
-                "ts_rel_file": ts_rel_file,
             }
             script = "temp_filter.py"
             job_id = brainsss.sbatch(
