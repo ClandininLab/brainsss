@@ -7,6 +7,7 @@ import brainsss
 import h5py
 import ants
 import psutil
+import gc
 
 def main(args):
     fly_directory = args['fly_directory']
@@ -97,6 +98,13 @@ def main(args):
             with h5py.File(save_file, "w") as data_file:
                     data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
                     data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
+             
+            # Delete variables to free up memory
+            del brain_all, ts_all, loom_all, bin_shape, odd_mask, ts_rel, within_bin_brain_np, within_bin_ts_rel_np
+            del dims, T, fs, max_len, nx, ny, nz, nt, plane, plane_ts_rel, within_bin_vox, within_bin_vox_ts_rel, sorted_indices
+            
+            # Manually invoke the garbage collector
+            gc.collect() 
                 
             printlog(f"Temporal filtering for {behavior} is done. Data saved in {save_file}")
 if __name__ == '__main__':
