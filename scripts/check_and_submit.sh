@@ -1,4 +1,5 @@
 #!/bin/bash
+#SBATCH --output=./logs/mainlog.out
 
 # Define the job name or ID you want to check
 JOB_NAME="prepro"
