@@ -8,6 +8,7 @@ import brainsss
 import h5py
 import ants
 import psutil
+import gc
 
 def STA_supervoxel_to_full_res(STA_brain, cluster_labels):
     n_clusters = STA_brain.shape[2]
@@ -97,6 +98,13 @@ def main(args):
         save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+ f'_STA_{behavior}.h5')
         with h5py.File(save_file, "w") as data_file:
                 data_file.create_dataset("data", data=STA.astype('float32'))
+        
+        # Delete variables to free up memory
+        del ts, dimst, label_name, signal_name, cluster_labels, all_signals, all_signals_new
+        del STA_brain, reformed_STA_brain, STA_brain_temp, STA_brain_final, STA
+        
+        # Manually invoke the garbage collector
+        gc.collect()
                 
         printlog(f"STA for {behavior} done. Data saved in {save_file}")
 if __name__ == '__main__':
