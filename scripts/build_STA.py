@@ -101,6 +101,7 @@ def main(args):
             with h5py.File(save_file, "w") as data_file:
                     data_file.create_dataset("data", data=STA.astype('float32'))
             
+            printlog(f"STA for {behavior} done. Data saved in {save_file}")
             # Delete variables to free up memory
             del ts, dimst, label_name, signal_name, cluster_labels, all_signals, all_signals_new
             del STA_brain, reformed_STA_brain, STA_brain_temp, STA_brain_final, STA
@@ -108,7 +109,7 @@ def main(args):
             # Manually invoke the garbage collector
             gc.collect()
                     
-            printlog(f"STA for {behavior} done. Data saved in {save_file}")
+            
         else:
             printlog(f'STA for {behavior} already exists. Skipping...')
 if __name__ == '__main__':
