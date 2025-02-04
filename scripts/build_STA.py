@@ -31,7 +31,6 @@ def main(args):
     fly_directory = args['fly_directory']
     load_directory = args['load_directory']
     save_directory = args['save_directory']
-    tf_file = args['tf_file']
     ch_num = args['ch_num'] 
     
     steps=100
