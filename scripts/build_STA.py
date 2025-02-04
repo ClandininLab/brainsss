@@ -68,14 +68,10 @@ def main(args):
                     label_name = x
                     load_file = os.path.join(cluster_dir, label_name)
                     cluster_labels = np.load(load_file)
-                else:
-                    printlog("No cluster labels")
                 if 'signals' in x and ch_num in x and behavior in x:
                     signal_name = x
                     load_file = os.path.join(cluster_dir, signal_name)
                     all_signals = np.load(load_file)
-                else:
-                    printlog("No signals")
                     
             printlog(label_name)
             printlog(signal_name)
