@@ -89,7 +89,7 @@ def main(args):
             for i in range(range_start, range_end, steps):
                 end = i + steps if i + steps < range_end else range_end
                 mask = (ts > i) & (ts < end)
-                result = np.mean(np.where(mask, STA_brain_final, 0), axis=-1)
+                result = np.mean(np.where(mask, STA_brain_final, np.nan), axis=-1)
                 STA.append(result)
             STA=np.asarray(STA)
         
