@@ -55,58 +55,58 @@ def main(args):
     #load brain
         tf_load_path = os.path.join(load_directory, f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5")
         save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+ f'_STA_{behavior}.h5')
-        if os.path.exists(save_file)==False:
-            with h5py.File(tf_load_path, 'r') as hf:    
-                ts = hf['time_stamps'][:]
-                dimst = np.shape(ts)
-            printlog(f"time stamp shape is {dimst}")
-            label_name =''
-            signal_name =''
+        # if os.path.exists(save_file)==False:
+        with h5py.File(tf_load_path, 'r') as hf:    
+            ts = hf['time_stamps'][:]
+            dimst = np.shape(ts)
+        printlog(f"time stamp shape is {dimst}")
+        label_name =''
+        signal_name =''
 
-            for x in sorted(os.listdir(cluster_dir)):
-                if 'label' in x and ch_num in x and behavior in x:
-                    label_name = x
-                    load_file = os.path.join(cluster_dir, label_name)
-                    cluster_labels = np.load(load_file)
-                if 'signals' in x and ch_num in x and behavior in x:
-                    signal_name = x
-                    load_file = os.path.join(cluster_dir, signal_name)
-                    all_signals = np.load(load_file)
-                    
-            printlog(label_name)
-            printlog(signal_name)
-            all_signals_new=np.moveaxis(all_signals,-1,1)
-            printlog(str(np.shape(all_signals_new)))
-            
-            STA_brain = np.nan_to_num(all_signals_new)
-            reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels)
-            STA_brain = gaussian_filter1d(reformed_STA_brain,sigma=1,axis=1,truncate=1)
-            STA_brain_temp=np.moveaxis(STA_brain,0,-1).astype('float32')
-            STA_brain_final=np.moveaxis(STA_brain_temp,0,-1)
-            range_start=-500; range_end=1900
-            STA=[]  
-            
-            for i in range(range_start, range_end, steps):
-                end = i + steps if i + steps < range_end else range_end
-                mask = (ts > i) & (ts < end)
-                result = np.mean(np.where(mask, STA_brain_final, np.nan), axis=-1)
-                STA.append(result)
-            STA=np.asarray(STA)
+        for x in sorted(os.listdir(cluster_dir)):
+            if 'label' in x and ch_num in x and behavior in x:
+                label_name = x
+                load_file = os.path.join(cluster_dir, label_name)
+                cluster_labels = np.load(load_file)
+            if 'signals' in x and ch_num in x and behavior in x:
+                signal_name = x
+                load_file = os.path.join(cluster_dir, signal_name)
+                all_signals = np.load(load_file)
+                
+        printlog(label_name)
+        printlog(signal_name)
+        all_signals_new=np.moveaxis(all_signals,-1,1)
+        printlog(str(np.shape(all_signals_new)))
         
-            with h5py.File(save_file, "w") as data_file:
-                    data_file.create_dataset("data", data=STA.astype('float32'))
-            
-            printlog(f"STA for {behavior} done. Data saved in {save_file}")
-            # Delete variables to free up memory
-            del ts, dimst, label_name, signal_name, cluster_labels, all_signals, all_signals_new
-            del STA_brain, reformed_STA_brain, STA_brain_temp, STA_brain_final, STA
-            
-            # Manually invoke the garbage collector
-            gc.collect()
+        STA_brain = np.nan_to_num(all_signals_new)
+        reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels)
+        STA_brain = gaussian_filter1d(reformed_STA_brain,sigma=1,axis=1,truncate=1)
+        STA_brain_temp=np.moveaxis(STA_brain,0,-1).astype('float32')
+        STA_brain_final=np.moveaxis(STA_brain_temp,0,-1)
+        range_start=-500; range_end=1900
+        STA=[]  
+        
+        for i in range(range_start, range_end, steps):
+            end = i + steps if i + steps < range_end else range_end
+            mask = (ts > i) & (ts < end)
+            result = np.mean(np.where(mask, STA_brain_final, np.nan), axis=-1)
+            STA.append(result)
+        STA=np.asarray(STA)
+    
+        with h5py.File(save_file, "w") as data_file:
+                data_file.create_dataset("data", data=STA.astype('float32'))
+        
+        printlog(f"STA for {behavior} done. Data saved in {save_file}")
+        # Delete variables to free up memory
+        del ts, dimst, label_name, signal_name, cluster_labels, all_signals, all_signals_new
+        del STA_brain, reformed_STA_brain, STA_brain_temp, STA_brain_final, STA
+        
+        # Manually invoke the garbage collector
+        gc.collect()
                     
             
-        else:
-            printlog(f'STA for {behavior} already exists. Skipping...')
+        # else:
+        #     printlog(f'STA for {behavior} already exists. Skipping...')
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
