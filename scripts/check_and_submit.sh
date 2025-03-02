@@ -6,7 +6,7 @@ JOB_NAME="prepro"
 # Check if the job is running
 if ! squeue -u $USER | grep -q "$JOB_NAME"; then
     echo "Job $JOB_NAME not running. Submitting a new job..."
-    sbatch preprocess.sh -f fly_218 -fb -rts -tf --supervox
+    sbatch preprocess.sh -f fly_227 -fb -rts -tf
 else
     echo "Job $JOB_NAME is still running."
 fi
