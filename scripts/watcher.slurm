@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=watcher
-#SBATCH --time=00:10:00
+#SBATCH --time=00:7:00
 #SBATCH --partition=trc
 #SBATCH --output=./logs/mainlog.out
 #SBATCH --open-mode=append
