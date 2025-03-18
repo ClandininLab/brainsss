@@ -64,7 +64,7 @@ def main(args):
 			cluster_model.fit(neural_activity)
 			cluster_labels.append(cluster_model.labels_)
 		cluster_labels = np.asarray(cluster_labels)
-		save_file = os.path.join(cluster_dir, f'cluster_labels_{ch_num}_{behavior}.npy')
+		save_file = os.path.join(cluster_dir, f'cluster_labels_{ch_num}_{behavior}_{n_clusters}.npy')
 		np.save(save_file,cluster_labels)
 
 		### GET CLUSTER AVERAGE SIGNAL ###
@@ -81,7 +81,7 @@ def main(args):
 			signals = np.asarray(signals)
 			all_signals.append(signals)
 		all_signals = np.asarray(all_signals)
-		save_file = os.path.join(cluster_dir, f'cluster_signals_{ch_num}_{behavior}.npy')
+		save_file = os.path.join(cluster_dir, f'cluster_signals_{ch_num}_{behavior}_{n_clusters}.npy')
 		np.save(save_file, all_signals)
 		printlog(f'Clustering for {behavior} done bitches')
 		printlog(f'Saved in {cluster_dir}')
