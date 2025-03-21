@@ -165,7 +165,7 @@ def main(args):
     if args["BUILD_STA"] != "":
         build_STA = True
     if args["TF_TO_STA"] != "":
-        build_STA = True
+        tf_to_STA = True
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
     if args["CLEAN_ANAT"] != "":
