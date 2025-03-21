@@ -77,6 +77,7 @@ def main(args):
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
         whole_brain_interp = brainsss.parse_true_false(settings.get("whole_brain_interp", False))
         build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
+        tf_to_STA = brainsss.parse_true_false(settings.get("tf_to_STA", False))
         h5_to_nii = brainsss.parse_true_false(settings.get("h5_to_nii", False))
         clean_anat = brainsss.parse_true_false(settings.get("clean_anat", False))
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
@@ -102,6 +103,7 @@ def main(args):
         temp_filter = False
         whole_brain_interp = False
         build_STA = False
+        tf_to_STA = False
         h5_to_nii = False
         clean_anat = False
         func2anat = False
@@ -161,6 +163,8 @@ def main(args):
     if args["WHOLE_BRAIN_INTERP"] != "":
         whole_brain_interp = True
     if args["BUILD_STA"] != "":
+        build_STA = True
+    if args["TF_TO_STA"] != "":
         build_STA = True
     if args["H5_TO_NII"] != "":
         h5_to_nii = True
@@ -1077,6 +1081,26 @@ def main(args):
                 nodes=nodes,
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
+            
+    if tf_to_STA:
+        later_directory = os.path.join(dataset_path, "later", "temp_filter")
+        args = {"logfile": logfile, 
+                "later_directory": later_directory, 
+                "ch_num": ch_num,
+                }
+        script = "tf_to_STA.py"
+        job_id = brainsss.sbatch(
+            jobname="tf_to_STA",
+            script=os.path.join(scripts_path, script),
+            modules=modules,
+            args=args,
+            logfile=logfile,
+            cpus=32,
+            mem='250GB',
+            nice=nice,
+            nodes=nodes,
+        )
+        brainsss.wait_for_job(job_id, logfile, com_path)
 
     ############
     ### Done ###
