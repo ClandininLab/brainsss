@@ -36,6 +36,7 @@ def main(args):
         STA=[]  
 
         for file in os.listdir(behave_dir):
+            if '_tf_' in file:
                 load_path = os.path.join(behave_dir,file)
                 printlog(load_path)
                 temp=[]
