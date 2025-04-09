@@ -32,7 +32,7 @@ def main(args):
     
     for behavior in behaviors:
         behave_dir = os.path.join(later_directory, behavior)
-        range_start=-500; range_end=1900; steps=100
+        range_start=-500; range_end=1900; steps=20
         STA=[]  
 
         for file in os.listdir(behave_dir):
