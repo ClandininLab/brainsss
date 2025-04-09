@@ -64,7 +64,7 @@ def main(args):
                 for loom in starts_loom_ms:
                 #     print(loom)
                     start=loom+bin_start
-                    end=loom+bin_end-bin_size
+                    end=loom+bin_end-bin_size   # why did i subtract out bin size??? 
                 #     edges=[start,end]
                     bins_array.append(start)
                     bins_array.append(end)
