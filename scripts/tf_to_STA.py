@@ -27,7 +27,7 @@ def main(args):
     ###########
 
     printlog("Beginning giant STA")
-    behaviors = ['inc', 'dec', 'flat', 'total']
+    behaviors = ['total'] #'inc', 'dec', 'flat',
     
     
     for behavior in behaviors:

@@ -31,7 +31,7 @@ def main(args):
 	load_directory = args['load_directory']
 	ch_num = args['ch_num']
 	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
-	n_clusters = 3000
+	n_clusters = 2000
 
 
 	behaviors = ['inc', 'dec', 'flat', 'total']
