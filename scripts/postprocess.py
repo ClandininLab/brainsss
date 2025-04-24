@@ -36,21 +36,22 @@ def main(args):
     #############################
 
     ### Get user settings
-    # printlog("PWD: {}".format(args['PWD']))
     scripts_path = args["PWD"]
+    printlog(f"PWD: {scripts_path}")
     com_path = os.path.join(scripts_path, "com")
     user = scripts_path.split("/")[3]
     settings = brainsss.load_user_settings(user, scripts_path)
+    
     dataset_path = settings["dataset_path"]
     later_path=settings["later_path"]
 
     ### Grab buildflies from command line args first since it will impact parsing
     if args["BEST_FLIES"] == "":
-        best_flies = False
+        fly_dirs = None
     else:
-        best_flies = True
         fly_list=[208,209,210,217,218,226,227,228,233,234,239,240,241,242,249,250]
         num_flies = len(fly_list)
+        printlog(f"Number of flies to process: {num_flies}")
         fly_dirs = []
         for fly in fly_list:
             fly_name= f"fly_{fly}"
