@@ -10,13 +10,25 @@
 while [[ $# -gt 0 ]]; do
   case $1 in
     -pp|--postprocess)
-      POSTPROCESS="$2"
-      shift
+      POSTPROCESS=True
       shift
       ;;
     -best|--best_flies)
       BEST_FLIES=True
       shift
+      ;;
+    -f|--flies)
+      FLIES="$2"
+      shift
+      shift
+      ;;
+    -e|--events)
+      EVENTS="$2"
+      shift
+      shift
+      ;;
+    -cc|--channel_change)
+      CHANNEL_CHANGE=True
       shift
       ;;
      -fb|--filter_bins)
@@ -31,10 +43,6 @@ while [[ $# -gt 0 ]]; do
       TEMP_FILTER=True
       shift
       ;;
-    -wbi|--whole_brain_interp)
-      WHOLE_BRAIN_INTERP=True
-      shift
-      ;;
     --supervox)
       MAKE_SUPERVOXELS=True
       shift
@@ -46,8 +54,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-ARGS="{\"PWD\":\"$PWD\",\"POSTPROCESS\":\"$POSTPROCESS\",\"BEST_FLIES\":\"$BEST_FLIES\",\"FILTER_BINS\":\"$FILTER_BINS\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\
-\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
+ARGS="{\"PWD\":\"$PWD\",\"BEST_FLIES\":\"$BEST_FLIES\",\"POSTPROCESS\":\"$POSTPROCESS\",\"FILTER_BINS\":\"$FILTER_BINS\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\
+\"FLIES\":\"$FLIES\",\"EVENTS\":\"$EVENTS\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
 
 ml python/3.6
 date

@@ -12,13 +12,17 @@ import gc
 def main(args):
     fly_directory = args['fly_directory']
     fly= args['fly']
-    dataset_path = args['dataset_path']
+    later_path = args['later_path']
     save_directory = args['save_directory']
     timestamp_file = args['timestamp_file']
+    event= args['event']
     # behavior = args['behavior']
 
     load_path = os.path.join(fly_directory, timestamp_file)
-    event_times_path = os.path.join(dataset_path, 'later/event_times_split_dic.pkl')
+    if event != None:
+        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
 
     #####################
     ### SETUP LOGGING ###
