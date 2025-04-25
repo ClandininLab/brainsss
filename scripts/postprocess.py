@@ -275,9 +275,9 @@ def main(args):
     brainsss.print_footer(logfile, width)
 
 
-# if __name__ == "__main__":
-#     main(json.loads(sys.argv[1]))
-#     # parser = argparse.ArgumentParser()
-#     # parser.add_argument("PWD")
-#     # args = parser.parse_args()
-#     # main(args)
+if __name__ == "__main__":
+    main(json.loads(sys.argv[1]))
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("PWD")
+    # args = parser.parse_args()
+    # main(args)
