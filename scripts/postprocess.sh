@@ -60,4 +60,6 @@ ARGS="{\"PWD\":\"$PWD\",\"BEST_FLIES\":\"$BEST_FLIES\",\"POSTPROCESS\":\"$POSTPR
 ml python/3.6
 date
 echo "Running: python3 -u ./postprocess.py $ARGS"
-python3 -u ./postprocess.py $ARGS
+echo "$ARGS" > ./args_temp.json
+python3 -u ./postprocess.py "$(cat ./args_temp.json)"
+rm ./args_temp.json
