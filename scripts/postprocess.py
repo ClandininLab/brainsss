@@ -87,6 +87,7 @@ def main(args):
             fly_dirs.append(fly_dir)
     elif args["FLIES"] != "":
         fly_dirs = args["FLIES"].split(",")
+        printlog(f"Fly being processed: {fly_dirs}")
     ### add 'fly_' to beginning if it isn't there
         for i in range(len(fly_dirs)):
             if not fly_dirs[i].startswith("fly_"):
@@ -120,7 +121,7 @@ def main(args):
         ch_num = '1'
     else:
         ch_num = '2'
-    printlog('Channel number: {}'.format(ch_num))
+    printlog(f"Channel number: {ch_num}")
         
 
     if filter_bins:

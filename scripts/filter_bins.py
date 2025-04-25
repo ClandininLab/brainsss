@@ -21,8 +21,12 @@ def main(args):
     load_path = os.path.join(fly_directory, timestamp_file)
     if event != None:
         event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+        filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}_{event}.h5')
+        file_name = f'filter_needs_{behavior}_{event}.h5'
     else:
         event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+        filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}.h5')
+        file_name = f'filter_needs_{behavior}.h5'
 
     #####################
     ### SETUP LOGGING ###
@@ -43,7 +47,7 @@ def main(args):
     #load timestamp data
 
     for behavior in behaviors:
-        if f'filter_needs_{behavior}.h5' not in os.listdir(save_directory):
+        if file_name not in os.listdir(save_directory):
             with h5py.File(load_path, 'r') as hf:
                 ts = hf['data']
                 dimst = np.shape(ts)
@@ -94,10 +98,6 @@ def main(args):
                     bin_shape = [bin_start, bin_end]
                 
                     #save filter_needs
-                    if event != None:
-                        filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}_{event}.h5')
-                    else:
-                        filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}.h5')
                     with h5py.File(filter_needs_file, "w") as data_file:
                                 data_file.create_dataset("bins", data=bin_idx)
                                 data_file.create_dataset("loom_starts", data=starts_loom_ms)
