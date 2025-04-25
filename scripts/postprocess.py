@@ -42,33 +42,10 @@ def main(args):
     user = scripts_path.split("/")[3]
     settings = brainsss.load_user_settings(user, scripts_path)
     
-    dataset_path = settings["dataset_path"]
-    later_path=settings["later_path"]
+
 
     ### Grab buildflies from command line args first since it will impact parsing
-    if args["BEST_FLIES"] == "":
-        fly_dirs = None
-    else:
-        fly_list=[208,209,210,217,218,226,227,228,233,234,239,240,241,242,249,250]
-        num_flies = len(fly_list)
-        printlog(f"Number of flies to process: {num_flies}")
-        fly_dirs = []
-        for fly in fly_list:
-            fly_name= f"fly_{fly}"
-            fly_dir=os.path.join(dataset_path, fly_name)
-            fly_dirs.append(fly_dir)
 
-            # printlog(f"Flies to process: {dirs_to_process}")
-    if args["FLIES"] == "":
-    # printlog('no flies specified')
-        fly_dirs = None
-    else:
-        fly_dirs = args["FLIES"].split(",")
-    ### add 'fly_' to beginning if it isn't there
-        for i in range(len(fly_dirs)):
-            if not fly_dirs[i].startswith("fly_"):
-                fly_dirs[i] = "fly_" + fly_dirs[i]
-    ### Parse user settings
     if args["POSTPROCESS"] == "":
         # printlog('not building flies')
         postprocess = False
@@ -76,20 +53,16 @@ def main(args):
         # printlog('building flies')
         postprocess = True
     
-    if args["EVENTS"] == "":
-        # printlog('not building flies')
-        event = None
-    else:
-        # printlog('building flies')
-        event = args["EVENTS"]
+        
+    ### Parse user settings
+    dataset_path = settings["dataset_path"]
+    later_path=settings["later_path"]
     
     if postprocess:
         filter_bins = brainsss.parse_true_false(settings.get("filter_bins", False))
         relative_ts = brainsss.parse_true_false(settings.get("relative_ts", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
-        make_supervoxels = brainsss.parse_true_false(
-            settings.get("make_supervoxels", False)
-        )
+        make_supervoxels = brainsss.parse_true_false(settings.get("make_supervoxels", False))
         channel_change = brainsss.parse_true_false(settings.get("channel_change", False))
         
     else:
@@ -98,7 +71,36 @@ def main(args):
         temp_filter = False
         make_supervoxels = False
         channel_change = False
-
+    
+     ### Parse remaining command line args
+    if args["BEST_FLIES"] == "" and args["FLIES"] == "":
+        printlog('no flies specified')
+        fly_dirs = None
+    elif args["BEST_FLIES"] != "":
+        fly_list=[208,209,210,217,218,226,227,228,233,234,239,240,241,242,249,250]
+        num_flies = len(fly_list)
+        printlog(f"Number of flies to process: {num_flies}")
+        fly_dirs = []
+        for fly in fly_list:
+            fly_name= f"fly_{fly}"
+            fly_dir=os.path.join(dataset_path, fly_name)
+            fly_dirs.append(fly_dir)
+    elif args["FLIES"] != "":
+        fly_dirs = args["FLIES"].split(",")
+    ### add 'fly_' to beginning if it isn't there
+        for i in range(len(fly_dirs)):
+            if not fly_dirs[i].startswith("fly_"):
+                fly_dirs[i] = "fly_" + fly_dirs[i] 
+            # printlog(f"Flies to process: {dirs_to_process}")
+        
+    if args["EVENTS"] == "":
+        # printlog('not building flies')
+        event = None
+    else:
+        # printlog('building flies')
+        event = args["EVENTS"].lower()          
+        
+        
     # These command line arguments will be empty unless the flag is called from the command line
     if args["FILTER_BINS"] != "":
         filter_bins = True
@@ -110,7 +112,6 @@ def main(args):
         make_supervoxels = True
     if args["CHANNEL_CHANGE"] != "":
         channel_change = True
-  
 #     #################################
 #     ############# BEGIN #############
 #     #################################
