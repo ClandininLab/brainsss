@@ -35,7 +35,7 @@ def main(args):
 
     printlog("Beginning bin creation")
     
-    behaviors = ['inc']#, 'dec', 'flat', 'total']
+    behaviors = ['inc', 'dec', 'flat', 'total']
     
     #load timestamp data
 
@@ -61,7 +61,7 @@ def main(args):
                 # printlog(f"Event times loaded from {event_times_path}")
                 fly_name= fly[4:7]
                 printlog(f"Fly name is {fly_name} and behavior is {behavior}")
-                if behavior in event_times_struct[fly_name].keys():
+                if behavior in list(event_times_struct[fly_name].keys()):
                     starts_loom_ms = event_times_struct[fly_name][behavior]
                     
                     bin_start = -500; bin_end = 2000; bin_size = 100 #ms
