@@ -7,12 +7,6 @@
 #SBATCH --output=./logs/mainlog.out
 #SBATCH --open-mode=append
 
-echo "====== Starting postprocess.sh at $(date) ======"
-echo "Environment info:"
-echo "User: $(whoami)"
-echo "Host: $(hostname)"
-echo "Working directory: $PWD"
-
 while [[ $# -gt 0 ]]; do
   case $1 in
     -pp|--postprocess)
@@ -63,74 +57,7 @@ done
 ARGS="{\"PWD\":\"$PWD\",\"BEST_FLIES\":\"$BEST_FLIES\",\"POSTPROCESS\":\"$POSTPROCESS\",\"FILTER_BINS\":\"$FILTER_BINS\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\
 \"FLIES\":\"$FLIES\",\"EVENTS\":\"$EVENTS\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
 
-# ml python/3.6
-# date
-# echo "Running: python3 -u ./postprocess.py $ARGS"
-# python3 -u ./postprocess.py $ARGS
-
-echo "Arguments prepared:"
-echo "$ARGS"
-echo "$ARGS" > ./args_temp.json
-
-# Check for Python and script
-echo "Looking for Python and script files..."
-echo "Files in current directory:"
-ls -la *.py
-
-# Load Python module
-echo "Loading Python module..."
 ml python/3.6
-PYTHON_STATUS=$?
-if [ $PYTHON_STATUS -ne 0 ]; then
-    echo "WARNING: Module loading returned status $PYTHON_STATUS"
-fi
-
-# Check Python availability
-PYTHON_PATH=$(which python3)
-echo "Python path: $PYTHON_PATH"
-echo "Python version: $(python3 --version 2>&1)"
-
-# Check if postprocess.py exists
-SCRIPT_PATH="$PWD/postprocess.py"
-if [ ! -f "$SCRIPT_PATH" ]; then
-    echo "ERROR: $SCRIPT_PATH does not exist!"
-    exit 1
-else
-    echo "Script found: $SCRIPT_PATH"
-    echo "Script permissions: $(ls -l $SCRIPT_PATH)"
-fi
-
-# Make sure script is executable
-chmod +x "$SCRIPT_PATH"
-echo "Made script executable"
-
-# Try running a simple Python command
-echo "Testing Python with simple command..."
-python3 -c "print('Python is working correctly')" 
-if [ $? -ne 0 ]; then
-    echo "ERROR: Basic Python test failed"
-    exit 1
-fi
-
-# Run the actual script with arguments
-echo "====== Running postprocess.py at $(date) ======"
-echo "Command: $PYTHON_PATH -u $SCRIPT_PATH $(cat ./args_temp.json)"
-
-# Run with error capturing
-$PYTHON_PATH -u "$SCRIPT_PATH" "$(cat ./args_temp.json)" 2>./python_errors.log
-PYTHON_EXIT=$?
-
-# Check for errors
-if [ $PYTHON_EXIT -ne 0 ]; then
-    echo "ERROR: Python script exited with code $PYTHON_EXIT"
-    echo "Error output:"
-    cat ./python_errors.log
-else
-    echo "Script completed with exit code $PYTHON_EXIT"
-fi
-
-# Clean up
-rm -f ./args_temp.json
-rm -f ./python_errors.log
-
-echo "====== Completed postprocess.sh at $(date) ======"
+date
+echo "Running: python3 -u ./postprocess.py $ARGS"
+python3 -u ./postprocess.py $ARGS
