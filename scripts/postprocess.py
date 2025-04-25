@@ -83,8 +83,7 @@ def main(args):
         fly_dirs = []
         for fly in fly_list:
             fly_name= f"fly_{fly}"
-            fly_dir=os.path.join(dataset_path, fly_name)
-            fly_dirs.append(fly_dir)
+            fly_dirs.append(fly_name)
         printlog(f"Flies to be processed {fly_dirs}")
     elif args["FLIES"] != "":
         fly_dirs = args["FLIES"].split(",")
