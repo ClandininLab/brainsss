@@ -77,7 +77,8 @@ def main(args):
         printlog('no flies specified')
         fly_dirs = None
     elif args["BEST_FLIES"] != "":
-        fly_list=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
+        fly_list = [234,239,240,241,242,249,250]
+        # fly_list=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
         num_flies = len(fly_list)
         printlog(f"Number of flies to process: {num_flies}")
         fly_dirs = []
