@@ -8,6 +8,7 @@ import h5py
 import ants
 import psutil
 import gc
+import pickle
 
 def main(args):
     fly_directory = args['fly_directory']
@@ -15,6 +16,8 @@ def main(args):
     save_directory = args['save_directory']
     brain_file = args['brain_file']
     timestamp_file = args['timestamp_file']
+    later_path = args['later_path']
+    event= args['event']
     stepsize = 100
 
     brain_load_path = os.path.join(load_directory, brain_file)
@@ -33,7 +36,17 @@ def main(args):
     #######################
 
     printlog("Beginning temporal filter")
-    behaviors = ['inc', 'dec', 'flat', 'total']
+   
+    #Get behaviors
+    if event != None:
+        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+    with open(event_times_path, 'rb') as file:
+        event_times_struct = pickle.load(file)
+        f=list(event_times_struct.keys())[0]
+        behaviors=list(event_times_struct[f].keys())
+   
     for behavior in behaviors:
         filter_load_path=os.path.join(save_directory, f"filter_needs_{behavior}.h5")
         ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{behavior}.h5")

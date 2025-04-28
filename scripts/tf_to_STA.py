@@ -9,10 +9,13 @@ import h5py
 import ants
 import psutil
 import gc
+import pickle
 
 def main(args):
     later_directory = args['later_directory']
     ch_num = args['ch_num'] 
+    event = args['event']
+    later_path = args['later_path']
     
     #####################
     ### SETUP LOGGING ###
@@ -27,7 +30,14 @@ def main(args):
     ###########
 
     printlog("Beginning giant STA")
-    behaviors = ['total'] #'inc', 'dec', 'flat',
+    if event != None:
+        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+    with open(event_times_path, 'rb') as file:
+        event_times_struct = pickle.load(file)
+        f=list(event_times_struct.keys())[0]
+        behaviors=list(event_times_struct[f].keys())
     
     
     for behavior in behaviors:
