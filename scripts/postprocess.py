@@ -183,6 +183,8 @@ def main(args):
             filter_file = "filter_needs.h5"
             args = {
                 "logfile": logfile,
+                "event": event,
+                "later_path": later_path,
                 "fly_directory": fly_directory,
                 "save_directory": save_directory,
                 "timestamp_file": timestamp_file,
@@ -225,6 +227,8 @@ def main(args):
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
+                "later_path": later_path,
+                "event": event,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
                 "brain_file": brain_file,
@@ -256,8 +260,10 @@ def main(args):
                 brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
                 args = {"logfile": logfile, 
                         "func_path": func, 
-                        'brain_file': brain_file, 
-                        'ch_num': ch_num,
+                        "brain_file": brain_file, 
+                        "ch_num": ch_num,
+                        "event": event,
+                        "later_path": later_path,
                         "load_directory": load_directory,
                         }
                 script = "make_supervoxels.py"
@@ -278,6 +284,7 @@ def main(args):
         later_directory = os.path.join(later_path, "temp_filter")
         args = {"logfile": logfile, 
                 "later_directory": later_directory, 
+                "event": event,
                 "ch_num": ch_num,
                 }
         script = "tf_to_STA.py"

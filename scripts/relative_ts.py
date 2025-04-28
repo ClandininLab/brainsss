@@ -8,12 +8,14 @@ import h5py
 import ants
 import psutil
 import gc
+import pickle
 
 def main(args):
     fly_directory = args['fly_directory']
     save_directory = args['save_directory']
     timestamp_file = args['timestamp_file']
-    stepsize = 100
+    later_path = args['later_path']
+    event= args['event']
 
     ts_load_path = os.path.join(fly_directory, timestamp_file)
 
@@ -30,14 +32,29 @@ def main(args):
     ###########################
 
     printlog("Beginning relative timestamp & odd mask creation")
-   
-    behaviors = ['inc', 'dec', 'flat', 'total']
+    
+    #Get behaviors
+    if event != None:
+        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+    with open(event_times_path, 'rb') as file:
+        event_times_struct = pickle.load(file)
+        f=list(event_times_struct.keys())[0]
+        behaviors=list(event_times_struct[f].keys())
+            
+            
     for behavior in behaviors:
-        
-        if f'ts_rel_odd_mask_{behavior}.h5' not in os.listdir(save_directory):
+        if event != None:
+            save_name=f'ts_rel_odd_mask_{behavior}_{event}.h5'
+            load_name=f'filter_needs_{behavior}_{event}.h5'
+        else:
+            save_name=f'ts_rel_odd_mask_{behavior}.h5'
+            load_name=f'filter_needs_{behavior}.h5'
+        if save_name not in os.listdir(save_directory):
             #load brain
             with h5py.File(ts_load_path, 'r') as tf, \
-                h5py.File(os.path.join(save_directory, f"filter_needs_{behavior}.h5"), 'r') as ff:
+                h5py.File(os.path.join(save_directory, load_name), 'r') as ff:
 
                 ts = tf['data'][:].astype('float32')
                 bins = ff['bins'][:].astype('int32')
