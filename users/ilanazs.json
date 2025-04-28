@@ -14,7 +14,6 @@
     "clean_anat": "True",
     "func2anat": "True",
     "anat2atlas": "True",
-
     "filter_bins": "True",
     "relative_ts": "True",
     "temp_filter": "True",
