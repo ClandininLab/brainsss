@@ -13,5 +13,12 @@
     "h5_to_nii": "False",
     "clean_anat": "True",
     "func2anat": "True",
-    "anat2atlas": "True"
+    "anat2atlas": "True",
+
+    "filter_bins": "True",
+    "relative_ts": "True",
+    "temp_filter": "True",
+    "make_supervoxels": "False",
+    "channel_change": "False",
+    "tf_to_STA": "False"
 }
