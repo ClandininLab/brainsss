@@ -75,10 +75,8 @@ def main(args):
                 om_shape=np.shape(odd_mask)
                 
                 printlog(f"Relative time shape is {ts_shape} and odd mask shape is {om_shape}")
-                if event==None:
-                    save_file = os.path.join(save_directory, f'ts_rel_odd_mask_{behavior}.h5')
-                else:
-                    save_file = os.path.join(save_directory, f'ts_rel_odd_mask_{behavior}_{event}.h5')
+
+                save_file = os.path.join(save_directory, save_name)
                 with h5py.File(save_file, "w") as data_file:
                         data_file.create_dataset("odd_mask", data=odd_mask.astype('bool'))
                         data_file.create_dataset("ts_rel", data=ts.astype('float32'))
