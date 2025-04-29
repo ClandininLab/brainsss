@@ -50,7 +50,10 @@ def main(args):
     for behavior in behaviors:
         filter_load_path=os.path.join(save_directory, f"filter_needs_{behavior}.h5")
         ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{behavior}.h5")
-        save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
+        if event != None:
+            save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}_{event}.h5')
+        else:
+            save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
         if os.path.exists(save_file)==False:
             #load brain
             with h5py.File(brain_load_path, 'r') as hf, \
