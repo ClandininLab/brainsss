@@ -66,7 +66,10 @@ def main(args):
                 printlog(f'STA is {np.shape(STA)}')
         STA=np.asarray(np.nanmean(STA, axis=0))
     
-        save_file= os.path.join(behave_dir, f'STA_total_{steps}.h5')
+        if event==None:
+            save_file= os.path.join(behave_dir, f'STA_total_{steps}.h5')
+        else:
+            save_file= os.path.join(behave_dir, f'STA_total_{steps}_{event}.h5')
         printlog(f'Saving STA to {save_file}')
         with h5py.File(save_file, "w") as data_file:
                 data_file.create_dataset("data", data=STA.astype('float32'))
