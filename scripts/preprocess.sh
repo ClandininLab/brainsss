@@ -56,28 +56,8 @@ while [[ $# -gt 0 ]]; do
       DFF=True
       shift
       ;;
-     -fb|--filter_bins)
-      FILTER_BINS=True
-      shift
-      ;;
-    -rts|--relative_ts)
-      RELATIVE_TS=True
-      shift
-      ;;
-    -tf|--temp_filter)
-      TEMP_FILTER=True
-      shift
-      ;;
     -wbi|--whole_brain_interp)
       WHOLE_BRAIN_INTERP=True
-      shift
-      ;;
-    -STA|--build_STA)
-      BUILD_STA=True
-      shift
-      ;;
-    -tSTA|--tf_to_STA)
-      TF_TO_STA=True
       shift
       ;;
     --fictrac_qc)
@@ -112,10 +92,6 @@ while [[ $# -gt 0 ]]; do
       ANAT2ATLAS=True
       shift
       ;;
-    --supervox)
-      MAKE_SUPERVOXELS=True
-      shift
-      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -124,12 +100,12 @@ while [[ $# -gt 0 ]]; do
 done
 
 ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
-\"MOCO\":\"$MOCO\",\"FILTER_BINS\":\"$FILTER_BINS\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\
-\"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\"DFF\":\"$DFF\",\
-\"BLEACHING_QC\":\"$BLEACHING_QC\",\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
-\"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\"BUILD_STA\":\"$BUILD_STA\",\"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
-\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"TF_TO_STA\":\"$TF_TO_STA\",\"H5_TO_NII\":\"$H5_TO_NII\",\
-\"FUNC2ANAT\":\"$FUNC2ANAT\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\"}"
+\"MOCO\":\"$MOCO\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",,\"DFF\":\"$DFF\",\
+\"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\
+\"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
+\"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
+\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"H5_TO_NII\":\"$H5_TO_NII\",\"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\
+\"FUNC2ANAT\":\"$FUNC2ANAT\",\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\""}"
 
 ml python/3.6
 date

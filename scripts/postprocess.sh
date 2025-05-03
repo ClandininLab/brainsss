@@ -51,6 +51,10 @@ while [[ $# -gt 0 ]]; do
       MAKE_SUPERVOXELS=True
       shift
       ;;
+    -STA|--build_STA)
+      BUILD_STA=True
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -60,7 +64,7 @@ done
 
 ARGS="{\"PWD\":\"$PWD\",\"BEST_FLIES\":\"$BEST_FLIES\",\"POSTPROCESS\":\"$POSTPROCESS\",\"FILTER_BINS\":\"$FILTER_BINS\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\
 \"FLIES\":\"$FLIES\",\"EVENTS\":\"$EVENTS\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\",\
-\"TF_TO_STA\":\"$TF_TO_STA\"}"
+\"BUILD_STA\":\"$BUILD_STA\",\"TF_TO_STA\":\"$TF_TO_STA\"}"
 
 ml python/3.6
 date
