@@ -65,6 +65,7 @@ def main(args):
         make_supervoxels = brainsss.parse_true_false(settings.get("make_supervoxels", False))
         channel_change = brainsss.parse_true_false(settings.get("channel_change", False))
         tf_to_STA = brainsss.parse_true_false(settings.get("tf_to_STA", False))
+        build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
         
     else:
         filter_bins = False
@@ -73,6 +74,7 @@ def main(args):
         make_supervoxels = False
         channel_change = False
         tf_to_STA = False
+        build_STA = False
     
      ### Parse remaining command line args
     if args["BEST_FLIES"] == "" and args["FLIES"] == "":
@@ -118,6 +120,8 @@ def main(args):
         channel_change = True
     if args["TF_TO_STA"] != "":
         tf_to_STA = True
+    if args["BUILD_STA"] != "":
+        build_STA = True
 #     #################################
 #     ############# BEGIN #############
 #     #################################
@@ -302,6 +306,33 @@ def main(args):
         )
         brainsss.wait_for_job(job_id, logfile, com_path)
     
+    if build_STA:
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            load_directory = os.path.join(fly_directory, "temp_filter")
+            save_directory = os.path.join(fly_directory, "STA")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
+            args = {"logfile": logfile, 
+                    "fly_directory": fly_directory, 
+                    'ch_num': ch_num,
+                    "load_directory": load_directory,
+                    "save_directory": save_directory,
+                    }
+            script = "build_STA.py"
+            job_id = brainsss.sbatch(
+                jobname="STA",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                cpus=32,
+                mem='250GB',
+                nice=nice,
+                nodes=nodes,
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+            
     ############
     ### Done ###
     ############
