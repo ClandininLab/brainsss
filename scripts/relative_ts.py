@@ -16,6 +16,8 @@ def main(args):
     timestamp_file = args['timestamp_file']
     later_path = args['later_path']
     event= args['event']
+    redo = args['redo']
+    
 
     ts_load_path = os.path.join(fly_directory, timestamp_file)
 
@@ -51,7 +53,7 @@ def main(args):
         else:
             save_name=f'ts_rel_odd_mask_{behavior}.h5'
             load_name=f'filter_needs_{behavior}.h5'
-        if save_name not in os.listdir(save_directory):
+        if save_name not in os.listdir(save_directory) or redo:
             #load brain
             with h5py.File(ts_load_path, 'r') as tf, \
                 h5py.File(os.path.join(save_directory, load_name), 'r') as ff:
