@@ -13,7 +13,7 @@ import pickle
 
 def main(args):
     later_directory = args['later_directory']
-    ch_num = args['ch_num'] 
+    cc = args['ch_num'] 
     event = args['event']
     later_path = args['later_path']
     
@@ -32,8 +32,10 @@ def main(args):
     printlog("Beginning giant STA")
     if event != None:
         event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+        save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
     else:
         event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+        save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
     with open(event_times_path, 'rb') as file:
         event_times_struct = pickle.load(file)
         f=list(event_times_struct.keys())[0]
@@ -66,10 +68,6 @@ def main(args):
                 printlog(f'STA is {np.shape(STA)}')
         STA=np.asarray(np.nanmean(STA, axis=0))
     
-        if event==None:
-            save_file= os.path.join(behave_dir, f'STA_total_{steps}.h5')
-        else:
-            save_file= os.path.join(behave_dir, f'STA_total_{steps}_{event}.h5')
         printlog(f'Saving STA to {save_file}')
         with h5py.File(save_file, "w") as data_file:
                 data_file.create_dataset("data", data=STA.astype('float32'))
