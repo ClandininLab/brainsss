@@ -44,7 +44,7 @@ def main(args):
     
 
 
-    ### Grab buildflies from command line args first since it will impact parsing
+    ### Grab postprocess & redo from command line args first since it will impact parsing
 
     if args["POSTPROCESS"] == "":
         # printlog('not building flies')
@@ -52,6 +52,10 @@ def main(args):
     else:
         # printlog('building flies')
         postprocess = True
+    if args["REDO"] == "":
+        redo = False
+    else:
+        redo = True
     
         
     ### Parse user settings
@@ -148,6 +152,7 @@ def main(args):
             timestamp_file = "warp/timestamps_warp.h5"
             args = {
                 "logfile": logfile,
+                "redo": redo,
                 "later_path": later_path,
                 "event": event,
                 "fly": fly,
@@ -187,6 +192,7 @@ def main(args):
             filter_file = "filter_needs.h5"
             args = {
                 "logfile": logfile,
+                "redo": redo,
                 "event": event,
                 "later_path": later_path,
                 "fly_directory": fly_directory,
@@ -231,6 +237,7 @@ def main(args):
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
+                "redo": redo,
                 "later_path": later_path,
                 "event": event,
                 "load_directory": load_directory,
@@ -262,7 +269,8 @@ def main(args):
             load_directory = os.path.join(fly_directory, "temp_filter")
             for func in funcs:
                 brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
-                args = {"logfile": logfile, 
+                args = {"logfile": logfile,
+                        "redo": redo,
                         "func_path": func, 
                         "brain_file": brain_file, 
                         "ch_num": ch_num,
@@ -314,7 +322,8 @@ def main(args):
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             args = {"logfile": logfile, 
-                    "fly_directory": fly_directory, 
+                    "fly_directory": fly_directory,
+                    "redo": redo,
                     'ch_num': ch_num,
                     "load_directory": load_directory,
                     "save_directory": save_directory,

@@ -18,6 +18,7 @@ def main(args):
     timestamp_file = args['timestamp_file']
     later_path = args['later_path']
     event= args['event']
+    redo = args['redo']
     stepsize = 100
 
     brain_load_path = os.path.join(load_directory, brain_file)
@@ -54,7 +55,7 @@ def main(args):
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}_{event}.h5')
         else:
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
-        if os.path.exists(save_file)==False:
+        if os.path.exists(save_file)==False or redo:
             #load brain
             with h5py.File(brain_load_path, 'r') as hf, \
                 h5py.File(ts_load_path, 'r') as tf, \

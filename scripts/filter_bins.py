@@ -15,7 +15,8 @@ def main(args):
     later_path = args['later_path']
     save_directory = args['save_directory']
     timestamp_file = args['timestamp_file']
-    event= args['event']
+    event = args['event']
+    redo = args['redo']
     # behavior = args['behavior']
 
     load_path = os.path.join(fly_directory, timestamp_file)
@@ -49,7 +50,7 @@ def main(args):
             filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}.h5')
             file_name = f'filter_needs_{behavior}.h5'
         printlog(f"Event times from {event_times_path}")
-        if file_name not in os.listdir(save_directory):
+        if file_name not in os.listdir(save_directory) or redo:
             with h5py.File(load_path, 'r') as hf:
                 ts = hf['data']
                 dimst = np.shape(ts)
