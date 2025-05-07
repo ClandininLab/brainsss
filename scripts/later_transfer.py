@@ -27,7 +27,8 @@ def main(args):
     ##################################
     ### TRANSFERRING FILTERED DATA ###
     ##################################
-
+    
+    temp_filter_dir = os.path.join(later_dir, 'temp_filter')
     printlog("Beginning transfer of filtered data")
     if event != None:
         event_times_path = os.path.join(later_dir, f'{event}_event_times_split_dic.pkl')
@@ -51,7 +52,7 @@ def main(args):
                 new_file = f"{fly}_tf_{behavior}_{cc}_{event}.h5"
             if file in files:
                 source = os.path.join(fly_path, 'temp_filter', file)
-                destination = os.path.join(later_dir, behavior, new_file)
+                destination = os.path.join(temp_filter_dir, behavior, new_file)
                 if os.path.exists(destination)==False: 
                     dest = shutil.copyfile(source, destination)
                 printlog("Destination path:", destination)
