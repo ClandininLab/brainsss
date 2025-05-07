@@ -55,7 +55,7 @@ def main(args):
                 destination = os.path.join(temp_filter_dir, behavior, new_file)
                 if os.path.exists(destination)==False: 
                     dest = shutil.copyfile(source, destination)
-                printlog("Destination path:", destination)
+                printlog(f"Destination path: {destination}")
 
             else:
                 printlog("Not there yet!")
