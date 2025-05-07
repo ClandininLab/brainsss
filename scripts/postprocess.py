@@ -70,6 +70,7 @@ def main(args):
         channel_change = brainsss.parse_true_false(settings.get("channel_change", False))
         tf_to_STA = brainsss.parse_true_false(settings.get("tf_to_STA", False))
         build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
+        later_transfer = brainsss.parse_true_false(settings.get("later_transfer", False))
         
     else:
         filter_bins = False
@@ -79,6 +80,7 @@ def main(args):
         channel_change = False
         tf_to_STA = False
         build_STA = False
+        later_transfer = False
     
      ### Parse remaining command line args
     if args["BEST_FLIES"] == "" and args["FLIES"] == "":
@@ -126,6 +128,9 @@ def main(args):
         tf_to_STA = True
     if args["BUILD_STA"] != "":
         build_STA = True
+    if args["LATER_TRANSFER"] != "":
+        later_transfer = True
+
 #     #################################
 #     ############# BEGIN #############
 #     #################################
@@ -342,6 +347,30 @@ def main(args):
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
             
+    if later_transfer:
+        later_directory = os.path.join(later_path, "temp_filter")
+        args = {"logfile": logfile, 
+                "later_directory": later_directory, 
+                "event": event,
+                "dataset_path": dataset_path,
+                "flies": fly_dirs,
+                "ch_num": ch_num,
+                }
+        script = "later_transfer.py"
+        job_id = brainsss.sbatch(
+            jobname="later_transfer",
+            script=os.path.join(scripts_path, script),
+            modules=modules,
+            args=args,
+            logfile=logfile,
+            time=48,
+            cpus=32,
+            mem='250GB',
+            nice=nice,
+            nodes=nodes,
+        )
+        brainsss.wait_for_job(job_id, logfile, com_path)
+    
     ############
     ### Done ###
     ############
