@@ -44,13 +44,15 @@ def main(args):
         behave_dir = os.path.join(later_directory, behavior)
         if event != None:
             save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
+            add_on = event
         else:
             save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
+            add_on = ''
         range_start=-500; range_end=1900; steps=20
         STA=[]  
 
         for file in os.listdir(behave_dir):
-            if '_tf_' in file:
+            if '_tf_' in file and add_on in file:
                 load_path = os.path.join(behave_dir,file)
                 printlog(load_path)
                 temp=[]
