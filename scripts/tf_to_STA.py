@@ -12,10 +12,10 @@ import gc
 import pickle
 
 def main(args):
-    later_directory = args['later_directory']
+    later_path = args['later_directory']
     cc = args['ch_num'] 
     event = args['event']
-    later_path = args['later_path']
+    
     
     #####################
     ### SETUP LOGGING ###
@@ -41,7 +41,7 @@ def main(args):
     
     
     for behavior in behaviors:
-        behave_dir = os.path.join(later_directory, behavior)
+        behave_dir = os.path.join(later_path, behavior)
         if event != None:
             save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
             add_on = event
