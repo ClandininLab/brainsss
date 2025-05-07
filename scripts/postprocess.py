@@ -348,9 +348,8 @@ def main(args):
             brainsss.wait_for_job(job_id, logfile, com_path)
             
     if later_transfer:
-        later_directory = os.path.join(later_path, "temp_filter")
         args = {"logfile": logfile, 
-                "later_directory": later_directory, 
+                "later_directory": later_path, 
                 "event": event,
                 "dataset_path": dataset_path,
                 "flies": fly_dirs,
