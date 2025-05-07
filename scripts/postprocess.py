@@ -298,9 +298,10 @@ def main(args):
             brainsss.wait_for_job(job_id, logfile, com_path)
 
     if tf_to_STA:
-        later_directory = os.path.join(later_path, "temp_filter")
+        temp_directory = os.path.join(later_path, "temp_filter")
         args = {"logfile": logfile, 
-                "later_directory": later_directory, 
+                "temp_directory": temp_directory, 
+                "later_path": later_path,
                 "event": event,
                 "ch_num": ch_num,
                 }
