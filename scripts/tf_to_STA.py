@@ -32,10 +32,8 @@ def main(args):
     printlog("Beginning giant STA")
     if event != None:
         event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-        save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
     else:
         event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
-        save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
     with open(event_times_path, 'rb') as file:
         event_times_struct = pickle.load(file)
         f=list(event_times_struct.keys())[0]
@@ -44,6 +42,10 @@ def main(args):
     
     for behavior in behaviors:
         behave_dir = os.path.join(later_directory, behavior)
+        if event != None:
+            save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
+        else:
+            save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
         range_start=-500; range_end=1900; steps=20
         STA=[]  
 
