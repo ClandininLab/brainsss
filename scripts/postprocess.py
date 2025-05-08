@@ -88,11 +88,11 @@ def main(args):
         fly_dirs = None
     elif args["BEST_FLIES"] != "":
         # fly_list = [234,239,240,241,242,249,250]
-        fly_list=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
-        num_flies = len(fly_list)
-        printlog(f"Number of flies to process: {num_flies}")
+        fly_num=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
+        fly_count = len(fly_num)
+        printlog(f"Number of flies to process: {fly_count}")
         fly_dirs = []
-        for fly in fly_list:
+        for fly in fly_num:
             fly_name= f"fly_{fly}"
             fly_dirs.append(fly_name)
         printlog(f"Flies to be processed {fly_dirs}")
