@@ -13,7 +13,7 @@ def main(args):
     later_dir = args['later_directory']
     cc = args['ch_num'] 
     event = args['event']
-    flies = args['flies']
+    flies = args['fly_num']
     dataset_path = args['dataset_path']
     
     #####################
