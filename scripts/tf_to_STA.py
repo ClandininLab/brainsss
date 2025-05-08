@@ -43,13 +43,14 @@ def main(args):
     
     for behavior in behaviors:
         behave_dir = os.path.join(temp_dir, behavior)
+        range_start=-500; range_end=1900; steps=20
         if event != None:
             save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
             add_on = event
         else:
             save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
             add_on = ''
-        range_start=-500; range_end=1900; steps=20
+        
         STA=[]  
 
         for file in os.listdir(behave_dir):
