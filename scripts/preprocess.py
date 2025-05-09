@@ -95,10 +95,20 @@ def main(args):
         anat2atlas = False
 
     ### Parse remaining command line args
-    if args["FLIES"] == "":
-        # printlog('no flies specified')
+    if args["BEST_FLIES"] == "" and args["FLIES"] == "":
+        printlog('no flies specified')
         fly_dirs = None
-    else:
+    elif args["BEST_FLIES"] != "":
+        # fly_list = [234,239,240,241,242,249,250]
+        fly_num=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
+        fly_count = len(fly_num)
+        printlog(f"Number of flies to process: {fly_count}")
+        fly_dirs = []
+        for fly in fly_num:
+            fly_name= f"fly_{fly}"
+            fly_dirs.append(fly_name)
+        printlog(f"Flies to be processed {fly_dirs}")
+    elif args["FLIES"] != "":
         fly_dirs = args["FLIES"].split(",")
 
         ### add 'fly_' to beginning if it isn't there
