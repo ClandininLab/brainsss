@@ -18,6 +18,7 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']
+    redo = args['redo']
     stepsize = 100
 
     full_load_path = os.path.join(load_directory, brain_file)
@@ -35,32 +36,36 @@ def main(args):
     ###########
     ### DFF ###
     ###########
-    stepsize=100
-    printlog("Beginning DFF")
-    with h5py.File(full_load_path, 'r') as hf:
-        hpf = hf['hpf'][:]
-        lpf = hf['lpf'][:]
-        dimsh = np.shape(hpf)
-        dimsl = np.shape(lpf)
+    
+    if os.path.exists(save_file)==False or redo:
+        stepsize=100
+        printlog("Beginning DFF")
+        with h5py.File(full_load_path, 'r') as hf:
+            hpf = hf['hpf'][:]
+            lpf = hf['lpf'][:]
+            dimsh = np.shape(hpf)
+            dimsl = np.shape(lpf)
 
-        printlog(f"Highpass filter shape is {dimsh}, lowpass filter shape is {dimsl}")
+            printlog(f"Highpass filter shape is {dimsh}, lowpass filter shape is {dimsl}")
+            
+            # #load the mean brain
+            # fixed = brainsss.load_fda_meanbrain()
+            lpf_min=np.min(lpf)
+            #do dff
+            with np.errstate(divide='ignore', invalid='ignore'):
+                dff = np.true_divide(hpf, lpf-lpf_min)
+            
+            #mask brain
+            # dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
+            dff_dims = np.shape(dff)
+            printlog("dff data shape is {}".format(dff_dims))
+            # save dff data
+            with h5py.File(save_file, "w") as data_file:
+                data_file.create_dataset("data", data=dff.astype('float32')) 
         
-        # #load the mean brain
-        # fixed = brainsss.load_fda_meanbrain()
-        lpf_min=np.min(lpf)
-        #do dff
-        with np.errstate(divide='ignore', invalid='ignore'):
-            dff = np.true_divide(hpf, lpf-lpf_min)
-        
-        #mask brain
-        # dff=np.where(fixed.numpy()[...,None]>0.1, dff, 0)
-        dff_dims = np.shape(dff)
-        printlog("dff data shape is {}".format(dff_dims))
-        # save dff data
-        with h5py.File(save_file, "w") as data_file:
-            data_file.create_dataset("data", data=dff.astype('float32')) 
-      
-    printlog(f"Df/f done. Data saved in {save_file}")
+        printlog(f"Df/f done. Data saved in {save_file}")
+    else:
+        printlog(f"Df/f already done. Data saved in {save_file}")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 

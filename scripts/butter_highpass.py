@@ -14,6 +14,7 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']
+    redo = args['redo']
     stepsize = 100
 
     full_load_path = os.path.join(load_directory, brain_file)
@@ -31,37 +32,39 @@ def main(args):
     ####################
     ### Butterworth ###
     ###################
+    if os.path.exists(save_file_h)==False or redo:
+        printlog("Beginning highpass filter")
+        with h5py.File(full_load_path, 'r') as hf:
+            brain = hf['data']
+            dims = np.shape(brain)
+            stepsize=100
+            printlog("Data shape is {}".format(dims))
+            
+            #filter requirements
+            order = 2
+            fs = 1.8 #sample rate, Hz
+            cutoff =0.01 #desired cutoff frequency of the filter, Hz
 
-    printlog("Beginning highpass filter")
-    with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data']
-        dims = np.shape(brain)
-        stepsize=100
-        printlog("Data shape is {}".format(dims))
-        
-        #filter requirements
-        order = 2
-        fs = 1.8 #sample rate, Hz
-        cutoff =0.01 #desired cutoff frequency of the filter, Hz
-
-        #create high pass filter data
-        hpf_total = np.zeros_like(brain)
-        steps = list(range(0,dims[-1],stepsize))
-        steps.append(dims[-1])
-        for z in range(dims[-2]):
-            hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
-            hpf_total[...,z,:]=hpf_warps
-        hpf_total = np.array(hpf_total)
-        dims_hpfw = np.shape(hpf_total)
-        printlog(f"High Pass Filter Data shape is {dims_hpfw}")
-        
-        #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
-        lpf_total = brain-hpf_total
-        del brain
-        with h5py.File(save_file_h, "w") as data_file:
-            data_file.create_dataset("hpf", data=hpf_total.astype('float32'))
-            data_file.create_dataset("lpf", data=lpf_total.astype('float32'))
-        printlog("Butter high pass done")
+            #create high pass filter data
+            hpf_total = np.zeros_like(brain)
+            steps = list(range(0,dims[-1],stepsize))
+            steps.append(dims[-1])
+            for z in range(dims[-2]):
+                hpf_warps = brain_utils.apply_butter_highpass(brain, z, cutoff, order, fs)
+                hpf_total[...,z,:]=hpf_warps
+            hpf_total = np.array(hpf_total)
+            dims_hpfw = np.shape(hpf_total)
+            printlog(f"High Pass Filter Data shape is {dims_hpfw}")
+            
+            #subtract the high pass filter data from the blurred data to get low pass filter data as f nought
+            lpf_total = brain-hpf_total
+            del brain
+            with h5py.File(save_file_h, "w") as data_file:
+                data_file.create_dataset("hpf", data=hpf_total.astype('float32'))
+                data_file.create_dataset("lpf", data=lpf_total.astype('float32'))
+            printlog("Butter high pass done")
+    else:
+        printlog("Butter high pass already done")
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
