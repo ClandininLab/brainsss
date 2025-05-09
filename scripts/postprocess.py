@@ -353,7 +353,7 @@ def main(args):
                 "later_directory": later_path, 
                 "event": event,
                 "dataset_path": dataset_path,
-                "flies": fly_dirs,
+                "flies": fly_num,
                 "ch_num": ch_num,
                 }
         script = "later_transfer.py"
