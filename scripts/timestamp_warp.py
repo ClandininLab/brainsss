@@ -18,6 +18,7 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']
+    redo = args['redo']
     stepsize = 100
 
     # full_load_path = os.path.join(load_directory, brain_file)
@@ -38,7 +39,7 @@ def main(args):
     printlog("Beginning TIMESTAMP WARP")
     
     #Timestamps need to be warped as well, load them here    
-    if save_file not in os.listdir(save_directory):
+    if save_file not in os.listdir(save_directory) or redo==True:
         timestamps = brainsss.load_timestamps(load_directory)    
         printlog("Timestamp shape is {}".format(np.shape(timestamps)))
         

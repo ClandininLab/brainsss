@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       BEST_FLIES=True
       shift
       ;;
+    --redo)
+      REDO=True
+      shift
+      ;;
     -m|--moco)
       MOCO=True
       shift
@@ -107,7 +111,7 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 \"MOCO\":\"$MOCO\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",,\"DFF\":\"$DFF\",\
 \"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\
 \"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
-\"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
+\"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"REDO\":\"$REDO\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
 \"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"H5_TO_NII\":\"$H5_TO_NII\",\"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\
 \"FUNC2ANAT\":\"$FUNC2ANAT\",\"BEST_FLIES\":\"$BEST_FLIES\",\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\""}"
 

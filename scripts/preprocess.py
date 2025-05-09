@@ -49,6 +49,12 @@ def main(args):
         # printlog('building flies')
         build_flies = True
         dir_to_build = args["BUILDFLIES"]
+    
+    
+    if args["REDO"] == "":
+        redo = False
+    else:
+        redo = True
 
     ### Parse user settings
     imports_path = settings["imports_path"]
@@ -621,6 +627,7 @@ def main(args):
             brain_file = f"functional_channel_{ch_num}_moco.h5"
                 
             args = {
+                "redo": redo,
                 "logfile": logfile,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
@@ -660,6 +667,7 @@ def main(args):
             brain_file = f"functional_channel_{ch_num}_moco.h5"
             
             args = {
+                "redo": redo,
                 "logfile": logfile,
                 "fly_directory": fly_directory,
                 "load_directory": load_directory,
@@ -700,6 +708,7 @@ def main(args):
             brain_file = "timestamps.h5"
             
             args = {
+                "redo": redo,
                 "logfile": logfile,
                 "fly_directory": fly_directory,
                 "load_directory": load_directory,
@@ -740,6 +749,7 @@ def main(args):
             brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
             
             args = {
+                "redo": redo,
                 "logfile": logfile,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
@@ -777,6 +787,7 @@ def main(args):
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
             
             args = {
+                "redo": redo,
                 "logfile": logfile,
                 "load_directory": load_directory,
                 "save_directory": save_directory,
@@ -817,6 +828,7 @@ def main(args):
             # brain_file_l = f"functional_channel_{ch_num}_moco_warp_blurred_lpf.h5"
             
             args = {
+                "redo": redo,
                 "logfile": logfile,
                 "load_directory": load_directory,
                 "save_directory": save_directory,

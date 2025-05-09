@@ -28,6 +28,7 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     brain_file = args['brain_file']
+    redo = args['redo']
     # stepsize = 100
 
     full_load_path = os.path.join(load_directory, brain_file)
@@ -44,30 +45,32 @@ def main(args):
     ################
     ### BLURRRRR ###
     ################
+    if os.path.exists(save_file)==False or redo:
+        printlog("Beginning blurring")
+        with h5py.File(full_load_path, 'r') as hf:
+            brain = hf['data'][:]
+            dims = np.shape(brain)
+            stepsize=100
 
-    printlog("Beginning blurring")
-    with h5py.File(full_load_path, 'r') as hf:
-        brain = hf['data'][:]
-        dims = np.shape(brain)
-        stepsize=100
 
+            printlog(f"Data shape is {dims}")
 
-        printlog(f"Data shape is {dims}")
-
-        #gaussian blur data for less noise
-        
-        warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
-        
-        warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
-        blur_dim=np.shape(warps_blur)
-        printlog(f"Blurred data shape is {blur_dim}")
-        
-        del brain
-        
-        with h5py.File(save_file, "w") as data_file:
-            data_file.create_dataset("data", data=warps_blur.astype('float32'))
-        # utils.save_h5_chunks(save_file, warps_blur, stepsize=stepsize)
-        printlog("Blurring done")
+            #gaussian blur data for less noise
+            
+            warps_blur = np.array([gaussian_filter(brain[..., i], sigma=2) for i in range(dims[-1])])
+            
+            warps_blur = np.moveaxis(np.array(warps_blur), 0, -1) 
+            blur_dim=np.shape(warps_blur)
+            printlog(f"Blurred data shape is {blur_dim}")
+            
+            del brain
+            
+            with h5py.File(save_file, "w") as data_file:
+                data_file.create_dataset("data", data=warps_blur.astype('float32'))
+            # utils.save_h5_chunks(save_file, warps_blur, stepsize=stepsize)
+            printlog("Blurring done")
+    else:
+        printlog("Blurring already done")
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
