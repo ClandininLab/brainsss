@@ -40,13 +40,17 @@ def main(args):
         event_times_struct = pickle.load(file)
         f=list(event_times_struct.keys())[0]
         behaviors=list(event_times_struct[f].keys())
+        printlog(f"Found behaviors: {behaviors}")
     
+    
+    range_start=-500; range_end=1900; steps=20
+    num_flies = len(flies)
     
     for behavior in behaviors:
+        printlog(f"\n=======================================")
+        printlog(f'Processing behavior: {behavior}')
         behave_dir = os.path.join(temp_dir, behavior)
-        range_start=-500; range_end=1900; steps=20
-        num_flies = len(flies)
-        printlog(f'Processing {behave_dir}')
+        printlog(f'Processing directory {behave_dir}')
         STA = []
         tf_files = [] 
         for file in os.listdir(behave_dir):
