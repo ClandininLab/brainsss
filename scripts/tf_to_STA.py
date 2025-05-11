@@ -44,6 +44,7 @@ def main(args):
     
     
     range_start=-500; range_end=1900; steps=20
+    printlog(f"Flies: {flies}")
     num_flies = len(flies)
     
     for behavior in behaviors:
@@ -63,7 +64,6 @@ def main(args):
                     save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}.h5')
         for file in tf_files:
             fly_val=file.split("_")[0]
-            printlog(f'Processing file {file} with fly {fly_val}') 
             if fly_val in flies:
                 load_path = os.path.join(behave_dir,file)
                 printlog(f"being processes {load_path}")
@@ -82,6 +82,8 @@ def main(args):
                 printlog(f'Temp shape is {np.shape(temp)}')
                 STA.append(temp)
                 printlog(f'STA is {np.shape(STA)}')
+            else:
+                printlog(f'Fly {fly_val} not in {flies}')
         STA=np.asarray(np.nanmean(STA, axis=0))
     
         # printlog(f'Saving STA to {save_file}')
