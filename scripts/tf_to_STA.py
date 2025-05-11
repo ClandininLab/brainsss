@@ -16,6 +16,7 @@ def main(args):
     temp_dir=args['temp_directory']
     cc = args['ch_num'] 
     event = args['event']
+    flies = args['fly_num']
     
     
     #####################
@@ -44,17 +45,19 @@ def main(args):
     for behavior in behaviors:
         behave_dir = os.path.join(temp_dir, behavior)
         range_start=-500; range_end=1900; steps=20
-        if event != None:
-            save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
-            add_on = event
-        else:
-            save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
-            add_on = ''
-        
-        STA=[]  
-
+        STA = []
+        tf_files = [] 
         for file in os.listdir(behave_dir):
-            if '_tf_' in file and add_on in file:
+            if event!=None:
+                if '_tf_' in file and f'_{cc}' in file and event in file:
+                    tf_files.append(file)
+                    save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
+            elif '_tf_' in file and f'_{cc}' in file and f'_{cc}_' not in file:
+                    tf_files.append(file)
+                    save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
+
+        for file in tf_files:
+            if file.split("_")[0] in flies:
                 load_path = os.path.join(behave_dir,file)
                 printlog(load_path)
                 temp=[]
