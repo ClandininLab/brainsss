@@ -61,12 +61,12 @@ def main(args):
             elif '_tf_' in file and f'_{cc}' in file and behavior in file and f'_{cc}_' not in file:
                     tf_files.append(file)
                     save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}.h5')
-        printlog(f'files being processed: {tf_files}')
         for file in tf_files:
             fly_val=file.split("_")[0]
+            printlog(f'Processing file {file} with fly {fly_val}') 
             if fly_val in flies:
                 load_path = os.path.join(behave_dir,file)
-                printlog(load_path)
+                printlog(f"being processes {load_path}")
                 temp=[]
                 with h5py.File(load_path, 'r+') as hf:    
                         ts = hf['time_stamps'][:]
