@@ -313,7 +313,7 @@ def main(args):
                 "later_path": later_path,
                 "event": event,
                 "ch_num": ch_num,
-                "flies": fly_num,
+                "fly_num": fly_num,
                 }
         script = "tf_to_STA.py"
         job_id = brainsss.sbatch(
