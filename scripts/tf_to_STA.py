@@ -46,6 +46,7 @@ def main(args):
         behave_dir = os.path.join(temp_dir, behavior)
         range_start=-500; range_end=1900; steps=20
         num_flies = len(flies)
+        printlog(f'Processing {behave_dir}')
         STA = []
         tf_files = [] 
         for file in os.listdir(behave_dir):
@@ -79,7 +80,7 @@ def main(args):
                 printlog(f'STA is {np.shape(STA)}')
         STA=np.asarray(np.nanmean(STA, axis=0))
     
-        printlog(f'Saving STA to {save_file}')
+        # printlog(f'Saving STA to {save_file}')
         with h5py.File(save_file, "w") as data_file:
                 data_file.create_dataset("data", data=STA.astype('float32'))
         
