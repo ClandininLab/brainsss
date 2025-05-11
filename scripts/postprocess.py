@@ -133,6 +133,13 @@ def main(args):
     if args["LATER_TRANSFER"] != "":
         later_transfer = True
 
+    if fly_dirs is None:
+        printlog(
+                "ERROR: you did not provide a directory to build flies from, nor a fly directory to process."
+            )
+        printlog("Aborting.")
+        return
+
 #     #################################
 #     ############# BEGIN #############
 #     #################################
