@@ -88,7 +88,8 @@ def main(args):
         fly_dirs = None
     elif args["BEST_FLIES"] != "":
         # fly_list = [234,239,240,241,242,249,250]
-        fly_num=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
+        # fly_num=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
+        fly_num=[226,227,228,234,239,240,241,242,249,250]
         fly_count = len(fly_num)
         printlog(f"Number of flies to process: {fly_count}")
         fly_dirs = []
@@ -97,6 +98,7 @@ def main(args):
             fly_dirs.append(fly_name)
         printlog(f"Flies to be processed {fly_dirs}")
     elif args["FLIES"] != "":
+        fly_num = None
         fly_dirs = args["FLIES"].split(",")
         printlog(f"Fly being processed: {fly_dirs}")
     ### add 'fly_' to beginning if it isn't there
@@ -304,6 +306,7 @@ def main(args):
                 "later_path": later_path,
                 "event": event,
                 "ch_num": ch_num,
+                "flies": fly_num,
                 }
         script = "tf_to_STA.py"
         job_id = brainsss.sbatch(
