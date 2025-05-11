@@ -45,17 +45,18 @@ def main(args):
     for behavior in behaviors:
         behave_dir = os.path.join(temp_dir, behavior)
         range_start=-500; range_end=1900; steps=20
+        num_flies = len(flies)
         STA = []
         tf_files = [] 
         for file in os.listdir(behave_dir):
             if event!=None:
                 if '_tf_' in file and f'_{cc}' in file and event in file:
                     tf_files.append(file)
-                    save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}_{event}.h5')
+                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_total_{steps}_{event}_.h5')
             elif '_tf_' in file and f'_{cc}' in file and f'_{cc}_' not in file:
                     tf_files.append(file)
-                    save_file= os.path.join(behave_dir, f'STA_{cc}_total_{steps}.h5')
-
+                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_total_{steps}.h5')
+        
         for file in tf_files:
             if file.split("_")[0] in flies:
                 load_path = os.path.join(behave_dir,file)
