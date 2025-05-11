@@ -50,15 +50,16 @@ def main(args):
         tf_files = [] 
         for file in os.listdir(behave_dir):
             if event!=None:
-                if '_tf_' in file and f'_{cc}' in file and event in file:
+                if '_tf_' in file and f'_{cc}' in file and behavior in file and event in file:
                     tf_files.append(file)
-                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_total_{steps}_{event}_.h5')
-            elif '_tf_' in file and f'_{cc}' in file and f'_{cc}_' not in file:
+                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}_{event}_.h5')
+            elif '_tf_' in file and f'_{cc}' in file and behavior in file and f'_{cc}_' not in file:
                     tf_files.append(file)
-                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_total_{steps}.h5')
-        
+                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}.h5')
+        printlog(f'files being processed: {tf_files}')
         for file in tf_files:
-            if file.split("_")[0] in flies:
+            fly_val=file.split("_")[0]
+            if fly_val in flies:
                 load_path = os.path.join(behave_dir,file)
                 printlog(load_path)
                 temp=[]
