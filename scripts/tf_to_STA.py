@@ -63,7 +63,7 @@ def main(args):
                     tf_files.append(file)
                     save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}.h5')
         for file in tf_files:
-            fly_val=file.split("_")[0]
+            fly_val=int(file.split("_")[0])
             if fly_val in flies:
                 load_path = os.path.join(behave_dir,file)
                 printlog(f"being processes {load_path}")
