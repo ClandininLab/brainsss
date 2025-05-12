@@ -43,7 +43,7 @@ def main(args):
         printlog(f"Found behaviors: {behaviors}")
     
     
-    range_start=-500; range_end=1900; steps=20
+    range_start=-500; range_end=1900; steps=100
     printlog(f"Flies: {flies}")
     num_flies = len(flies)
     
