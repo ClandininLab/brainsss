@@ -108,7 +108,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
-\"MOCO\":\"$MOCO\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",,\"DFF\":\"$DFF\",\
+\"MOCO\":\"$MOCO\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\"DFF\":\"$DFF\",\
 \"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\
 \"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
 \"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"REDO\":\"$REDO\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
@@ -117,4 +117,5 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 
 ml python/3.6
 date
+echo "Running: python3 -u ./postprocess.py $ARGS"
 python3 -u ./preprocess.py $ARGS
