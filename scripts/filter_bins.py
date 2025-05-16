@@ -17,6 +17,7 @@ def main(args):
     timestamp_file = args['timestamp_file']
     event = args['event']
     redo = args['redo']
+    cc = args['cc']
     # behavior = args['behavior']
 
     load_path = os.path.join(fly_directory, timestamp_file)
@@ -43,12 +44,12 @@ def main(args):
     for behavior in behaviors:
         if event != None:
             event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-            filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}_{event}.h5')
-            file_name = f'filter_needs_{behavior}_{event}.h5'
+            filter_needs_file = os.path.join(save_directory, f'filter_needs_{cc}_{behavior}_{event}.h5')
+            file_name = f'filter_needs_{cc}_{behavior}_{event}.h5'
         else:
             event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
-            filter_needs_file = os.path.join(save_directory, f'filter_needs_{behavior}.h5')
-            file_name = f'filter_needs_{behavior}.h5'
+            filter_needs_file = os.path.join(save_directory, f'filter_needs_{cc}_{behavior}.h5')
+            file_name = f'filter_needs_{cc}_{behavior}.h5'
         printlog(f"Event times from {event_times_path}")
         if file_name not in os.listdir(save_directory) or redo:
             with h5py.File(load_path, 'r') as hf:
