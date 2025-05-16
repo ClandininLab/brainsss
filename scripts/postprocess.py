@@ -327,6 +327,7 @@ def main(args):
             mem='250GB',
             nice=nice,
             nodes=nodes,
+            global_resources=True,
         )
         brainsss.wait_for_job(job_id, logfile, com_path)
     
@@ -355,6 +356,7 @@ def main(args):
                 mem='250GB',
                 nice=nice,
                 nodes=nodes,
+                global_resources=True,
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
             
