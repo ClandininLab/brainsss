@@ -169,6 +169,7 @@ def main(args):
                 "redo": redo,
                 "later_path": later_path,
                 "event": event,
+                "cc": ch_num,
                 "fly": fly,
                 "fly_directory": fly_directory,
                 "save_directory": save_directory,
@@ -203,7 +204,6 @@ def main(args):
                 os.mkdir(save_directory)
             
             timestamp_file = "warp/timestamps_warp.h5"
-            filter_file = "filter_needs.h5"
             args = {
                 "logfile": logfile,
                 "redo": redo,
@@ -213,6 +213,7 @@ def main(args):
                 "save_directory": save_directory,
                 "timestamp_file": timestamp_file,
                 "filter_file": filter_file,
+                "cc": ch_num,
             }
             script = "relative_ts.py"
             job_id = brainsss.sbatch(
@@ -246,8 +247,6 @@ def main(args):
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             timestamp_file = "warp/timestamps_warp.h5"
-            filter_file = "filter_needs.h5"
-            ts_rel_file = "ts_rel_odd_mask.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
@@ -258,8 +257,7 @@ def main(args):
                 "save_directory": save_directory,
                 "brain_file": brain_file,
                 "timestamp_file": timestamp_file,
-                "filter_file": filter_file,
-                "ts_rel_file": ts_rel_file,
+                "cc": ch_num,
             }
             script = "temp_filter.py"
             job_id = brainsss.sbatch(
@@ -327,7 +325,7 @@ def main(args):
             mem='250GB',
             nice=nice,
             nodes=nodes,
-            global_resources=True,
+            # global_resources=True,
         )
         brainsss.wait_for_job(job_id, logfile, com_path)
     

@@ -19,6 +19,7 @@ def main(args):
     later_path = args['later_path']
     event= args['event']
     redo = args['redo']
+    cc = args['cc']
     stepsize = 100
 
     brain_load_path = os.path.join(load_directory, brain_file)
@@ -49,11 +50,13 @@ def main(args):
         behaviors=list(event_times_struct[f].keys())
    
     for behavior in behaviors:
-        filter_load_path=os.path.join(save_directory, f"filter_needs_{behavior}.h5")
-        ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{behavior}.h5")
         if event != None:
+            filter_load_path=os.path.join(save_directory, f"filter_needs_{cc}_{behavior}.h5")
+            ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{cc}_{behavior}.h5")
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}_{event}.h5')
         else:
+            filter_load_path=os.path.join(save_directory, f"filter_needs_{cc}_{behavior}.h5")
+            ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{cc}_{behavior}.h5")
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
         if os.path.exists(save_file)==False or redo:
             #load brain

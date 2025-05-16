@@ -17,6 +17,7 @@ def main(args):
     later_path = args['later_path']
     event= args['event']
     redo = args['redo']
+    cc = args['cc']
     
 
     ts_load_path = os.path.join(fly_directory, timestamp_file)
@@ -48,11 +49,11 @@ def main(args):
             
     for behavior in behaviors:
         if event != None:
-            save_name=f'ts_rel_odd_mask_{behavior}_{event}.h5'
-            load_name=f'filter_needs_{behavior}_{event}.h5'
+            save_name=f'ts_rel_odd_mask_{cc}_{behavior}_{event}.h5'
+            load_name=f'filter_needs_{cc}_{behavior}_{event}.h5'
         else:
-            save_name=f'ts_rel_odd_mask_{behavior}.h5'
-            load_name=f'filter_needs_{behavior}.h5'
+            save_name=f'ts_rel_odd_mask_{cc}_{behavior}.h5'
+            load_name=f'filter_needs_{cc}_{behavior}.h5'
         if save_name not in os.listdir(save_directory) or redo:
             #load brain
             with h5py.File(ts_load_path, 'r') as tf, \
