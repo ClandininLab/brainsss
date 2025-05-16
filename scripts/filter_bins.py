@@ -113,6 +113,8 @@ def main(args):
                     
                     # Manually invoke the garbage collector
                     gc.collect()
+                else:
+                    printlog(f"Behavior {behavior} not found in event times structure.")
                         
         else:
             printlog(f"Filter bins for {behavior} already exists. Skipping...")
