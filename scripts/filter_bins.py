@@ -103,9 +103,9 @@ def main(args):
                 
                     #save filter_needs
                     with h5py.File(filter_needs_file, "w") as data_file:
-                                data_file.create_dataset("bins", data=bin_idx)
-                                data_file.create_dataset("loom_starts", data=starts_loom_ms)
-                                data_file.create_dataset("bin_shape", data=bin_shape)
+                                data_file.create_dataset("bins", data=bin_idx, compression="gzip", compression_opts=4, chunks=True,shuffle=True)
+                                data_file.create_dataset("loom_starts", data=starts_loom_ms,  compression="gzip", compression_opts=4)
+                                data_file.create_dataset("bin_shape", data=bin_shape,  compression="gzip", compression_opts=4)
                     
                     printlog(f"Array for temp filter done. Data saved in {filter_needs_file}")
                 # Delete variables to free up memory

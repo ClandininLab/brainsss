@@ -118,8 +118,8 @@ def main(args):
                 
                 
                 with h5py.File(save_file, "w") as data_file:
-                        data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32'))
-                        data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'))
+                        data_file.create_dataset("brain", data=within_bin_brain_np.astype('float32') compression="gzip", compression_opts=4, chunks=True, shuffle=True)
+                        data_file.create_dataset("time_stamps", data=within_bin_ts_rel_np.astype('float32'),  compression="gzip", compression_opts=4, chunks=True, shuffle=True)
                 
                 printlog(f"Temporal filtering for {behavior} is done. Data saved in {save_file}")
                 # Delete variables to free up memory
