@@ -81,8 +81,8 @@ def main(args):
 
                 save_file = os.path.join(save_directory, save_name)
                 with h5py.File(save_file, "w") as data_file:
-                        data_file.create_dataset("odd_mask", data=odd_mask.astype('bool'))
-                        data_file.create_dataset("ts_rel", data=ts.astype('float32'))
+                        data_file.create_dataset("odd_mask", data=odd_mask.astype('bool'),  compression="gzip", compression_opts=4)
+                        data_file.create_dataset("ts_rel", data=ts.astype('float32') compression="gzip", compression_opts=4, chunks=True), shuffle=True)
                         
                 printlog(f"Relative timestamps for {behavior} and odd mask creation done. Data saved in {save_file}")   
                
