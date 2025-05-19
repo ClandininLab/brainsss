@@ -93,9 +93,11 @@ def main(args):
                     # Read in z plane
                     plane = brain_all[:,:,z,:]
                     plane_ts_rel = ts_rel[:,:,z,:]
-
+                    printlog(F"At {z}")
                     for x in range(nx):
+                        printlog(F"At {x}")
                         for y in range(ny):
+                            printlog(F"At {y}")
                             within_bin_vox = plane[x, y, odd_mask[x,y,z,:]]
                             within_bin_vox_ts_rel = plane_ts_rel[x, y, odd_mask[x,y,z,:]]
                             
