@@ -2,6 +2,7 @@
     "imports_path": "/oak/stanford/groups/trc/data/Ilana/2P/imports",
     "dataset_path": "/oak/stanford/groups/trc/data/Ilana/2P/data",
     "later_path": "/oak/stanford/groups/trc/data/Ilana/2P/data/later",
+    "scratch_path": "/scratch/users/ilanazs",
     "fictrac_qc": "True",
     "bleaching_qc": "True",
     "temporal_mean_brain_pre": "True",
