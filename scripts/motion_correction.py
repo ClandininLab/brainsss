@@ -11,9 +11,39 @@ import ants
 import datetime
 import pyfiglet
 import matplotlib.pyplot as plt
+import gzip
+import tempfile
+import shutil
 from time import time
 from time import strftime
 from time import sleep
+
+def decompress_nii_gz(filepath, directory, printlog=print):
+    """
+    Decompress a .nii.gz file to a temporary file and return the path to the decompressed file.
+    
+    Args:
+        filepath: Path to the .nii.gz file
+		directory: Directory to save the decompressed file
+        printlog: Function to use for logging
+        
+    Returns:
+        Path to the decompressed .nii file
+    """
+    if not filepath.endswith('.nii.gz'):
+        return filepath
+    
+    printlog(f"Decompressing {filepath} for faster processing...")
+    temp_file = os.path.join(directory, os.path.basename(filepath)[:-3])
+    print(f"Temporary file: {temp_file}")
+    
+	# Create a temporary decompressed file using gzip
+    with gzip.open(filepath, 'rb') as f_in:
+        with open(temp_file, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+    printlog(f"Decompressed to temporary file: {temp_file}")
+    return temp_file
 
 def main(args):
 	# REQUIRED args
@@ -26,12 +56,19 @@ def main(args):
 	# OPTIONAL PARAMETERS
 	type_of_transform = args.get('type_of_transform', 'SyN')  # For ants.registration(), see ANTsPy docs | Default 'SyN'
 	output_format = args.get('output_format', 'h5')  #  Save format for registered image data | Default h5. Also allowed: 'nii'
-	assert output_format in ['h5', 'nii'], 'OPTIONAL PARAM output_format MUST BE ONE OF: "h5", "nii"'
+	assert output_format in ['h5', 'nii', 'nii.gz'], 'OPTIONAL PARAM output_format MUST BE ONE OF: "h5", "nii", "nii.gz"'
 	flow_sigma = int(args.get('flow_sigma', 3))  # For ants.registration(), higher sigma focuses on coarser features | Default 3
 	total_sigma = int(args.get('total_sigma', 0))  # For ants.registration(), higher values will restrict the amount of deformation allowed | Default 0
 	meanbrain_n_frames = args.get('meanbrain_n_frames', None)  # First n frames to average over when computing mean/fixed brain | Default None (average over all frames)
 	aff_metric = args.get('aff_metric', 'mattes')  # For ants.registration(), metric for affine registration | Default 'mattes'. Also allowed: 'GC', 'meansquares'
 	meanbrain_target = args.get('meanbrain_target', None)  # filename of precomputed target meanbrain to register to
+
+	# Create a temporary directory
+	if 'SCRATCH' in os.environ: #Sherlock
+		temp_dir = tempfile.TemporaryDirectory(dir=os.environ['SCRATCH'])
+	else:
+		# If not, use the default temporary directory
+		temp_dir = tempfile.TemporaryDirectory()
 
 	#####################
 	### SETUP LOGGING ###
@@ -46,7 +83,7 @@ def main(args):
 	except:
 		# no logfile provided; create one
 		# this will be the case if this script was directly run from a .sh file
-		logfile = './logs/' + strftime("%Y%m%d-%H%M%S") + '.txt'
+		logfile = os.path.join(os.getcwd(), 'logs', strftime("%Y%m%d-%H%M%S") + '.txt')
 		printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 		sys.stderr = brainsss.Logger_stderr_sherlock(logfile)
 		save_type = 'curr_dir'
@@ -103,8 +140,8 @@ def main(args):
 	filepath_brain_master = os.path.join(dataset_path, brain_master)
 
 	### Quit if no master brain
-	if not brain_master.endswith('.nii'):
-		printlog("Brain master does not end with .nii")
+	if not brain_master.endswith('.nii') and not brain_master.endswith('.nii.gz'):
+		printlog("Brain master does not end with .nii or .nii.gz.")
 		printlog(F"{'   Aborting Moco   ':*^{width}}")
 		return
 	if not os.path.exists(filepath_brain_master):
@@ -113,17 +150,29 @@ def main(args):
 		return
 
 	### Brain mirror is optional
+	filepath_brain_mirror = None
 	if brain_mirror is not None:
 		filepath_brain_mirror = os.path.join(dataset_path, brain_mirror)
-		if not brain_mirror.endswith('.nii'):
-			printlog("Brain mirror does not end with .nii. Continuing without a mirror brain.")
-			# filepath_brain_mirror = None
+		if not brain_mirror.endswith('.nii') and not brain_mirror.endswith('.nii.gz'):
+			printlog("Brain mirror does not end with .nii or .nii.gz. Continuing without a mirror brain.")
 			brain_mirror = None
-		if not os.path.exists(filepath_brain_mirror):
+			filepath_brain_mirror = None
+		elif not os.path.exists(filepath_brain_mirror):
 			printlog(F"Could not find{filepath_brain_mirror:.>{width-8}}")
 			printlog("Will continue without a mirror brain.")
-			# filepath_brain_mirror = None
 			brain_mirror = None
+			filepath_brain_mirror = None
+		
+	# Decompress gzipped files if necessary for faster processing
+	if filepath_brain_master.endswith('.nii.gz'):
+		filepath_brain_master_orig = filepath_brain_master
+		filepath_brain_master = decompress_nii_gz(filepath_brain_master, temp_dir.name, printlog)
+		printlog(F"Using decompressed master brain{filepath_brain_master:.>{width-28}}")
+	
+	if filepath_brain_mirror is not None and filepath_brain_mirror.endswith('.nii.gz'):
+		filepath_brain_mirror_orig = filepath_brain_mirror
+		filepath_brain_mirror = decompress_nii_gz(filepath_brain_mirror, temp_dir.name, printlog)
+		printlog(F"Using decompressed mirror brain{filepath_brain_mirror:.>{width-28}}")
 
 	########################################
 	### Calculate Meanbrain of Channel 1 ###
@@ -139,7 +188,7 @@ def main(args):
 	if meanbrain_target is not None:
 		existing_meanbrain_file = meanbrain_target
 	else:
-		existing_meanbrain_file = brain_master[:-4] + '_mean.nii'
+		existing_meanbrain_file = brain_master[:-4] + '_mean.nii.gz'
 
 	existing_meanbrain_path = os.path.join(dataset_path, existing_meanbrain_file)
 	if os.path.exists(existing_meanbrain_path):
@@ -311,11 +360,12 @@ def main(args):
 	save_motion_figure(transform_matrix, dataset_path, moco_dir, scantype, printlog)
 
 	### OPTIONAL: SAVE REGISTERED IMAGES AS NII ###
-	if output_format == 'nii':
+	if output_format.startswith('nii'):
 		printlog('saving .nii images')
+		gzip = output_format.endswith('gz')
 
 		# Save master:
-		nii_savefile_master = h5_to_nii(savefile_master)
+		nii_savefile_master = h5_to_nii(savefile_master, gzip=gzip)
 		printlog(F"nii_savefile_master: {str(nii_savefile_master)}")
 		if nii_savefile_master is not None: # If .nii conversion went OK, delete h5 file
 			printlog('deleting .h5 file at {}'.format(savefile_master))
@@ -325,7 +375,7 @@ def main(args):
 
 		# Save mirror:
 		if brain_mirror is not None:
-			nii_savefile_mirror = h5_to_nii(savefile_mirror)
+			nii_savefile_mirror = h5_to_nii(savefile_mirror, gzip=gzip)
 			printlog(F"nii_savefile_mirror: {str(nii_savefile_mirror)}")
 			if nii_savefile_mirror is not None: # If .nii conversion went OK, delete h5 file
 				printlog('deleting .h5 file at {}'.format(savefile_mirror))
@@ -333,6 +383,8 @@ def main(args):
 			else:
 				printlog('nii conversion failed for {}'.format(savefile_mirror))
 
+	### DELETE TEMP FILES ###
+	temp_dir.cleanup()
 
 def make_empty_h5(directory, file, brain_dims, save_type):
 	if save_type == 'curr_dir':
@@ -416,8 +468,9 @@ def sec_to_hms(t):
 	return ':'.join([hrs, mins, secs])
 
 
-def h5_to_nii(h5_path):
-	nii_savefile = h5_path.split('.')[0] + '.nii'
+def h5_to_nii(h5_path, gzip=False):
+	extension = '.nii.gz' if gzip else '.nii'
+	nii_savefile = h5_path.split('.')[0] + extension
 	with h5py.File(h5_path, 'r+') as h5_file:
 		image_array = h5_file.get("data")[:].astype('uint16')
 
