@@ -245,7 +245,8 @@ def main(args):
             scratch_directory = os.path.join(scratch_path, fly)
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
-            timestamp_file = "warp/timestamps_warp.h5"
+            # timestamp_file = "warp/timestamps_warp.h5" ##### CHANGED TO TRY SCRATCH WILL NEED TO BE CHANGED BACK
+            timestamp_file = "timestamps_warp.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
