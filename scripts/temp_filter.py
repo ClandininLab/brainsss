@@ -13,7 +13,7 @@ import pickle
 def main(args):
     fly_directory = args['fly_directory']
     load_directory = args['load_directory']
-    save_directory = args['save_directory']
+    scratch_dir = args['scratch_directory']
     brain_file = args['brain_file']
     timestamp_file = args['timestamp_file']
     later_path = args['later_path']
@@ -24,6 +24,7 @@ def main(args):
 
     brain_load_path = os.path.join(load_directory, brain_file)
     ts_load_path = os.path.join(fly_directory, timestamp_file)
+    save_directory = os.path.join(fly_directory, "temp_filter")
 
     #####################
     ### SETUP LOGGING ###
@@ -51,12 +52,12 @@ def main(args):
    
     for behavior in behaviors:
         if event != None:
-            filter_load_path=os.path.join(save_directory, f"filter_needs_{cc}_{behavior}_{event}.h5")
-            ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{cc}_{behavior}_{event}.h5")
+            filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}_{behavior}_{event}.h5")
+            ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}_{behavior}_{event}.h5")
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}_{event}.h5')
         else:
-            filter_load_path=os.path.join(save_directory, f"filter_needs_{cc}_{behavior}.h5")
-            ts_rel_load_path=os.path.join(save_directory, f"ts_rel_odd_mask_{cc}_{behavior}.h5")
+            filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}_{behavior}.h5")
+            ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}_{behavior}.h5")
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
         if os.path.exists(save_file)==False or redo:
             #load brain

@@ -61,6 +61,7 @@ def main(args):
     ### Parse user settings
     dataset_path = settings["dataset_path"]
     later_path=settings["later_path"]
+    scratch_path=settings["scratch_path"]
     
     if postprocess:
         filter_bins = brainsss.parse_true_false(settings.get("filter_bins", False))
@@ -159,7 +160,8 @@ def main(args):
 
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
-            save_directory = os.path.join(fly_directory, "temp_filter")
+            # save_directory = os.path.join(fly_directory, "temp_filter")
+            save_directory = os.path.join(scratch_path, fly)
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
@@ -199,7 +201,7 @@ def main(args):
 
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
-            save_directory = os.path.join(fly_directory, "temp_filter")
+            save_directory = os.path.join(scratch_path, fly)
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
@@ -240,9 +242,7 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             load_directory = os.path.join(fly_directory, "dff")
-            save_directory = os.path.join(fly_directory, "temp_filter")
-            if not os.path.exists(save_directory):
-                os.mkdir(save_directory)
+            scratch_directory = os.path.join(scratch_path, fly)
             
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             timestamp_file = "warp/timestamps_warp.h5"
@@ -253,7 +253,7 @@ def main(args):
                 "later_path": later_path,
                 "event": event,
                 "load_directory": load_directory,
-                "save_directory": save_directory,
+                "scratch_directory": scratch_directory,
                 "brain_file": brain_file,
                 "timestamp_file": timestamp_file,
                 "cc": ch_num,
