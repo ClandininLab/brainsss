@@ -6,7 +6,7 @@ import json
 import brainsss
 import h5py
 import ants
-import psutil
+import time
 import gc
 import pickle
 
@@ -22,8 +22,8 @@ def main(args):
     cc = args['cc']
     stepsize = 100
 
-    brain_load_path = os.path.join(load_directory, brain_file)
-    ts_load_path = os.path.join(fly_directory, timestamp_file)
+    brain_load_path = os.path.join(scratch_dir, brain_file)
+    ts_load_path = os.path.join(scratch_dir, timestamp_file)
     save_directory = os.path.join(fly_directory, "temp_filter")
 
     #####################
@@ -87,18 +87,16 @@ def main(args):
 
                 within_bin_brain_np = np.full((nx, ny, nz, max_len), np.nan)
                 within_bin_ts_rel_np = np.full((nx, ny, nz, max_len), np.nan)
-
+                start_time = time.time()
                 #### Loop over z planes (io access is done nz times!!)
                 for z in (range(nz)):
-
+                    elapsed = time.time() - start_time
+                    printlog(f"Elapsed time for z plane {z} is {elapsed:.2f} seconds")
                     # Read in z plane
                     plane = brain_all[:,:,z,:]
                     plane_ts_rel = ts_rel[:,:,z,:]
-                    printlog(F"At {z}")
                     for x in range(nx):
-                        printlog(F"At {x}")
                         for y in range(ny):
-                            printlog(F"At {y}")
                             within_bin_vox = plane[x, y, odd_mask[x,y,z,:]]
                             within_bin_vox_ts_rel = plane_ts_rel[x, y, odd_mask[x,y,z,:]]
                             
