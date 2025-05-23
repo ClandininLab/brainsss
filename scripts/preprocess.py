@@ -59,7 +59,8 @@ def main(args):
         temporal_mean_brain_pre = brainsss.parse_true_false(settings.get('temporal_mean_brain_pre',False))
         motion_correction = brainsss.parse_true_false(settings.get('motion_correction',False))
         temporal_mean_brain_post = brainsss.parse_true_false(settings.get('temporal_mean_brain_post',False))
-        zscore = brainsss.parse_true_false(settings.get('zscore',False))
+	background_subtraction = brainsss.parse_true_false(settings.get('background_subtraction', False))
+       	zscore = brainsss.parse_true_false(settings.get('zscore',False))
         highpass = brainsss.parse_true_false(settings.get('highpass',False))
         correlation = brainsss.parse_true_false(settings.get('correlation', False))
         STA = brainsss.parse_true_false(settings.get('STA', False))
@@ -131,6 +132,8 @@ def main(args):
         motion_correction = True
     if args['TEMPORAL_MEAN_BRAIN_POST'] != '':
         temporal_mean_brain_post = True
+    if args['BACKGROUND_SUBTRACTION'] != '':
+	background_subtraction = True
     if args['ZSCORE'] != '':
         zscore = True
     if args['HIGHPASS'] != '':
@@ -362,6 +365,28 @@ def main(args):
         ### currently submitting these jobs simultaneously since using global resources
         brainsss.wait_for_job(job_id, logfile, com_path)
 
+    if background_subtraction:
+
+        ##############################
+        ### BACKGROUND SUBTRACTION ###
+        ##############################
+
+	for func in funcs:
+            load_directory = os.path.join(func, 'moco')
+            save_directory = os.path.join(func)
+            brain_file = 'functional_channel_2_moco.h5'
+
+            args = {'logfile': logfile, 'load_directory': load_directory,'save_directory': save_directory,'brain_file': brain_file}
+            script = 'background_subtraction.py'
+            job_id = brainsss.sbatch(jobname='background_subtraction',
+                                 script=os.path.join(scripts_path, script),
+                                 modules=modules,
+                                 args=args,
+                                 logfile=logfile,
+                                 time=2, mem=24,
+                                 nice=nice, nodes=nodes)
+        brainsss.wait_for_job(job_id, logfile, com_path)
+    
     if zscore:
 
         ##############
