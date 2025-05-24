@@ -415,14 +415,34 @@ def main(args):
             if not os.path.exists(input_nii):
                 printlog(f"WARNING: NIfTI file not found for bleedthrough removal: {input_nii}")
                 continue
-            cmd = f'python "{os.path.join(scripts_path, "remove_bleedthrough_line.py")}" "{input_nii}" --method percentile --percentile 10 --channel 0'
-            script_path = os.path.join(scripts_path, 'com', f'rmbldthr_{time.time():.0f}.sh')
-            with open(script_path, 'w') as f:
-                f.write("#!/bin/bash\n")
-                f.write(cmd + "\n")
-            os.chmod(script_path, 0o755)
-            job_id = brainsss.sbatch(jobname='rmbldthr', script=script_path, modules=modules, args={}, logfile=logfile, time=3, mem=24, nice=nice, nodes=nodes)
+            args = {
+                'logfile': logfile,
+                'img_path': input_nii,
+                'method': 'percentile',
+                'percentile': 10,
+                'channel': 0
+            }
+            script = 'remove_bleedthrough_line.py'
+            job_id = brainsss.sbatch(
+                jobname='rmbldthr',
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=3,
+                mem=24,
+                nice=nice,
+                nodes=nodes
+            )
             brainsss.wait_for_job(job_id, logfile, com_path)
+            # #cmd = f'python "{os.path.join(scripts_path, "remove_bleedthrough_line.py")}" "{input_nii}" --method percentile --percentile 10 --channel 0'
+            # script_path = os.path.join(scripts_path, 'com', f'rmbldthr_{time.time():.0f}.sh')
+            # with open(script_path, 'w') as f:
+            #     f.write("#!/bin/bash\n")
+            #     f.write(cmd + "\n")
+            # os.chmod(script_path, 0o755)
+            # job_id = brainsss.sbatch(jobname='rmbldthr', script=script_path, modules=modules, args={}, logfile=logfile, time=3, mem=24, nice=nice, nodes=nodes)
+            # brainsss.wait_for_job(job_id, logfile, com_path)
 
 
     if h5_back_conversion:
