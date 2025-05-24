@@ -57,7 +57,7 @@ class BleedthroughRemoverLine:
             save_dir = os.path.join(root_save_dir, 'bts', 'line', 'percentile', f'p{self.percentile_threshold}')
             self.suffix = f'_bts_line_p{self.percentile_threshold}'
         else:  # kernel method
-            save_dir = os.path.join(root_save_dir, 'bts', 'line', 'kernel' f'hw{self.half_width}')
+            save_dir = os.path.join(root_save_dir, 'bts', 'line', 'kernel', f'hw{self.half_width}')
             self.suffix = f'_bts_line_hw{self.half_width}'
             
         if not os.path.exists(save_dir):
