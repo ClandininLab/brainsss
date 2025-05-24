@@ -52,13 +52,20 @@ class BleedthroughRemoverLine:
 
         if root_save_dir is None:
             root_save_dir = os.path.dirname(self.path)
-        
+       #Minseung original code 
+        # if self.method == 'percentile':
+        #     save_dir = os.path.join(root_save_dir, 'bts', 'line', 'percentile', f'p{self.percentile_threshold}')
+        #     self.suffix = f'_bts_line_p{self.percentile_threshold}'
+        # else:  # kernel method
+        #     save_dir = os.path.join(root_save_dir, 'bts', 'line', 'kernel', f'hw{self.half_width}')
+        #     self.suffix = f'_bts_line_hw{self.half_width}'
+        #Yandan's try to aviod f'
         if self.method == 'percentile':
-            save_dir = os.path.join(root_save_dir, 'bts', 'line', 'percentile', f'p{self.percentile_threshold}')
-            self.suffix = f'_bts_line_p{self.percentile_threshold}'
+            save_dir = os.path.join(root_save_dir, 'bts', 'line', 'percentile', 'p{}'.format(self.percentile_threshold))
+            self.suffix = '_bts_line_p{}'.format(self.percentile_threshold)
         else:  # kernel method
-            save_dir = os.path.join(root_save_dir, 'bts', 'line', 'kernel', f'hw{self.half_width}')
-            self.suffix = f'_bts_line_hw{self.half_width}'
+            save_dir = os.path.join(root_save_dir, 'bts', 'line', 'kernel', 'hw{}'.format(self.half_width))
+            self.suffix = '_bts_line_hw{}'.format(self.half_width)
             
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
@@ -157,7 +164,9 @@ class BleedthroughRemoverLine:
             for j in range(show_bg_scaled.shape[1]):  # for each y-line
                 show_bg_scaled[i, j, self.bg_masks[i][j]] = int16_max
                     
-        save_name = os.path.join(self.save_dir, self.file_head+f'{self.suffix}_bg_visualization.tif')
+        #save_name = os.path.join(self.save_dir, self.file_head+f'{self.suffix}_bg_visualization.tif')
+        save_name = os.path.join(self.save_dir, '{}{}_bg_visualization.tif'.format(self.file_head, self.suffix))
+
         io.imsave(save_name, np.round(show_bg_scaled).astype('int16'))
         
         # Create a figure showing a subset of z-slices
@@ -174,7 +183,8 @@ class BleedthroughRemoverLine:
         for i, z in enumerate(z_indices):
             # Original image - flipped upside down
             axes[0, i].imshow(np.flipud(orig_img[:,:,z]), cmap='gray')
-            axes[0, i].set_title(f"Z={z}")
+            #axes[0, i].set_title(f"Z={z}")
+            axes[0, i].set_title("Z={}".format(z))
             axes[0, i].axis('off')
             
             # Background-marked image with color overlay - flipped upside down            
@@ -194,14 +204,19 @@ class BleedthroughRemoverLine:
             axes[1, i].imshow(np.flipud(bg_overlay), interpolation='nearest')
             
             if self.method == 'percentile':
-                axes[1, i].set_title(f"Background (p{self.percentile_threshold})")
+                #axes[1, i].set_title(f"Background (p{self.percentile_threshold})")
+                axes[1, i].set_title("Background (p{})".format(self.percentile_threshold))
+
             else:
-                axes[1, i].set_title(f"Background (hw{self.half_width})")
+                #axes[1, i].set_title(f"Background (hw{self.half_width})")
+                axes[1, i].set_title("Background (hw{})".format(self.half_width))
+
                 
             axes[1, i].axis('off')
         
         plt.tight_layout()
-        plt.savefig(os.path.join(self.save_dir, self.file_head+f'{self.suffix}_bg_visualization.png'))
+        #plt.savefig(os.path.join(self.save_dir, self.file_head+f'{self.suffix}_bg_visualization.png'))
+        plt.savefig(os.path.join(self.save_dir, self.file_head + '{}_bg_visualization.png'.format(self.suffix)))
         plt.close()
 
     def remove_bg(self):
@@ -303,18 +318,32 @@ class BleedthroughRemoverLine:
         ax2.set_ylabel('Power Spectral Density')
         ax2.set_title('After Background Removal')
         
-        # Add a main title and adjust layout
-        if self.method == 'percentile':
-            fig.suptitle(f'Spectrum Comparison (Percentile={self.percentile_threshold})', fontsize=16)
-        else:
-            fig.suptitle(f'Spectrum Comparison (Half Width={self.half_width})', fontsize=16)
+        # # Add a main title and adjust layout
+        # if self.method == 'percentile':
+        #     fig.suptitle(f'Spectrum Comparison (Percentile={self.percentile_threshold})', fontsize=16)
+        # else:
+        #     fig.suptitle(f'Spectrum Comparison (Half Width={self.half_width})', fontsize=16)
             
-        plt.tight_layout()
+        # plt.tight_layout()
+        # Save the combined figure
+        #plt.savefig(os.path.join(self.save_dir, self.file_head+f'{self.suffix}_spectrum_comparison.png'))
+        #plt.close()
         
         # Save the combined figure
-        plt.savefig(os.path.join(self.save_dir, self.file_head+f'{self.suffix}_spectrum_comparison.png'))
+        #plt.savefig(os.path.join(self.save_dir, self.file_head+f'{self.suffix}_spectrum_comparison.png'))
+        #plt.close()
+        # Add a main title and adjust layout
+        if self.method == 'percentile':
+            fig.suptitle('Spectrum Comparison (Percentile={})'.format(self.percentile_threshold), fontsize=16)
+        else:
+            fig.suptitle('Spectrum Comparison (Half Width={})'.format(self.half_width), fontsize=16)
+
+        plt.tight_layout()
+
+        # Save the combined figure
+        plt.savefig(os.path.join(self.save_dir, self.file_head + '{}_spectrum_comparison.png'.format(self.suffix)))
         plt.close()
-    
+
     def save_out(self, use_gzip=False, save_in_root=False, save_merged=False):
         """
         Save the background-removed image as a NIfTI file.
@@ -336,7 +365,9 @@ class BleedthroughRemoverLine:
             if not save_merged:
                 # Save only the processed channel (default behavior)
                 self.out = out_1ch
-                suffix = f'_ch{self.channel+1}' + self.suffix # +1 for 1-based indexing
+                #suffix = f'_ch{self.channel+1}' + self.suffix # +1 for 1-based indexing
+                suffix = '_ch{}'.format(self.channel + 1) + self.suffix
+
             else:
                 # Reconstruct the full multi-channel image
                 self.out = self.og_img.copy()
@@ -353,7 +384,9 @@ class BleedthroughRemoverLine:
         save_path = os.path.join(save_dir, save_fn)
         nib.Nifti1Image(np.round(self.out).astype('uint16'), np.eye(4)).to_filename(save_path)
 
-        print(f"Saved background-removed image to {save_path}")
+        #print(f"Saved background-removed image to {save_path}")
+        print("Saved background-removed image to {}".format(save_path))
+
 
 
 if __name__ == "__main__":
@@ -403,7 +436,9 @@ if __name__ == "__main__":
                     help='If provided and a channel was specified, merge the processed channel back into the original multi-channel image. Default is to save only the processed channel.')
     args = parser.parse_args()
     if not os.path.exists(args.img_path):
-        raise FileNotFoundError(f"Image file not found: {args.img_path}")
+        #raise FileNotFoundError(f"Image file not found: {args.img_path}")
+        raise FileNotFoundError("Image file not found: {}".format(args.img_path))
+
 
     t0 = time.time()
 
@@ -417,17 +452,23 @@ if __name__ == "__main__":
     )
 
     t1 = time.time()
-    print(f"Image loaded from {args.img_path}. Shape: {remover.img.shape}. ({t1-t0:.2f}s)")
+    #print(f"Image loaded from {args.img_path}. Shape: {remover.img.shape}. ({t1-t0:.2f}s)")
+    print("Image loaded from {}. Shape: {}. ({:.2f}s)".format(args.img_path, remover.img.shape, t1 - t0))
+
     
     remover.find_bg()
 
     t2 = time.time()
-    print(f"Background regions identified using {args.method} method. ({t2-t1:.2f}s)")
+    #print(f"Background regions identified using {args.method} method. ({t2-t1:.2f}s)")
+    print("Background regions identified using {} method. ({:.2f}s)".format(args.method, t2 - t1))
+
 
     remover.show_bg()
 
     t3 = time.time()
-    print(f"Background regions visualized and saved. ({t3-t2:.2f}s)")
+    #print(f"Background regions visualized and saved. ({t3-t2:.2f}s)")
+    print("Background regions visualized and saved. ({:.2f}s)".format(t3 - t2))
+
     
     if args.show_bg_only:
         exit()
@@ -435,15 +476,21 @@ if __name__ == "__main__":
     remover.remove_bg()
 
     t4 = time.time()
-    print(f"Background removed from image. ({t4-t3:.2f}s)")
+    #print(f"Background removed from image. ({t4-t3:.2f}s)")
+    print("Background removed from image. ({:.2f}s)".format(t4 - t3))
+
 
     if args.do_spectral_analysis:
         remover.show_spectrum(fs=args.sampling_rate, half_width=args.analysis_half_width)
         t5 = time.time()
-        print(f"Spectral analysis completed. ({t5-t4:.2f}s)")
+        #print(f"Spectral analysis completed. ({t5-t4:.2f}s)")
+        print("Spectral analysis completed. ({:.2f}s)".format(t5 - t4))
+
     
     t6 = time.time()
     remover.save_out(use_gzip=not args.no_gzip, save_in_root=args.save_out_in_root, save_merged=args.save_merged)
     t7 = time.time()
-    print(f"Background-removed image saved. ({t7-t6:.2f}s)")
-    print(f"Total time taken: {t7-t0:.2f}s")
+    #print(f"Background-removed image saved. ({t7-t6:.2f}s)")
+    #print(f"Total time taken: {t7-t0:.2f}s")
+    print("Background-removed image saved. ({:.2f}s)".format(t7 - t6))
+    print("Total time taken: {:.2f}s".format(t7 - t0))
