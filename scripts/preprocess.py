@@ -59,8 +59,11 @@ def main(args):
         temporal_mean_brain_pre = brainsss.parse_true_false(settings.get('temporal_mean_brain_pre',False))
         motion_correction = brainsss.parse_true_false(settings.get('motion_correction',False))
         temporal_mean_brain_post = brainsss.parse_true_false(settings.get('temporal_mean_brain_post',False))
-	background_subtraction = brainsss.parse_true_false(settings.get('background_subtraction', False))
-       	zscore = brainsss.parse_true_false(settings.get('zscore',False))
+	# background_subtraction = brainsss.parse_true_false(settings.get('background_subtraction', False))
+	remove_bleedthrough_line = brainsss.parse_true_false(settings.get('remove_bleedthrough_line', False))
+       	h5_to_nii = brainsss.parse_true_false(settings.get('h5_to_nii', False))
+        h5_back_conversion = brainsss.parse_true_false(settings.get('h5_back_conversion', False))
+	zscore = brainsss.parse_true_false(settings.get('zscore',False))
         highpass = brainsss.parse_true_false(settings.get('highpass',False))
         correlation = brainsss.parse_true_false(settings.get('correlation', False))
         STA = brainsss.parse_true_false(settings.get('STA', False))
@@ -80,7 +83,9 @@ def main(args):
         bleaching_qc = False
         temporal_mean_brain_pre = False
         motion_correction = False
-        temporal_mean_brain_post = False
+	temporal_mean_brain_post = False
+	#background_subtraction = False
+	remove_bleedthrough_line = False
         zscore = False
         highpass = False
         correlation = False
@@ -132,8 +137,14 @@ def main(args):
         motion_correction = True
     if args['TEMPORAL_MEAN_BRAIN_POST'] != '':
         temporal_mean_brain_post = True
-    if args['BACKGROUND_SUBTRACTION'] != '':
-	background_subtraction = True
+    if args['REMOVE_BLEEDTHROUGH'] != '':
+        remove_bleedthrough = True
+ #    if args['BACKGROUND_SUBTRACTION'] != '':
+	# background_subtraction = True	
+    if args['H5_TO_NII'] != '':
+        h5_to_nii = True
+    if args['H5_BACK_CONVERSION'] != '':
+        h5_back_conversion = True
     if args['ZSCORE'] != '':
         zscore = True
     if args['HIGHPASS'] != '':
@@ -365,28 +376,63 @@ def main(args):
         ### currently submitting these jobs simultaneously since using global resources
         brainsss.wait_for_job(job_id, logfile, com_path)
 
-    if background_subtraction:
+ #    if background_subtraction:
 
-        ##############################
-        ### BACKGROUND SUBTRACTION ###
-        ##############################
+ #        ##############################
+ #        ### BACKGROUND SUBTRACTION ###
+ #        ##############################
 
+	# for func in funcs:
+ #            load_directory = os.path.join(func, 'moco')
+ #            save_directory = os.path.join(func)
+ #            brain_file = 'functional_channel_2_moco.h5'
+
+ #            args = {'logfile': logfile, 'load_directory': load_directory,'save_directory': save_directory,'brain_file': brain_file}
+ #            script = 'background_subtraction.py'
+ #            job_id = brainsss.sbatch(jobname='background_subtraction',
+ #                                 script=os.path.join(scripts_path, script),
+ #                                 modules=modules,
+ #                                 args=args,
+ #                                 logfile=logfile,
+ #                                 time=2, mem=24,
+ #                                 nice=nice, nodes=nodes)
+ #        brainsss.wait_for_job(job_id, logfile, com_path)
+    if h5_to_nii:
 	for func in funcs:
-            load_directory = os.path.join(func, 'moco')
-            save_directory = os.path.join(func)
-            brain_file = 'functional_channel_2_moco.h5'
+            args = {'logfile': logfile, 'h5_path': os.path.join(func, 'functional_channel_2_moco.h5')}
+            script = 'h5_to_nii.py'
+            job_id = brainsss.sbatch(jobname='h5tonii', script=os.path.join(scripts_path, script), modules=modules, args=args, logfile=logfile, time=2, mem=10, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
 
-            args = {'logfile': logfile, 'load_directory': load_directory,'save_directory': save_directory,'brain_file': brain_file}
-            script = 'background_subtraction.py'
-            job_id = brainsss.sbatch(jobname='background_subtraction',
-                                 script=os.path.join(scripts_path, script),
-                                 modules=modules,
-                                 args=args,
-                                 logfile=logfile,
-                                 time=2, mem=24,
-                                 nice=nice, nodes=nodes)
-        brainsss.wait_for_job(job_id, logfile, com_path)
-    
+    if remove_bleedthrough:
+	###############################
+    	### REMOVE BLEEDTHROUGH LINE #
+    	###############################
+	for func in funcs:
+            input_nii = os.path.join(func, 'functional_channel_2_moco.nii')
+            if not os.path.exists(input_nii):
+                printlog(f"WARNING: NIfTI file not found for bleedthrough removal: {input_nii}")
+                continue
+            cmd = f"python {os.path.join(scripts_path, 'remove_bleedthrough_line.py')} {input_nii} --method percentile --percentile 10 --channel 0"
+            script_path = os.path.join(scripts_path, 'com', f'rmbldthr_{time.time():.0f}.sh')
+            with open(script_path, 'w') as f:
+                f.write("#!/bin/bash\n")
+                f.write(cmd + "\n")
+            os.chmod(script_path, 0o755)
+            job_id = brainsss.sbatch(jobname='rmbldthr', script=script_path, modules=modules, args={}, logfile=logfile, time=3, mem=24, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+
+    if h5_back_conversion:
+	for func in funcs:
+            cleaned_nii = os.path.join(func, 'bts', 'line', 'percentile', 'p10', 'functional_channel_2_moco_ch1_bts_line_p10.nii')
+            output_h5 = os.path.join(func, 'functional_channel_2_moco_bleedcleaned.h5')
+            args = {'logfile': logfile, 'nii_path': cleaned_nii, 'output_path': output_h5}
+            script = 'nii_to_h5.py'
+            job_id = brainsss.sbatch(jobname='niitoh5', script=os.path.join(scripts_path, script), modules=modules, args=args, logfile=logfile, time=2, mem=10, nice=nice, nodes=nodes)
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+	    
     if zscore:
 
         ##############
@@ -394,9 +440,9 @@ def main(args):
         ##############
 
         for func in funcs:
-            load_directory = os.path.join(func, 'moco')
+            load_directory = os.path.join(func)
             save_directory = os.path.join(func)
-            brain_file = 'functional_channel_2_moco.h5'
+            brain_file = 'functional_channel_2_moco_bleedcleaned.h5'
 
             args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
             script = 'zscore.py'
@@ -416,7 +462,7 @@ def main(args):
         for func in funcs:
             load_directory = os.path.join(func)
             save_directory = os.path.join(func)
-            brain_file = 'functional_channel_2_moco_zscore.h5'
+            brain_file = 'functional_channel_2_moco_bleedcleaned_zscore.h5'
 
             args = {'logfile': logfile, 'load_directory': load_directory, 'save_directory': save_directory, 'brain_file': brain_file}
             script = 'temporal_high_pass_filter.py'
@@ -437,7 +483,7 @@ def main(args):
             load_directory = os.path.join(func)
             save_directory = os.path.join(func, 'corr')
             if use_warp:
-                brain_file = 'functional_channel_2_moco_zscore_highpass_warped.nii'
+                brain_file = 'functional_channel_2_moco_bleedcleaned_zscore_highpass_warped.nii'
                 fps = 100
             elif loco_dataset:
                 brain_file = 'brain_zscored_green_high_pass_masked.nii'
