@@ -60,7 +60,7 @@ def main(args):
         motion_correction = brainsss.parse_true_false(settings.get('motion_correction',False))
         temporal_mean_brain_post = brainsss.parse_true_false(settings.get('temporal_mean_brain_post',False))
 	# background_subtraction = brainsss.parse_true_false(settings.get('background_subtraction', False))
-	remove_bleedthrough_line = brainsss.parse_true_false(settings.get('remove_bleedthrough_line', False))
+	remove_bleedthrough_line = brainsss.parse_true_false(settings.get('remove_bleedthrough', False))
        	h5_to_nii = brainsss.parse_true_false(settings.get('h5_to_nii', False))
         h5_back_conversion = brainsss.parse_true_false(settings.get('h5_back_conversion', False))
 	zscore = brainsss.parse_true_false(settings.get('zscore',False))
