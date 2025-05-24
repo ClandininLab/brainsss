@@ -414,10 +414,7 @@ def main(args):
             if not os.path.exists(input_nii):
                 printlog(f"WARNING: NIfTI file not found for bleedthrough removal: {input_nii}")
                 continue
-            #cmd = f"python {os.path.join(scripts_path, 'remove_bleedthrough_line.py')} {input_nii} --method percentile --percentile 10 --channel 0"
-            cmd = textwrap.dedent(f"""\
-                python "{os.path.join(scripts_path, 'remove_bleedthrough_line.py')}" "{input_nii}" --method percentile --percentile 10 --channel 0
-            """)
+            cmd = f'python "{os.path.join(scripts_path, "remove_bleedthrough_line.py")}" "{input_nii}" --method percentile --percentile 10 --channel 0'
             script_path = os.path.join(scripts_path, 'com', f'rmbldthr_{time.time():.0f}.sh')
             with open(script_path, 'w') as f:
                 f.write("#!/bin/bash\n")
