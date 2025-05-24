@@ -139,12 +139,12 @@ def main(args):
         motion_correction = True
     if args['TEMPORAL_MEAN_BRAIN_POST'] != '':
         temporal_mean_brain_post = True
+    if args['H5_TO_NII'] != '':
+        h5_to_nii = True
     if args['REMOVE_BLEEDTHROUGH'] != '':
         remove_bleedthrough = True
  #    if args['BACKGROUND_SUBTRACTION'] != '':
 	# background_subtraction = True	
-    if args['H5_TO_NII'] != '':
-        h5_to_nii = True
     if args['H5_BACK_CONVERSION'] != '':
         h5_back_conversion = True
     if args['ZSCORE'] != '':
