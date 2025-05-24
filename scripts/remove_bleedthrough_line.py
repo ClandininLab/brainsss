@@ -198,7 +198,9 @@ class BleedthroughRemoverLine:
             # Display the image in gray with red overlay for background - flipped upside down
             axes[1, i].imshow(np.flipud(marked_img), cmap='gray')
             # Create a red mask with transparency for background regions - flipped upside down
-            bg_overlay = np.zeros((*marked_img.shape, 4))
+            #bg_overlay = np.zeros((*marked_img.shape, 4))
+            shape = marked_img.shape + (4,)
+            bg_overlay = np.zeros(shape)
             bg_overlay[mask, 0] = 1.0  # Red channel
             bg_overlay[mask, 3] = 0.7  # Alpha channel (transparency)
             axes[1, i].imshow(np.flipud(bg_overlay), interpolation='nearest')
