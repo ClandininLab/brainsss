@@ -92,6 +92,7 @@ def main(args):
         correlation = False
         STA = False
         h5_to_nii = False
+        h5_back_conversion = False
         use_warp = False
         clean_anat = False
         func2anat = False
