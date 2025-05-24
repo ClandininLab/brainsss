@@ -399,7 +399,7 @@ def main(args):
  #        brainsss.wait_for_job(job_id, logfile, com_path)
     if h5_to_nii:
 	for func in funcs:
-            args = {'logfile': logfile, 'h5_path': os.path.join(func, 'functional_channel_2_moco.h5')}
+            args = {'logfile': logfile, 'h5_path': os.path.join(func,'moco', 'functional_channel_2_moco.h5')}
             script = 'h5_to_nii.py'
             job_id = brainsss.sbatch(jobname='h5tonii', script=os.path.join(scripts_path, script), modules=modules, args=args, logfile=logfile, time=2, mem=10, nice=nice, nodes=nodes)
             brainsss.wait_for_job(job_id, logfile, com_path)
@@ -409,7 +409,7 @@ def main(args):
     	### REMOVE BLEEDTHROUGH LINE #
     	###############################
 	for func in funcs:
-            input_nii = os.path.join(func, 'functional_channel_2_moco.nii')
+            input_nii = os.path.join(func, 'moco', 'functional_channel_2_moco.nii')
             if not os.path.exists(input_nii):
                 printlog(f"WARNING: NIfTI file not found for bleedthrough removal: {input_nii}")
                 continue
