@@ -85,7 +85,7 @@ def main(args):
         motion_correction = False
         temporal_mean_brain_post = False
 	#background_subtraction = False
-	remove_bleedthrough_line = False
+        remove_bleedthrough_line = False
         zscore = False
         highpass = False
         correlation = False
@@ -398,7 +398,7 @@ def main(args):
  #                                 nice=nice, nodes=nodes)
  #        brainsss.wait_for_job(job_id, logfile, com_path)
     if h5_to_nii:
-	for func in funcs:
+        for func in funcs:
             args = {'logfile': logfile, 'h5_path': os.path.join(func,'moco', 'functional_channel_2_moco.h5')}
             script = 'h5_to_nii.py'
             job_id = brainsss.sbatch(jobname='h5tonii', script=os.path.join(scripts_path, script), modules=modules, args=args, logfile=logfile, time=2, mem=10, nice=nice, nodes=nodes)
@@ -408,7 +408,7 @@ def main(args):
 	###############################
     	### REMOVE BLEEDTHROUGH LINE #
     	###############################
-	for func in funcs:
+        for func in funcs:
             input_nii = os.path.join(func, 'moco', 'functional_channel_2_moco.nii')
             if not os.path.exists(input_nii):
                 printlog(f"WARNING: NIfTI file not found for bleedthrough removal: {input_nii}")
@@ -424,7 +424,7 @@ def main(args):
 
 
     if h5_back_conversion:
-	for func in funcs:
+        for func in funcs:
             cleaned_nii = os.path.join(func, 'bts', 'line', 'percentile', 'p10', 'functional_channel_2_moco_ch1_bts_line_p10.nii')
             output_h5 = os.path.join(func, 'functional_channel_2_moco_bleedcleaned.h5')
             args = {'logfile': logfile, 'nii_path': cleaned_nii, 'output_path': output_h5}
