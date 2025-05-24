@@ -83,7 +83,7 @@ def main(args):
         bleaching_qc = False
         temporal_mean_brain_pre = False
         motion_correction = False
-	temporal_mean_brain_post = False
+        temporal_mean_brain_post = False
 	#background_subtraction = False
 	remove_bleedthrough_line = False
         zscore = False
