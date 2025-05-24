@@ -38,7 +38,9 @@ class BleedthroughRemoverLine:
         self.root_save_dir = root_save_dir
 
         # self.img should have dimension x, y, z, t, (c) here, x is along the line scan direction
-        self.og_img = np.asarray(nib.load(img_path).get_fdata().squeeze(), dtype='uint16')
+        #self.og_img = np.asarray(nib.load(img_path).get_fdata().squeeze(), dtype='uint16')
+        self.og_img = np.asarray(nib.load(img_path).dataobj).squeeze().astype('uint16')
+
         if channel is not None:
             self.img = self.og_img[..., channel]
         else:
