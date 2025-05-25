@@ -439,6 +439,9 @@ if __name__ == "__main__":
     parser.add_argument('-save_merged', action='store_true',
                     help='If provided and a channel was specified, merge the processed channel back into the original multi-channel image. Default is to save only the processed channel.')
     args = parser.parse_args()
+    
+    print(args.img_path)
+    
     if not os.path.exists(args.img_path):
         #raise FileNotFoundError(f"Image file not found: {args.img_path}")
         raise FileNotFoundError("Image file not found: {}".format(args.img_path))

@@ -420,7 +420,6 @@ def main(args):
                 'img_path': input_nii,
                 'method': 'percentile',
                 'percentile': 10,
-                'channel': 0
             }
             script = 'remove_bleedthrough_line.py'
             job_id = brainsss.sbatch(
