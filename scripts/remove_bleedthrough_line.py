@@ -395,76 +395,51 @@ class BleedthroughRemoverLine:
 
 if __name__ == "__main__":
 
-    # Example usages:
-    # Percentile method:
-    # python remove_bleedthrough_line.py /home/minseung/data/ImagingData/Bruker/20250225/TSeries-20250225-004_reg.nii --method percentile --sampling_rate 7.22 --channel 1 --percentile 5
-    # Kernel method:
-    # python remove_bleedthrough_line.py /home/minseung/data/ImagingData/Bruker/20250225/TSeries-20250225-004_reg.nii --method kernel --sampling_rate 7.22 --channel 1 --half_width 20
-    # Save only processed channel:
-    # python remove_bleedthrough_line.py /home/minseung/data/ImagingData/Bruker/20250225/TSeries-20250225-004_reg.nii --channel 1 --save_only_processed_channel
+    args = json.loads(sys.argv[1])
 
-    parser = argparse.ArgumentParser(
-        description='Remove bleedthrough from 3D image using either percentile or kernel-based background detection. ' +
-                   'The percentile method identifies background pixels below a specified percentile threshold in each line. ' +
-                   'The kernel method uses a sliding window to find the darkest region in each line. ' +
-                   'Both methods then remove the background signal from the entire line.')
+    logfile = args['logfile']
+    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
-    parser.add_argument('img_path', type=str,
-                    help='Path to nii file. E.g. /path/to/data/TSeries-20250225-004_reg.nii')
-    parser.add_argument('--channel', type=int, default=None,
-                    help='Channel number to process. If not provided, assume single channel data.')
-    parser.add_argument('-show_bg_only', action='store_true',
-                    help='If provided, only show the background regions and exit.')
-
-    parser.add_argument('--method', type=str, choices=['percentile', 'kernel'], default='percentile',
-                    help='Method to use for background detection. Default=percentile')
-    parser.add_argument('--percentile', type=int, default=10,
-                    help='(For percentile method) Percentile threshold for identifying dark pixels. Lower values select darker pixels. Default=10')
-    parser.add_argument('--half_width', type=int, default=10,
-                    help='(For kernel method) Half width of the kernel/window for background detection. Default=10')
-
-    parser.add_argument('-do_spectral_analysis', action='store_true',
-                    help='If provided, perform spectral analysis on the image data.')
-    parser.add_argument('--sampling_rate', type=float, default=7.22,
-                    help='Sampling rate of the imaging data. Used for spectral analysis. Default=7.22 (Hz)')
-    parser.add_argument('--analysis_half_width', type=int, default=20,
-                    help='Half width for spectrum analysis patch. Default=20')
-
-    parser.add_argument('--root_save_dir', type=str, default=None,
-                    help='Directory to save the output files. If not provided, saves in the same directory as img_path.')
-    parser.add_argument('-save_out_in_root', action='store_true',
-                    help='If provided, save the output files in the root save dir instead of the default nested save directory.')
-    parser.add_argument('-no_gzip', action='store_true',
-                    help='If provided, save the output file without gzip compression. Default is to use gzip.')
-    parser.add_argument('-save_merged', action='store_true',
-                    help='If provided and a channel was specified, merge the processed channel back into the original multi-channel image. Default is to save only the processed channel.')
-    args = parser.parse_args()
-    if not os.path.exists(args.img_path):
+    if 'channel' not in args:
+        args['channel'] = None
+    if 'method' not in args:
+        args['method'] = 'percentile'
+    if 'percentile' not in args:
+        args['percentile'] = 10
+    if 'half_width' not in args:
+        args['half_width'] = 10
+    if 'sampling_rate' not in args:
+        args['sampling_rate'] = 7.22
+    if 'analysis_half_width' not in args:
+        args['analysis_half_width'] = 20
+    if 'root_save_dir' not in args:
+        args['root_save_dir'] = None
+    if not os.path.exists(args['img_path']):
         #raise FileNotFoundError(f"Image file not found: {args.img_path}")
-        raise FileNotFoundError("Image file not found: {}".format(args.img_path))
+        raise FileNotFoundError("Image file not found: {}".format(args['img_path']))
 
 
     t0 = time.time()
 
     remover = BleedthroughRemoverLine(
-        img_path=args.img_path, 
-        method=args.method,
-        percentile_threshold=args.percentile,
-        half_width=args.half_width,
-        channel=args.channel,
-        root_save_dir=args.root_save_dir
+        img_path=args['img_path'], 
+        method=args['method'],
+        percentile_threshold=args['percentile'],
+        half_width=args['half_width'],
+        channel=args['channel'],
+        root_save_dir=args['root_save_dir']
     )
 
     t1 = time.time()
     #print(f"Image loaded from {args.img_path}. Shape: {remover.img.shape}. ({t1-t0:.2f}s)")
-    print("Image loaded from {}. Shape: {}. ({:.2f}s)".format(args.img_path, remover.img.shape, t1 - t0))
+    print("Image loaded from {}. Shape: {}. ({:.2f}s)".format(args['img_path'], remover.img.shape, t1 - t0))
 
     
     remover.find_bg()
 
     t2 = time.time()
     #print(f"Background regions identified using {args.method} method. ({t2-t1:.2f}s)")
-    print("Background regions identified using {} method. ({:.2f}s)".format(args.method, t2 - t1))
+    print("Background regions identified using {} method. ({:.2f}s)".format(args['method'], t2 - t1))
 
 
     remover.show_bg()
@@ -474,7 +449,7 @@ if __name__ == "__main__":
     print("Background regions visualized and saved. ({:.2f}s)".format(t3 - t2))
 
     
-    if args.show_bg_only:
+    if args['show_bg_only']:
         exit()
         
     remover.remove_bg()
@@ -484,15 +459,15 @@ if __name__ == "__main__":
     print("Background removed from image. ({:.2f}s)".format(t4 - t3))
 
 
-    if args.do_spectral_analysis:
-        remover.show_spectrum(fs=args.sampling_rate, half_width=args.analysis_half_width)
+    if args['do_spectral_analysis']:
+        remover.show_spectrum(fs=args['sampling_rate'], half_width=args['analysis_half_width'])
         t5 = time.time()
         #print(f"Spectral analysis completed. ({t5-t4:.2f}s)")
         print("Spectral analysis completed. ({:.2f}s)".format(t5 - t4))
 
     
     t6 = time.time()
-    remover.save_out(use_gzip=not args.no_gzip, save_in_root=args.save_out_in_root, save_merged=args.save_merged)
+    remover.save_out(use_gzip=not args['no_gzip'], save_in_root=args['save_out_in_root'], save_merged=args['save_merged'])
     t7 = time.time()
     #print(f"Background-removed image saved. ({t7-t6:.2f}s)")
     #print(f"Total time taken: {t7-t0:.2f}s")
