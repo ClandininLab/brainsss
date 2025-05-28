@@ -446,7 +446,7 @@ def main(args):
 
     if h5_back_conversion:
         for func in funcs:
-            cleaned_nii = os.path.join(func, 'bts', 'line', 'percentile', 'p10', 'functional_channel_2_moco_ch1_bts_line_p10.nii')
+            cleaned_nii = os.path.join(func, 'bts', 'line', 'percentile', 'p10', 'functional_channel_2_moco_bts_line_p10.nii.gz')
             output_h5 = os.path.join(func, 'functional_channel_2_moco_bleedcleaned.h5')
             args = {'logfile': logfile, 'nii_path': cleaned_nii, 'output_path': output_h5}
             script = 'nii_to_h5.py'
