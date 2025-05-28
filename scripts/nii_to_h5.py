@@ -18,6 +18,7 @@ def main(args):
 
     nii_path = args['nii_path']
     logfile = args['logfile']
+    output_path = args['output_path']  # <--- new
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
 
     printlog(f'Loading {nii_path}')
