@@ -87,11 +87,8 @@ def main(args):
 
                 within_bin_brain_np = np.full((nx, ny, nz, max_len), np.nan)
                 within_bin_ts_rel_np = np.full((nx, ny, nz, max_len), np.nan)
-                start_time = time.time()
                 #### Loop over z planes (io access is done nz times!!)
                 for z in (range(nz)):
-                    elapsed = time.time() - start_time
-                    printlog(f"Elapsed time for z plane {z} is {elapsed:.2f} seconds")
                     # Read in z plane
                     plane = brain_all[:,:,z,:]
                     plane_ts_rel = ts_rel[:,:,z,:]
