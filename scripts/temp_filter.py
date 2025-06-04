@@ -9,6 +9,7 @@ import ants
 import time
 import gc
 import pickle
+import shutil
 
 def main(args):
     fly_directory = args['fly_directory']
@@ -22,8 +23,8 @@ def main(args):
     cc = args['cc']
     stepsize = 100
 
-    brain_load_path = os.path.join(scratch_dir, brain_file)
-    ts_load_path = os.path.join(scratch_dir, timestamp_file)
+    brain_load_path = os.path.join(load_directory, brain_file)
+    ts_load_path = os.path.join(fly_directory, 'warp', timestamp_file)
     save_directory = os.path.join(fly_directory, "temp_filter")
 
     #####################
@@ -37,6 +38,15 @@ def main(args):
     #######################
     ### TEMPORAL FILTER ###
     #######################
+    
+    ## move brain and ts to scratch
+    brain_dest=os.path.join(scratch_dir, brain_file)
+    ts_dest=os.path.join(scratch_dir, timestamp_file)
+    if os.path.exists(brain_dest)==False: 
+        b_dest = shutil.copyfile(brain_load_path, brain_dest)
+    if os.path.exists(ts_dest)==False: 
+        t_dest = shutil.copyfile(ts_load_path, ts_dest)
+    printlog(f"brain in {brain_dest} and timestamp in {ts_dest}")
 
     printlog("Beginning temporal filter")
    
@@ -61,8 +71,8 @@ def main(args):
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
         if os.path.exists(save_file)==False or redo:
             #load brain
-            with h5py.File(brain_load_path, 'r') as hf, \
-                h5py.File(ts_load_path, 'r') as tf, \
+            with h5py.File(brain_dest, 'r') as hf, \
+                h5py.File(ts_dest, 'r') as tf, \
                 h5py.File(ts_rel_load_path, 'r') as of, \
                 h5py.File(filter_load_path, 'r') as ff:
                     
