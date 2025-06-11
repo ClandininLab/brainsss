@@ -312,6 +312,7 @@ def main(args):
                 "event": event,
                 "ch_num": ch_num,
                 "fly_num": fly_num,
+                "scratch_dir": scratch_path,
                 }
         script = "tf_to_STA.py"
         job_id = brainsss.sbatch(

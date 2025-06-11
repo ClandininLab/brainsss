@@ -17,6 +17,7 @@ def main(args):
     cc = args['ch_num'] 
     event = args['event']
     flies = args['fly_num']
+    scratch_dir = args['scratch_dir']
     
     
     #####################
@@ -50,18 +51,18 @@ def main(args):
     for behavior in behaviors:
         printlog(f"\n=======================================")
         printlog(f'Processing behavior: {behavior}')
-        behave_dir = os.path.join(temp_dir, behavior)
+        behave_dir = os.path.join(scratch_dir, 'tf', behavior)
         printlog(f'Processing directory {behave_dir}')
         STA = []
         tf_files = [] 
         for file in os.listdir(behave_dir):
             if event!=None:
-                if '_tf_' in file and f'_{cc}' in file and behavior in file and event in file:
+                if cc in file and event in file and '_tf_' in file and behavior in file:
                     tf_files.append(file)
-                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}_{event}_.h5')
-            elif '_tf_' in file and f'_{cc}' in file and behavior in file and f'_{cc}_' not in file:
+                    save_file= os.path.join(temp_dir, behavior, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}_{event}_.h5')
+            elif cc in file and event not in file and '_tf_' in file and behavior in file:
                     tf_files.append(file)
-                    save_file= os.path.join(behave_dir, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}.h5')
+                    save_file= os.path.join(temp_dir, behavior, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}.h5')
         for file in tf_files:
             fly_val=int(file.split("_")[0])
             if fly_val in flies:
