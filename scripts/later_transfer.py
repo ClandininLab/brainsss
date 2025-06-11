@@ -42,7 +42,7 @@ def main(args):
     
     for behavior in behaviors:
         for fly in flies:
-            fly_path = os.path.join(dataset_path, fly)
+            fly_path = os.path.join(dataset_path, f'fly_{fly}')
             files = os.listdir(os.path.join(fly_path, 'temp_filter'))
             if event == None:
                 file = f"functional_channel_{cc}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5"
@@ -52,7 +52,10 @@ def main(args):
                 new_file = f"{fly}_tf_{behavior}_{cc}_{event}.h5"
             if file in files:
                 source_path = os.path.join(fly_path, 'temp_filter', file)
-                destination_path = os.path.join(scratch_dir, 'tf', new_file)
+                tf_behave_dir = os.path.join(scratch_dir, 'tf', behavior)
+                if not os.path.exists(tf_behave_dir):
+                    os.makedirs(tf_behave_dir)
+                destination_path = os.path.join(tf_behave_dir, new_file)
                 with h5py.File(source_path, "r") as source:
                     fly_brain = source['brain']
                     fly_ts = source['time_stamps']
