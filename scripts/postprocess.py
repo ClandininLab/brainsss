@@ -365,6 +365,7 @@ def main(args):
                 "dataset_path": dataset_path,
                 "flies": fly_num,
                 "ch_num": ch_num,
+                "scratch_dir": scratch_path,
                 }
         script = "later_transfer.py"
         job_id = brainsss.sbatch(
