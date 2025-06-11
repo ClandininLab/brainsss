@@ -57,12 +57,13 @@ def main(args):
         tf_files = [] 
         for file in os.listdir(behave_dir):
             if event!=None:
-                if cc in file and event in file and '_tf_' in file and behavior in file:
+                if f'_{cc}_' in file and event in file and '_tf_' in file and behavior in file:
                     tf_files.append(file)
                     save_file= os.path.join(temp_dir, behavior, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}_{event}_.h5')
-            elif cc in file and event not in file and '_tf_' in file and behavior in file:
+            elif f'_{cc}_' in file and event not in file and '_tf_' in file and behavior in file:
                     tf_files.append(file)
                     save_file= os.path.join(temp_dir, behavior, f'STA_{num_flies}flies_{cc}_{behavior}_{steps}.h5')
+        printlog(f"Following files to process: {tf_files}")
         for file in tf_files:
             fly_val=int(file.split("_")[0])
             if fly_val in flies:
@@ -74,15 +75,15 @@ def main(args):
                         brain = hf['brain']
                         dimst = np.shape(ts)
                         dims = np.shape(brain)
-                        printlog(f'Brain shape: {dims}, time stamp shape: {dimst}')
+                        # printlog(f'Brain shape: {dims}, time stamp shape: {dimst}')
                         for i in range(range_start, range_end, steps):
                             end = i + steps if i + steps < range_end else range_end
                             mask = (ts > i) & (ts < end)
                             result = np.nanmean(np.where(mask, brain, np.nan),axis=-1)
                             temp.append(result)
-                printlog(f'Temp shape is {np.shape(temp)}')
+                # printlog(f'Temp shape is {np.shape(temp)}')
                 STA.append(temp)
-                printlog(f'STA is {np.shape(STA)}')
+                # printlog(f'STA is {np.shape(STA)}')
             else:
                 printlog(f'Fly {fly_val} not in {flies}')
         STA=np.asarray(np.nanmean(STA, axis=0))
