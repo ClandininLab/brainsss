@@ -15,6 +15,7 @@ def main(args):
     event = args['event']
     flies = args['fly_num']
     dataset_path = args['dataset_path']
+    scratch_dir = args['scratch_dir']
     
     #####################
     ### SETUP LOGGING ###
@@ -28,7 +29,6 @@ def main(args):
     ### TRANSFERRING FILTERED DATA ###
     ##################################
     
-    temp_filter_dir = os.path.join(later_dir, 'temp_filter')
     printlog("Beginning transfer of filtered data")
     if event != None:
         event_times_path = os.path.join(later_dir, f'{event}_event_times_split_dic.pkl')
@@ -51,11 +51,14 @@ def main(args):
                 file = f"functional_channel_{cc}_moco_warp_blurred_hpf_dff_filtered_{behavior}_{event}.h5"
                 new_file = f"{fly}_tf_{behavior}_{cc}_{event}.h5"
             if file in files:
-                source = os.path.join(fly_path, 'temp_filter', file)
-                destination = os.path.join(temp_filter_dir, behavior, new_file)
-                if os.path.exists(destination)==False: 
-                    dest = shutil.copyfile(source, destination)
-                printlog(f"Destination path: {destination}")
+                source_path = os.path.join(fly_path, 'temp_filter', file)
+                destination_path = os.path.join(scratch_dir, 'tf', new_file)
+                with h5py.File(source_path, "r") as source:
+                    fly_brain = source['brain']
+                    fly_ts = source['time_stamps']
+                    with h5py.File(destination_path, "w") as target:
+                        target.create_dataset("brain", data=fly_brain)
+                        target.create_dataset("time_stamps", data=fly_ts)
 
             else:
                 printlog("Not there yet!")
