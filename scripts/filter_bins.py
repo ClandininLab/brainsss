@@ -37,7 +37,7 @@ def main(args):
 
     printlog("Beginning bin creation")
     
-    behaviors = ['inc', 'dec', 'flat', 'total']
+    # behaviors = ['inc', 'dec', 'flat', 'total']
     if event != None:
         event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
     else:
