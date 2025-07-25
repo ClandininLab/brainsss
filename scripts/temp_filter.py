@@ -89,7 +89,10 @@ def main(args):
                 
                 T=(ts_all[0,0,0,1]-ts_all[0,0,0,0])/1000
                 fs=1/T #sample rate, Hz
-                max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
+                if loom_all.shape[0]>0:
+                    max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
+                else:
+                    max_len=loom_all.shape[0]
                 printlog(F"Max length of filtered data is {max_len}")
 
                 nx, ny, nz, nt = brain_all.shape
