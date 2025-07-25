@@ -67,7 +67,7 @@ def main(args):
                 fly_name= fly[4:7]
                 printlog(f"Fly name is {fly_name} and behavior is {behavior}")
                 starts_loom_ms = event_times_struct[fly_name][behavior]
-                starts_loom_ms=np.sort(starts_loom_ms)
+                # starts_loom_ms=np.sort(starts_loom_ms)
                 
                 bin_start = -500; bin_end = 2000; bin_size = 100 #ms
                 
