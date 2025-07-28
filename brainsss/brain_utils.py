@@ -327,6 +327,70 @@ def apply_butter_highpass(data, z, cutoff, order, fs):
     hpf_data = butter_highpass_filter(data[:,:,z, :], cutoff, fs, order)
     return hpf_data
 
+def supervoxel_to_full_res(brain, cluster_labels):
+    n_clusters = brain.shape[2]
+    n_tp = brain.shape[1]
+    brain_dims=[314,146]
+    
+    reformed_brain = []
+    for z in range(brain.shape[0]):
+        colored_by_betas = np.zeros((n_tp, brain_dims[0]*brain_dims[1]))
+        for cluster_num in range(n_clusters):
+            cluster_mask = cluster_labels[z,:]==cluster_num
+#             print(cluster_indicies)
+            colored_by_betas[:,cluster_mask] = brain[z,:,cluster_num,np.newaxis]
+        colored_by_betas = colored_by_betas.reshape(n_tp,brain_dims[0],brain_dims[1])
+        reformed_brain.append(colored_by_betas)
+    return np.asarray(reformed_brain)
+def dual_channel_remove_noise(arr_r, arr_g):
+    z,xy,t=np.shape(arr_g)
+    flat_red=arr_r.reshape(xy*z,t)
+    flat_green=arr_g.reshape(xy*z,t)
+    print(flat_green.shape)
+    flat_sig=np.zeros_like(flat_green)
+    for i in range(np.shape(flat_red)[0]):
+        a=np.polyfit(flat_red[i,:],flat_green[i,:],1)
+        sig = flat_green[i,:] - (a[0]*flat_red[i,:] + a[1])
+        flat_sig[i,:]=sig
+    return flat_sig.reshape(z,xy,t)
+def make_multi_behave_dict(behaviors,later_dir,step_size,event,ch_num):
+    behave_dict = {}
+    for behavior in behaviors:
+        behave_dir = os.path.join(later_dir, behavior)
+        behave_dict[behavior]=[]
+        for file in os.listdir(behave_dir):
+            if 'STA' in file and str(step_size) in file and f'_{event}.h5' in file and f'_{ch_num}_' in file:
+                STA_path=os.path.join(behave_dir, file)
+                with h5py.File(STA_path, 'r') as sf:
+                    brain = sf['data'][:]
+                    brain[np.isnan(brain)] = 0
+                    brain[np.isinf(brain)] = 4
+                    brain = np.moveaxis(brain, 0, -1)
+                    dims=np.shape(brain)
+                    print(f'brain {file} shape: {dims}')
+                    behave_dict[behavior]=brain
+    return behave_dict
+
+def make_supervox_dict(behave_dict, behaviors, n_clusters,cluster_labels):
+    supervox_dict={}
+    for behave in behaviors:
+        supervox_dict[behave]=[]
+        brain = behave_dict[behave]
+        dims = np.shape(brain)
+#         print(dims)
+        for z in range(dims[-2]):
+            neural_activity = brain[:,:,z,:].reshape(-1, dims[3])
+            signals = []
+            for cluster_num in range(n_clusters):
+                cluster_indicies = np.where(cluster_labels[z,:]==cluster_num)[0]
+                mean_signal = np.mean(neural_activity[cluster_indicies,:], axis=0)
+                signals.append(mean_signal)
+            signals = np.asarray(signals)
+            supervox_dict[behave].append(signals)
+        supervox_dict[behave] = np.asarray(supervox_dict[behave])
+        print(f'{behave} shape: {np.shape(supervox_dict[behave])}')
+    return supervox_dict
+
 def load_roi_hemi_ids():
 
     roi_ids = {}
