@@ -57,10 +57,10 @@ def main(args):
         tf_files = [] 
         for file in os.listdir(behave_dir):
             if event!=None:
-                if f'_{cc}_' in file and event in file and '_tf_' in file and behavior in file:
+                if f'_{cc}_' in file and f'_{event}.h5' in file and '_tf_' in file and behavior in file:
                     tf_files.append(file)
                     save_file= os.path.join(temp_dir, behavior, f'STA_{cc}_{behavior}_{steps}_{event}.h5')
-            elif f'_{cc}_' in file and event not in file and '_tf_' in file and behavior in file:
+            elif f'_{cc}_' in file and f'_{event}.h5' not in file and '_tf_' in file and behavior in file:
                     tf_files.append(file)
                     save_file= os.path.join(temp_dir, behavior, f'STA_{cc}_{behavior}_{steps}.h5')
         printlog(f"Following files to process: {tf_files}")
