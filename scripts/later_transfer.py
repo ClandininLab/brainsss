@@ -64,7 +64,7 @@ def main(args):
                         target.create_dataset("time_stamps", data=fly_ts)
 
             else:
-                printlog("Not there yet!")
+                printlog(f"File {file} not found for {behavior} in {fly_path}")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
