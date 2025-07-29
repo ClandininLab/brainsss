@@ -7,6 +7,7 @@ import time
 import psutil
 import brainsss
 from scipy.signal import butter, filtfilt, freqz
+import h5py
 
 def extract_traces(fictrac, stim_times, pre_window, post_window, val=None):
     traces = []
