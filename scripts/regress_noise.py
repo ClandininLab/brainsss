@@ -33,10 +33,10 @@ def main(args):
     step_size=100
     if event != None:
         event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-        save_file = os.path.join(later_path, f'behave_dict_total_{event}.pkl')
+        save_file = os.path.join(temp_dir, f'behave_dict_total_{event}.pkl')
     else:
         event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
-        save_file = os.path.join(later_path, 'behave_dict_total.pkl')
+        save_file = os.path.join(temp_dir, 'behave_dict_total.pkl')
     with open(event_times_path, 'rb') as file:
         event_times_struct = pickle.load(file)
         f=list(event_times_struct.keys())[0]
