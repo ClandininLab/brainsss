@@ -72,6 +72,7 @@ def main(args):
         tf_to_STA = brainsss.parse_true_false(settings.get("tf_to_STA", False))
         build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
         later_transfer = brainsss.parse_true_false(settings.get("later_transfer", False))
+        regress_noise = brainsss.parse_true_false(settings.get("regress_noise", False))
         
     else:
         filter_bins = False
@@ -82,6 +83,7 @@ def main(args):
         tf_to_STA = False
         build_STA = False
         later_transfer = False
+        regress_noise = False
     
      ### Parse remaining command line args
     if args["BEST_FLIES"] == "" and args["FLIES"] == "":
@@ -133,6 +135,8 @@ def main(args):
         build_STA = True
     if args["LATER_TRANSFER"] != "":
         later_transfer = True
+    if args["REGRESS_NOISE"] != "":
+        regress_noise = True
 
     if fly_dirs is None:
         printlog(
@@ -371,6 +375,28 @@ def main(args):
         script = "later_transfer.py"
         job_id = brainsss.sbatch(
             jobname="later_transfer",
+            script=os.path.join(scripts_path, script),
+            modules=modules,
+            args=args,
+            logfile=logfile,
+            time=48,
+            cpus=32,
+            mem='250GB',
+            nice=nice,
+            nodes=nodes,
+        )
+        brainsss.wait_for_job(job_id, logfile, com_path)
+        
+    if regress_noise:
+        temp_directory = os.path.join(later_path, "temp_filter")
+        args = {"logfile": logfile, 
+                "later_directory": later_path, 
+                "temp_directory": temp_directory,
+                "event": event,
+                }
+        script = "regress_noise.py"
+        job_id = brainsss.sbatch(
+            jobname="regress_noise",
             script=os.path.join(scripts_path, script),
             modules=modules,
             args=args,

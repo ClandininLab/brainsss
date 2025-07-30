@@ -15,8 +15,6 @@ def main(args):
     later_path = args['later_path']
     temp_dir=args['temp_directory']
     event = args['event']
-    flies = args['fly_num']
-    scratch_dir = args['scratch_dir']
     
     
     #####################
