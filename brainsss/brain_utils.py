@@ -343,11 +343,11 @@ def supervoxel_to_full_res(brain, cluster_labels):
         colored_by_betas = colored_by_betas.reshape(n_tp,brain_dims[0],brain_dims[1])
         reformed_brain.append(colored_by_betas)
     return np.asarray(reformed_brain)
-def dual_channel_remove_noise(arr_r, arr_g):
+def dual_channel_remove_noise(arr_r, arr_g, printlog):
     shape=np.shape(arr_g)
     flat_red=arr_r.reshape(-1,shape[-1])
     flat_green=arr_g.reshape(-1,shape[-1])
-    print(flat_green.shape)
+    printlog(flat_green.shape)
     flat_sig=np.zeros_like(flat_green)
     for i in range(np.shape(flat_red)[0]):
         a=np.polyfit(flat_red[i,:],flat_green[i,:],1)
@@ -355,7 +355,7 @@ def dual_channel_remove_noise(arr_r, arr_g):
         sig = flat_green[i,:] - (a[0]*flat_red[i,:] + a[1])
         flat_sig[i,:]=sig
     return flat_sig.reshape(shape)
-def make_multi_behave_dict(behaviors,later_dir,step_size,event,ch_num):
+def make_multi_behave_dict(behaviors,later_dir,step_size,event,ch_num,printlog):
     behave_dict = {}
     for behavior in behaviors:
         behave_dir = os.path.join(later_dir, behavior)
@@ -369,11 +369,11 @@ def make_multi_behave_dict(behaviors,later_dir,step_size,event,ch_num):
                     brain[np.isinf(brain)] = 4
                     brain = np.moveaxis(brain, 0, -1)
                     dims=np.shape(brain)
-                    print(f'brain {file} shape: {dims}')
+                    printlog(f'brain {file} shape: {dims}')
                     behave_dict[behavior]=brain
     return behave_dict
 
-def make_supervox_dict(behave_dict, behaviors, n_clusters,cluster_labels):
+def make_supervox_dict(behave_dict, behaviors, n_clusters,cluster_labels,):
     supervox_dict={}
     for behave in behaviors:
         supervox_dict[behave]=[]
