@@ -347,7 +347,7 @@ def dual_channel_remove_noise(arr_r, arr_g, printlog):
     shape=np.shape(arr_g)
     flat_red=arr_r.reshape(-1,shape[-1])
     flat_green=arr_g.reshape(-1,shape[-1])
-    printlog(f'flat shape is {flat_green.shape}')
+    printlog(f'flattened shape is {flat_green.shape}')
     flat_sig=np.zeros_like(flat_green)
     for i in range(np.shape(flat_red)[0]):
         a=np.polyfit(flat_red[i,:],flat_green[i,:],1)
