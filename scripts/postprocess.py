@@ -390,7 +390,7 @@ def main(args):
     if regress_noise:
         temp_directory = os.path.join(later_path, "temp_filter")
         args = {"logfile": logfile, 
-                "later_directory": later_path, 
+                "later_path": later_path, 
                 "temp_directory": temp_directory,
                 "event": event,
                 }
