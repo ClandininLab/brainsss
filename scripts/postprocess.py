@@ -73,6 +73,7 @@ def main(args):
         build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
         later_transfer = brainsss.parse_true_false(settings.get("later_transfer", False))
         regress_noise = brainsss.parse_true_false(settings.get("regress_noise", False))
+        supercluster = brainsss.parse_true_false(settings.get("supercluster", False))
         
     else:
         filter_bins = False
@@ -84,6 +85,7 @@ def main(args):
         build_STA = False
         later_transfer = False
         regress_noise = False
+        supercluster = False
     
      ### Parse remaining command line args
     if args["BEST_FLIES"] == "" and args["FLIES"] == "":
@@ -137,6 +139,8 @@ def main(args):
         later_transfer = True
     if args["REGRESS_NOISE"] != "":
         regress_noise = True
+    if args["SUPERCLUSTER"] != "":
+        supercluster = True
 
     if fly_dirs is None:
         printlog(
@@ -397,6 +401,28 @@ def main(args):
         script = "regress_noise.py"
         job_id = brainsss.sbatch(
             jobname="regress_noise",
+            script=os.path.join(scripts_path, script),
+            modules=modules,
+            args=args,
+            logfile=logfile,
+            time=48,
+            cpus=32,
+            mem='250GB',
+            nice=nice,
+            nodes=nodes,
+        )
+        brainsss.wait_for_job(job_id, logfile, com_path)
+        
+    if supercluster:
+        temp_directory = os.path.join(later_path, "temp_filter")
+        args = {"logfile": logfile, 
+                "later_path": later_path, 
+                "temp_directory": temp_directory,
+                "event": event,
+                }
+        script = "supercluster.py"
+        job_id = brainsss.sbatch(
+            jobname="supercluster",
             script=os.path.join(scripts_path, script),
             modules=modules,
             args=args,
