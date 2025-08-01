@@ -59,7 +59,7 @@ def main(args):
         brain=full_res[behavior]
         shape=np.shape(brain)
         
-        connectivity = grid_to_graph(shape[0],shape[1],shape[2])
+        connectivity = grid_to_graph(shape[0],shape[1],shape[2]).astype('float32')
         neural_activity= brain.reshape(-1, shape[-1])
         
         cluster_labels= []
