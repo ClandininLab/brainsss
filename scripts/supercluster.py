@@ -54,34 +54,38 @@ def main(args):
 
     printlog('clustering.........')
     superclust_labels_dict={}
+    superclust_dict = {}
     for behavior in full_res:
-        superclust_labels_dict[behavior]=[]
         brain=full_res[behavior]
-
         shape=np.shape(brain)
-        connectivity = grid_to_graph(shape[0],shape[1],shape[2])
-        cluster_labels= []
+        
+        connectivity = grid_to_graph(shape[0],shape[1],shape[2]).astype('float32')
         neural_activity= brain.reshape(-1, shape[-1])
+        
+        cluster_labels= []
         cluster_model= AgglomerativeClustering(n_clusters=n_clusters,
-                                    memory=cluster_dir,
+                                    memory=None,
                                     linkage='ward',
                                     connectivity=connectivity)
+        
         cluster_model.fit(neural_activity)
         cluster_labels = np.asarray(cluster_model.labels_)
         superclust_labels_dict[behavior]=cluster_labels
         printlog(f'done with {behavior} trial labels')
-    
-    superclust_dict = {}
-    for behavior in superclust_labels_dict:
-        superclust_dict[behavior] = []
+
+        behavior_superclusters = []
         for cluster_num in range(n_clusters):
             labels= superclust_labels_dict[behavior]
             cluster_indicies= np.where(labels==cluster_num)[0]
             mean_signal = np.mean(neural_activity[cluster_indicies,:], axis=0)
-            superclust_dict[behavior].append(mean_signal)
-        superclust_dict[behavior] = np.asarray(superclust_dict[behavior])
-        printlog(f'done with {behavior} superclustering')
+            behavior_superclusters.append(mean_signal)
+        superclust_dict[behavior] = np.asarray(behavior_superclusters)
         
+        
+         # Clean up
+        del brain, neural_activity, connectivity, cluster_model
+        gc.collect()
+        printlog(f'done with {behavior} superclustering')
     
     save_file_labels = os.path.join(cluster_dir, f'superclust_labels_{event}.pkl')
     save_file_clusters = os.path.join(cluster_dir, f'superclust_clusters_{event}.pkl')
