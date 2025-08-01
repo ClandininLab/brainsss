@@ -67,6 +67,10 @@ while [[ $# -gt 0 ]]; do
       REGRESS_NOISE=True
       shift
       ;;
+    -sc|--supercluster)
+      SUPERCLUSTER=True
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -76,7 +80,8 @@ done
 
 ARGS="{\"PWD\":\"$PWD\",\"BEST_FLIES\":\"$BEST_FLIES\",\"POSTPROCESS\":\"$POSTPROCESS\",\"FILTER_BINS\":\"$FILTER_BINS\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\
 \"FLIES\":\"$FLIES\",\"EVENTS\":\"$EVENTS\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\",\
-\"BUILD_STA\":\"$BUILD_STA\",\"REDO\":\"$REDO\",\"LATER_TRANSFER\":\"$LATER_TRANSFER\",\"REGRESS_NOISE\":\"$REGRESS_NOISE\",\"TF_TO_STA\":\"$TF_TO_STA\"}"
+\"BUILD_STA\":\"$BUILD_STA\",\"REDO\":\"$REDO\",\"LATER_TRANSFER\":\"$LATER_TRANSFER\",\"REGRESS_NOISE\":\"$REGRESS_NOISE\",\"SUPERCLUSTER\":\"$SUPERCLUSTER\",\
+\"TF_TO_STA\":\"$TF_TO_STA\"}"
 
 ml python/3.6
 date
