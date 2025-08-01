@@ -82,6 +82,17 @@ def main(args):
         superclust_dict[behavior] = np.asarray(superclust_dict[behavior])
         printlog(f'done with {behavior} superclustering')
         
+    
+    save_file_labels = os.path.join(cluster_dir, f'superclust_labels_{event}.pkl')
+    save_file_clusters = os.path.join(cluster_dir, f'superclust_clusters_{event}.pkl')
+    
+    printlog(f'Saving labels to {save_file_labels}')
+    with open(save_file_labels, 'wb') as file:
+        pickle.dump(superclust_labels_dict, file)
+    
+    printlog(f'Saving labels to {save_file_clusters}')
+    with open(save_file_clusters, 'wb') as file:
+        pickle.dump(superclust_dict, file)
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
