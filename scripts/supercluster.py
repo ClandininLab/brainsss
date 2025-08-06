@@ -64,6 +64,7 @@ def main(args):
         
         cluster_labels= []
         cluster_model= AgglomerativeClustering(distance_threshold=None,
+                                               connectivity=connectivity,
                                                n_clusters=n_clusters,
                                                memory=None,
                                                linkage='ward')
