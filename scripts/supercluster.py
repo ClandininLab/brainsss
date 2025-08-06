@@ -32,7 +32,7 @@ def main(args):
 
     printlog("Beginning superclustering")
  
-    n_clusters = 500
+    n_clusters = 50000
     
     behave_dict_path=os.path.join(temp_dir,f'behave_dict_total_{event}.pkl')
     with open(behave_dict_path, 'rb') as file:
@@ -63,10 +63,10 @@ def main(args):
         neural_activity= brain.reshape(-1, shape[-1])
         
         cluster_labels= []
-        cluster_model= AgglomerativeClustering(n_clusters=n_clusters,
-                                    memory=None,
-                                    linkage='ward',
-                                    connectivity=connectivity)
+        cluster_model= AgglomerativeClustering(distance_threshold=None,
+                                               n_clusters=n_clusters,
+                                               memory=None,
+                                               linkage='ward')
         
         cluster_model.fit(neural_activity)
         cluster_labels = np.asarray(cluster_model.labels_)
@@ -87,8 +87,8 @@ def main(args):
         gc.collect()
         printlog(f'done with {behavior} superclustering')
     
-    save_file_labels = os.path.join(cluster_dir, f'superclust_labels_{event}.pkl')
-    save_file_clusters = os.path.join(cluster_dir, f'superclust_clusters_{event}.pkl')
+    save_file_labels = os.path.join(cluster_dir, f'superclust_labels_{n_clusters}_{event}.pkl')
+    save_file_clusters = os.path.join(cluster_dir, f'superclust_clusters_{n_clusters}_{event}.pkl')
     
     printlog(f'Saving labels to {save_file_labels}')
     with open(save_file_labels, 'wb') as file:
