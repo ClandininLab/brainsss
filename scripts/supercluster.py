@@ -16,6 +16,7 @@ def main(args):
     later_path = args['later_path']
     temp_dir=args['temp_directory']
     event = args['event']
+    clust_num = args['clust_num']
     cluster_dir = os.path.join(temp_dir, 'clustering')
     
     #####################
@@ -33,7 +34,7 @@ def main(args):
     printlog("Beginning superclustering")
  
     super_vox = 2000
-    super_clust = 25000
+    super_clust = clust_num
     
     behave_dict_path=os.path.join(temp_dir,f'behave_dict_total_{event}.pkl')
     with open(behave_dict_path, 'rb') as file:

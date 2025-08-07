@@ -117,7 +117,14 @@ def main(args):
         event = None
     else:
         # printlog('building flies')
-        event = args["EVENTS"].lower()          
+        event = args["EVENTS"].lower()
+        
+    if args["SUPERCLUSTER"] == "":
+        # printlog('not building flies')
+        clust_num = None
+    else:
+        # printlog('building flies')
+        clust_num = args["EVENTS"].astype(int)
         
         
     # These command line arguments will be empty unless the flag is called from the command line
@@ -419,6 +426,7 @@ def main(args):
                 "later_path": later_path, 
                 "temp_directory": temp_directory,
                 "event": event,
+                "clust_num": clust_num,
                 }
         script = "supercluster.py"
         job_id = brainsss.sbatch(
