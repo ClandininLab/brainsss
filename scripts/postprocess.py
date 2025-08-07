@@ -124,7 +124,7 @@ def main(args):
         clust_num = None
     else:
         # printlog('building flies')
-        clust_num = args["EVENTS"].astype(int)
+        clust_num = args["SUPERCLUSTER"].astype(int)
         
         
     # These command line arguments will be empty unless the flag is called from the command line
