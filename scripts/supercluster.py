@@ -33,7 +33,7 @@ def main(args):
     printlog("Beginning superclustering")
  
     super_vox = 2000
-    super_clust = 50000
+    super_clust = 25000
     
     behave_dict_path=os.path.join(temp_dir,f'behave_dict_total_{event}.pkl')
     with open(behave_dict_path, 'rb') as file:
