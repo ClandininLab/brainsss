@@ -63,14 +63,14 @@ def main(args):
         neural_activity= brain.reshape(-1, shape[-1])
         
         cluster_labels= []
-        cluster_model= AgglomerativeClustering(distance_threshold=None,
-                                               connectivity=connectivity,
+        cluster_model= AgglomerativeClustering(connectivity=connectivity,
                                                n_clusters=n_clusters,
                                                memory=None,
                                                linkage='ward')
         
         cluster_model.fit(neural_activity)
         cluster_labels = np.asarray(cluster_model.labels_)
+        printlog(f'shape of cluster labels {np.shape(cluster_labels)}')
         superclust_labels_dict[behavior]=cluster_labels
         printlog(f'done with {behavior} trial labels')
 
