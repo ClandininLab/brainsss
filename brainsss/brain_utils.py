@@ -328,8 +328,7 @@ def apply_butter_highpass(data, z, cutoff, order, fs):
     hpf_data = butter_highpass_filter(data[:,:,z, :], cutoff, fs, order)
     return hpf_data
 
-def supervoxel_to_full_res(brain, cluster_labels):
-    n_clusters = brain.shape[2]
+def supervoxel_to_full_res(brain, cluster_labels, n_clusters):
     n_tp = brain.shape[1]
     brain_dims=[314,146]
     
