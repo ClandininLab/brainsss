@@ -32,7 +32,8 @@ def main(args):
 
     printlog("Beginning superclustering")
  
-    n_clusters = 50000
+    super_vox = 2000
+    super_clust = 50000
     
     behave_dict_path=os.path.join(temp_dir,f'behave_dict_total_{event}.pkl')
     with open(behave_dict_path, 'rb') as file:
@@ -41,12 +42,12 @@ def main(args):
         printlog(f'behaviors are {list(behave_dict_total.keys())}')
     
     giant_cluster_labels = np.load(os.path.join(cluster_dir, 'cluster_labels_best_flies.npy'))
-    supervox_dict_total=brainsss.make_supervox_dict(behave_dict_total, behaviors, n_clusters,giant_cluster_labels)
+    supervox_dict_total=brainsss.make_supervox_dict(behave_dict_total, behaviors, super_vox,giant_cluster_labels)
 
     full_res={}
     for behave in supervox_dict_total:
         supervox_brain=np.moveaxis(supervox_dict_total[behave],-1,-2)
-        full_res_brain=brainsss.supervoxel_to_full_res(supervox_brain, giant_cluster_labels)
+        full_res_brain=brainsss.supervoxel_to_full_res(supervox_brain, giant_cluster_labels, super_vox)
         full_res_brain=np.moveaxis(full_res_brain, 0,-1)
         full_res_brain=np.moveaxis(full_res_brain, 0,-1)
         full_res[behave]=np.asarray(full_res_brain)
@@ -64,7 +65,7 @@ def main(args):
         
         cluster_labels= []
         cluster_model= AgglomerativeClustering(connectivity=connectivity,
-                                               n_clusters=n_clusters,
+                                               n_clusters=super_clust,
                                                memory=None,
                                                linkage='ward')
         
@@ -75,7 +76,7 @@ def main(args):
         printlog(f'done with {behavior} trial labels')
 
         behavior_superclusters = []
-        for cluster_num in range(n_clusters):
+        for cluster_num in range(super_clust):
             labels= superclust_labels_dict[behavior]
             cluster_indicies= np.where(labels==cluster_num)[0]
             mean_signal = np.mean(neural_activity[cluster_indicies,:], axis=0)
@@ -88,8 +89,8 @@ def main(args):
         gc.collect()
         printlog(f'done with {behavior} superclustering')
     
-    save_file_labels = os.path.join(cluster_dir, f'superclust_labels_{n_clusters}_{event}.pkl')
-    save_file_clusters = os.path.join(cluster_dir, f'superclust_clusters_{n_clusters}_{event}.pkl')
+    save_file_labels = os.path.join(cluster_dir, f'superclust_labels_{super_clust}_{event}.pkl')
+    save_file_clusters = os.path.join(cluster_dir, f'superclust_clusters_{super_clust}_{event}.pkl')
     
     printlog(f'Saving labels to {save_file_labels}')
     with open(save_file_labels, 'wb') as file:
