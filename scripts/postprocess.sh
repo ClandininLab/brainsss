@@ -68,7 +68,8 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -sc|--supercluster)
-      SUPERCLUSTER=True
+      SUPERCLUSTER="$2"
+      shift
       shift
       ;;
     -*|--*)
