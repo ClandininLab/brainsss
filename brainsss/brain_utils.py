@@ -193,7 +193,7 @@ def load_fda_meanbrain():
     fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
     fixed_resolution = (2,2,2)
     fixed = np.asarray(nib.load(fixed_path).get_fdata().squeeze(), dtype='float32')
-    fixed = ants.from_numpy(fixed)
+    fixed = ants.core.ants_image_io(fixed)
     fixed.set_spacing(fixed_resolution)
     return fixed
 
