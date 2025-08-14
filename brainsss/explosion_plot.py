@@ -5,7 +5,7 @@ import pickle
 import ants
 from scipy.ndimage.morphology import binary_erosion
 from scipy.ndimage.morphology import binary_dilation
-import cv2
+# import cv2
 import time
 import matplotlib
 
@@ -38,31 +38,31 @@ def make_single_roi_masks(all_rois, atlas):
         masks[roi] = mask_dilated
     return masks
     
-def make_single_roi_contours(roi_masks, atlas):
-    roi_contours = {}
-    for roi in roi_masks:
-        mask = roi_masks[roi]
-        _, mask_binary = cv2.threshold(np.max(mask,axis=-1).astype('uint8'), 0, 1, cv2.THRESH_BINARY) 
-        contours, _ = cv2.findContours(mask_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)#cv2.RETR_TREE
+# def make_single_roi_contours(roi_masks, atlas):
+#     roi_contours = {}
+#     for roi in roi_masks:
+#         mask = roi_masks[roi]
+#         _, mask_binary = cv2.threshold(np.max(mask,axis=-1).astype('uint8'), 0, 1, cv2.THRESH_BINARY) 
+#         contours, _ = cv2.findContours(mask_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)#cv2.RETR_TREE
 
-        canvas = np.ones(atlas[:,:,0].shape)
-        out = cv2.drawContours(canvas, contours, -1, (0,255,0), 1)
-        out = np.abs(out-1) #flip 0/1
-        roi_contour = np.repeat(out[:,:,np.newaxis],repeats=4,axis=-1) ### copy into rgba channels to make white
+#         canvas = np.ones(atlas[:,:,0].shape)
+#         out = cv2.drawContours(canvas, contours, -1, (0,255,0), 1)
+#         out = np.abs(out-1) #flip 0/1
+#         roi_contour = np.repeat(out[:,:,np.newaxis],repeats=4,axis=-1) ### copy into rgba channels to make white
 
-        # get edge location
-        left_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=0)>0)[0][0]
-        right_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=0)>0)[0][-1]
-        top_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=1)>0)[0][0]
-        bottom_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=1)>0)[0][-1]
+#         # get edge location
+#         left_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=0)>0)[0][0]
+#         right_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=0)>0)[0][-1]
+#         top_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=1)>0)[0][0]
+#         bottom_edge = np.where(np.sum(np.nan_to_num(roi_contour),axis=1)>0)[0][-1]
         
-        roi_contours[roi] = {}
-        roi_contours[roi]['contour'] = roi_contour
-        roi_contours[roi]['left_edge'] = left_edge
-        roi_contours[roi]['right_edge'] = right_edge
-        roi_contours[roi]['top_edge'] = top_edge
-        roi_contours[roi]['bottom_edge'] = bottom_edge
-    return roi_contours
+#         roi_contours[roi] = {}
+#         roi_contours[roi]['contour'] = roi_contour
+#         roi_contours[roi]['left_edge'] = left_edge
+#         roi_contours[roi]['right_edge'] = right_edge
+#         roi_contours[roi]['top_edge'] = top_edge
+#         roi_contours[roi]['bottom_edge'] = bottom_edge
+#     return roi_contours
     
 def unnest_roi_groups(explosion_rois):
     all_rois = []
