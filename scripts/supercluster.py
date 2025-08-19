@@ -38,13 +38,13 @@ def main(args):
     
     behave_dict_path=os.path.join(temp_dir,f'behave_dict_total_{event}.pkl')
     giant_vox_labels = np.load(os.path.join(cluster_dir, 'cluster_labels_best_flies.npy'))
-    full_res = brainsss.sta_to_full_res(behave_dict_path, giant_vox_labels, super_vox)
+    full_res = brainsss.vox_to_full_res(behave_dict_path, giant_vox_labels, super_vox)
     
     printlog('clustering.........')
     giant_cluster_labels = np.load(os.path.join(cluster_dir, f'supercluster_labels_total_{super_clust}.npy'))
     if not os.path.exists(giant_cluster_labels):
         total_dict_path=os.path.join(temp_dir,'behave_dict_total_10flies.pkl')
-        full_res_total = brainsss.sta_to_full_res(total_dict_path, giant_vox_labels, super_vox)
+        full_res_total = brainsss.vox_to_full_res(total_dict_path, giant_vox_labels, super_vox)
         brain_total=full_res_total['total']
         shape=np.shape(brain_total)
 
