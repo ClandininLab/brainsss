@@ -8,6 +8,7 @@ import psutil
 import brainsss
 from scipy.signal import butter, filtfilt, freqz
 import h5py
+import pickle
 
 def extract_traces(fictrac, stim_times, pre_window, post_window, val=None):
     traces = []
@@ -391,6 +392,23 @@ def make_supervox_dict(behave_dict, behaviors, n_clusters,cluster_labels,):
         supervox_dict[behave] = np.asarray(supervox_dict[behave])
         print(f'{behave} shape: {np.shape(supervox_dict[behave])}')
     return supervox_dict
+
+def sta_to_full_res(behave_dict_path, labels, n_clust):
+    with open(behave_dict_path, 'rb') as file:
+        behave_dict_total = pickle.load(file)
+        behaviors=list(behave_dict_total.keys())
+        print(f'behaviors are {list(behave_dict_total.keys())}')
+    
+    supervox_dict_total=brainsss.make_supervox_dict(behave_dict_total, behaviors, n_clust,labels)
+
+    full_res={}
+    for behave in supervox_dict_total:
+        supervox_brain=np.moveaxis(supervox_dict_total[behave],-1,-2)
+        full_res_brain=brainsss.supervoxel_to_full_res(supervox_brain, labels, n_clust)
+        full_res_brain=np.moveaxis(full_res_brain, 0,-1)
+        full_res_brain=np.moveaxis(full_res_brain, 0,-1)
+        full_res[behave]=np.asarray(full_res_brain)
+    return full_res
 
 def load_roi_hemi_ids():
 
