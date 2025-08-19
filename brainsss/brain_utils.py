@@ -393,7 +393,7 @@ def make_supervox_dict(behave_dict, behaviors, n_clusters,cluster_labels,):
         print(f'{behave} shape: {np.shape(supervox_dict[behave])}')
     return supervox_dict
 
-def sta_to_full_res(behave_dict_path, labels, n_clust):
+def vox_to_full_res(behave_dict_path, labels, n_clust):
     with open(behave_dict_path, 'rb') as file:
         behave_dict_total = pickle.load(file)
         behaviors=list(behave_dict_total.keys())
