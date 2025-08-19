@@ -58,10 +58,13 @@ def main(args):
                                             linkage='ward')
 
         cluster_model.fit(neural_activity_total)
-        cluster_labels = np.asarray(cluster_model.labels_)
-        printlog(f'shape of cluster labels {np.shape(cluster_labels)}')
+        giant_cluster_labels = np.asarray(cluster_model.labels_)
+        printlog(f'shape of cluster labels {np.shape(giant_cluster_labels)}')
         
-        np.save(os.path.join(cluster_dir, f'supercluster_labels_total_{super_clust}.npy'), giant_cluster_labels)
+        np.save(giant_cluster_labels_path, giant_cluster_labels)
+        
+        del brain_total, neural_activity_total, connectivity, cluster_model
+        gc.collect()
     else:
         giant_cluster_labels = np.load(giant_cluster_labels_path)
     
@@ -80,7 +83,7 @@ def main(args):
         
         
          # Clean up
-        del brain, neural_activity, connectivity, cluster_model
+        del brain, neural_activity
         gc.collect()
         printlog(f'done with {behavior} superclustering')
     
