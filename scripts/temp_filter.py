@@ -64,11 +64,11 @@ def main(args):
         if event != None:
             filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}_{behavior}_{event}.h5")
             ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}_{behavior}_{event}.h5")
-            save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}_{event}.h5')
+            save_file = os.path.join(save_directory, '5sec_' + brain_file.split('.')[0] + '_filtered_' + f'{behavior}_{event}.h5')
         else:
             filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}_{behavior}.h5")
             ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}_{behavior}.h5")
-            save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
+            save_file = os.path.join(save_directory, '5sec_' + brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
         if os.path.exists(save_file)==False or redo:
             #load brain
             with h5py.File(brain_dest, 'r') as hf, \
