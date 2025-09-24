@@ -55,7 +55,7 @@ def main(args):
             temp_dir=os.path.join(dataset_path,fly,'temp_filter')
             for fx in os.listdir(temp_dir):
                 if '500_' not in fx and f'_{b}_' in fx and event in fx and f'_{channel}_' in fx:
-                    printlog(fly,fx)
+                    printlog(f'fly is {fly} and file is {fx}')
                     file_need=(fx)
                     if file_need!=[]:
                         path=os.path.join(temp_dir,file_need)
@@ -76,7 +76,7 @@ def main(args):
                             temp=np.asarray(temp)
                             brain_w_ts=np.moveaxis(temp,0,-1)
                             five_shape=brain_w_ts.shape
-                            printlog(five_shape)
+                            printlog(f'shape is {five_shape}')
                             brain_new=brain_w_ts
                             neural_activity= brain_new.reshape(-1, five_shape[-2], five_shape[-1])
 
@@ -87,7 +87,7 @@ def main(args):
                                 mean_signal = np.mean(neural_activity[cluster_indicies,:], axis=0)
                                 behavior_superclusters.append(mean_signal)
                             behavior_superclusters = np.asarray(behavior_superclusters)
-                            printlog(behavior_superclusters.shape)
+                            printlog(f'behavior_superclusters shape is {behavior_superclusters.shape}')
                             fly_superclust_dict[b][fn]=behavior_superclusters
                             del brain,neural_activity,behavior_superclusters,brain_new,ts,result,mask,labels,mean_signal
                             gc.collect()
