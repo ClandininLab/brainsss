@@ -73,6 +73,7 @@ def main(args):
         build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
         later_transfer = brainsss.parse_true_false(settings.get("later_transfer", False))
         regress_noise = brainsss.parse_true_false(settings.get("regress_noise", False))
+        get_ind_vox = brainsss.parse_true_false(settings.get("get_ind_vox", False))
         supercluster = brainsss.parse_true_false(settings.get("supercluster", False))
         
     else:
@@ -85,6 +86,7 @@ def main(args):
         build_STA = False
         later_transfer = False
         regress_noise = False
+        get_ind_vox = False
         supercluster = False
     
      ### Parse remaining command line args
@@ -148,6 +150,8 @@ def main(args):
         regress_noise = True
     if args["SUPERCLUSTER"] != "":
         supercluster = True
+    if args["GET_IND_VOX"] != "":
+        get_ind_vox = True
 
     if fly_dirs is None:
         printlog(
@@ -431,6 +435,29 @@ def main(args):
         script = "supercluster.py"
         job_id = brainsss.sbatch(
             jobname="supercluster",
+            script=os.path.join(scripts_path, script),
+            modules=modules,
+            args=args,
+            logfile=logfile,
+            time=48,
+            cpus=32,
+            mem='250GB',
+            nice=nice,
+            nodes=nodes,
+        )
+        brainsss.wait_for_job(job_id, logfile, com_path)
+        
+    if get_ind_vox:
+        args = {"logfile": logfile, 
+                "dataset_path": dataset_path,
+                "later_path": later_path, 
+                "event": event,
+                "fly_num": fly_num,
+                "ch_num": ch_num,
+                }
+        script = "get_ind_vox.py"
+        job_id = brainsss.sbatch(
+            jobname="get_ind_vox",
             script=os.path.join(scripts_path, script),
             modules=modules,
             args=args,
