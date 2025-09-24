@@ -32,7 +32,9 @@ def main(args):
 
     printlog("Beginning indivdual vox getting")
     
-    supercluster_labels=np.load(os.path.join(later_path, 'clustering', 'supercluster_labels_total_500.npy'))
+    later_dir=os.path.join(later_path, 'temp_filter')
+    
+    supercluster_labels=np.load(os.path.join(later_dir, 'clustering', 'supercluster_labels_total_500.npy'))
     
     event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
     with open(event_times_path, 'rb') as file:
@@ -91,7 +93,7 @@ def main(args):
                             gc.collect()
                     else:
                         printlog(f'{fly} does not contribute to this behavior')
-    file_path=os.path.join(later_path, 'clustering', 'individual_fly_superclusters_2bin_total.pkl')
+    file_path=os.path.join(later_dir, 'clustering', 'individual_fly_superclusters_2bin_total.pkl')
     with open(file_path, 'wb') as file:
             pickle.dump(fly_superclust_dict, file)
 
