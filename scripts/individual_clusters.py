@@ -36,7 +36,7 @@ def main(args):
  
     n_clusters=500
     
-    total_path = os.path.join(later_path, f'{event}_total_dict.pkl')
+    total_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
     with open(total_path, 'rb') as file:
         total_data_dict = pickle.load(file)
     
@@ -60,7 +60,7 @@ def main(args):
             if 'timestamps' in file:
                 ts_path=os.path.join(warp_path,file)
         event_time_bins=[]
-        for event in total_data_dict[fly_num]['event_times'][:197]:
+        for event in total_data_dict[fly_num]['total'][:198]:
             seconds_before = 2
             ms_per_unit = 10
 
