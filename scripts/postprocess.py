@@ -475,6 +475,7 @@ def main(args):
         brainsss.wait_for_job(job_id, logfile, com_path)
         
     if individual_clusters:
+        temp_directory = os.path.join(later_path, "temp_filter")
         args = {"logfile": logfile,
                 "later_path": later_path,
                 "temp_directory": temp_directory,
