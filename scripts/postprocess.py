@@ -75,6 +75,7 @@ def main(args):
         regress_noise = brainsss.parse_true_false(settings.get("regress_noise", False))
         get_ind_vox = brainsss.parse_true_false(settings.get("get_ind_vox", False))
         supercluster = brainsss.parse_true_false(settings.get("supercluster", False))
+        individual_clusters = brainsss.parse_true_false(settings.get("individual_clusters", False))
         
     else:
         filter_bins = False
@@ -88,7 +89,8 @@ def main(args):
         regress_noise = False
         get_ind_vox = False
         supercluster = False
-    
+        individual_clusters = False
+
      ### Parse remaining command line args
     if args["BEST_FLIES"] == "" and args["FLIES"] == "":
         printlog('no flies specified')
@@ -152,6 +154,8 @@ def main(args):
         supercluster = True
     if args["GET_IND_VOX"] != "":
         get_ind_vox = True
+    if args["INDIVIDUAL_CLUSTERS"] != "":
+        individual_clusters = True
 
     if fly_dirs is None:
         printlog(
@@ -458,6 +462,29 @@ def main(args):
         script = "get_ind_vox.py"
         job_id = brainsss.sbatch(
             jobname="get_ind_vox",
+            script=os.path.join(scripts_path, script),
+            modules=modules,
+            args=args,
+            logfile=logfile,
+            time=48,
+            cpus=32,
+            mem='250GB',
+            nice=nice,
+            nodes=nodes,
+        )
+        brainsss.wait_for_job(job_id, logfile, com_path)
+        
+    if individual_clusters:
+        args = {"logfile": logfile,
+                "later_path": later_path,
+                "temp_directory": temp_directory,
+                "event": event,
+                "fly_num": fly_num,
+                "ch_num": ch_num,
+                }
+        script = "individual_clusters.py"
+        job_id = brainsss.sbatch(
+            jobname="individual_clusters",
             script=os.path.join(scripts_path, script),
             modules=modules,
             args=args,
