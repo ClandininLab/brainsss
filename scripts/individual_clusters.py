@@ -60,7 +60,7 @@ def main(args):
             if 'timestamps' in file:
                 ts_path=os.path.join(warp_path,file)
         event_time_bins=[]
-        for event in total_data_dict[fly_num]['total'][:198]:
+        for event in total_data_dict[str(fly_num)]['total'][:198]:
             seconds_before = 2
             ms_per_unit = 10
 
