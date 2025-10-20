@@ -47,9 +47,7 @@ def main(args):
     giant_total_labels=np.load(label_files)
     
     giant_total_labels=giant_total_labels.reshape(314,146,91)
-    fly_clusters={}
     for fly_num in fly_nums:
-        fly_clusters[fly_num]={}
         printlog(f'Processing fly {fly_num}')
         dff_path = f'/oak/stanford/groups/trc/data/Ilana/2P/data/fly_{fly_num}/dff'
         warp_path = f'/oak/stanford/groups/trc/data/Ilana/2P/data/fly_{fly_num}/warp'
@@ -141,12 +139,12 @@ def main(args):
         #             print(f"Cluster {cluster}, Bin {bin_idx}: {len(averaged_data)} time points")
                 else:
                     cluster_averages[cluster][bin_idx] = np.array([]).reshape(0, 2)
-        fly_clusters[fly_num] = cluster_averages
+        save_file=os.path.join(later_path,f'{fly_num}_{event}_individual_clusters_ch_{ch_num}_dict.pkl')
+        with h5py.File(save_file, "w") as data_file:
+                    data_file.create_dataset("data", data=cluster_averages)
         printlog(f'Finished fly {fly_num}')
     
-    save_file=os.path.join(later_path,f'{event}_individual_clusters_ch_{ch_num}_dict.pkl')
-    with h5py.File(save_file, "w") as data_file:
-                data_file.create_dataset("data", data=fly_clusters)
+    
     
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
