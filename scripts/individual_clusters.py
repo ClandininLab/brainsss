@@ -146,7 +146,7 @@ def main(args):
     
     save_file=os.path.join(later_path,f'{event}_individual_clusters_ch_{ch_num}_dict.pkl')
     with h5py.File(save_file, "w") as data_file:
-                data_file.create_dataset("data", data=fly_clusters.astype('float32'))
+                data_file.create_dataset("data", data=fly_clusters)
     
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
