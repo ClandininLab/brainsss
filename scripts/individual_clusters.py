@@ -142,7 +142,7 @@ def main(args):
         save_file=os.path.join(later_path,f'{fly_num}_{event}_individual_clusters_ch_{ch_num}_dict.pkl')
         with h5py.File(save_file, "w") as data_file:
                     data_file.create_dataset("data", data=cluster_averages)
-        printlog(f'Finished fly {fly_num}')
+        printlog(f'Finished fly {fly_num} saved in {save_file}')
     
     
     
