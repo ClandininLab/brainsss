@@ -77,7 +77,7 @@ def main(args):
             time_ds = tf['data']
             
             for cluster in range_r:
-                printlog(f"Processing cluster {cluster}")
+                # printlog(f"Processing cluster {cluster}")
                 
                 mask = (giant_total_labels == cluster)
                 x_idx, y_idx, z_idx = np.where(mask)
@@ -140,8 +140,8 @@ def main(args):
                 else:
                     cluster_averages[cluster][bin_idx] = np.array([]).reshape(0, 2)
         save_file=os.path.join(later_path,f'{fly_num}_{event}_individual_clusters_ch_{ch_num}_dict.pkl')
-        with h5py.File(save_file, "w") as data_file:
-                    data_file.create_dataset("data", data=cluster_averages)
+        with open(save_file, 'wb') as file:
+            pickle.dump(cluster_averages, file)
         printlog(f'Finished fly {fly_num} saved in {save_file}')
     
     
