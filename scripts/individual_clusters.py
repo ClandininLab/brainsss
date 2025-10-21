@@ -77,7 +77,7 @@ def main(args):
             time_ds = tf['data']
             
             for cluster in range_r:
-                printlog(f"Processing cluster {cluster}")
+                # printlog(f"Processing cluster {cluster}")
                 
                 mask = (giant_total_labels == cluster)
                 x_idx, y_idx, z_idx = np.where(mask)
