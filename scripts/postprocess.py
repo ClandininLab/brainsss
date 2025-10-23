@@ -479,7 +479,7 @@ def main(args):
         args = {"logfile": logfile,
                 "later_path": later_path,
                 "temp_directory": temp_directory,
-                "event": event,
+                "scratch_dir": scratch_path,
                 "fly_num": fly_num,
                 "ch_num": ch_num,
                 }
