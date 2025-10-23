@@ -15,7 +15,6 @@ import pickle
 def main(args):
     later_path = args['later_path']
     temp_dir=args['temp_directory']
-    event = args['event']
     cluster_dir = os.path.join(temp_dir, 'clustering')
     ch_num = args['ch_num']
     fly_nums = args['fly_num']
@@ -36,7 +35,7 @@ def main(args):
  
     n_clusters=500
     
-    total_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    total_path = os.path.join(later_path, f'10flies_5sec_event_times_split_dic.pkl')
     with open(total_path, 'rb') as file:
         total_data_dict = pickle.load(file)
     
