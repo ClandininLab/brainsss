@@ -98,9 +98,9 @@ def main(args):
                 cluster_data=np.mean(cluster_data,axis=0)
         
         
-            cluster_brains[cluster] = {}
-            for event_idx in range(len(events)):
-                cluster_brains[cluster][event_idx] = np.array(cluster_data)
+                cluster_brains[cluster] = {}
+                for event_idx in range(len(events)):
+                    cluster_brains[cluster][event_idx] = np.array(cluster_data)
         save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_ch_{ch_num}_dict.pkl')
         with open(save_file, 'wb') as file:
             pickle.dump(cluster_brains, file)
