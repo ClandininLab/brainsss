@@ -57,18 +57,7 @@ def main(args):
         for file in os.listdir(warp_path):
             if 'timestamps' in file:
                 ts_path=os.path.join(warp_path,file)
-        event_time_bins=[]
-        for event in total_data_dict[str(fly_num)]['total'][:198]:
-            seconds_before = 2
-            ms_per_unit = 10
-
-            units_to_subtract = (seconds_before * 1000) // ms_per_unit
-            new_timepoint = event - units_to_subtract
-            event_edges=[new_timepoint,event]
-            event_time_bins.append(event_edges)
-        event_time_bins=np.asarray(event_time_bins)
-        
-        time_bins = event_time_bins
+        events=total_data_dict[str(fly_num)]['total']
         cluster_brains = {}
         range_r=np.arange(n_clusters)
 
@@ -87,61 +76,34 @@ def main(args):
                     continue
                     
                 # Initialize dictionary for this cluster's bins
-                cluster_data = {}
-                for bin_idx in range(len(time_bins)):
-                    cluster_data[bin_idx] = []
+                cluster_data = []
                 
                 for i, (x, y, z) in enumerate(zip(x_idx, y_idx, z_idx)):
                     voxel_times = time_ds[x, y, z, :]
                     voxel_data = data_ds[x, y, z, :]
                     
                     # For each time bin, find matching data
-                    for bin_idx, (start_time, end_time) in enumerate(time_bins):
-                        in_bin = (voxel_times >= start_time) & (voxel_times <= end_time)
-                        
-                        if np.any(in_bin):
-                            matching_times = voxel_times[in_bin]
-                            matching_data = voxel_data[in_bin]
+                    for event_idx in range(np.shape(events)[0]):
+                        if event_idx!=0:
+                            seconds_after = 2
+                            ms_per_unit = 10
+
+                            units = (seconds_after * 1000) // ms_per_unit
+                            new_timepoint = (events[event_idx-1]) + units
+                            matching_data=np.asarray(voxel_data[(voxel_times>=new_timepoint) & (voxel_times<=events[event_idx])])[-10:]
+                        else:
+                            matching_data=np.asarray(voxel_data[(voxel_times<=events[event_idx])])[-10:]
                             
-                            for t, d in zip(matching_times, matching_data):
-                                cluster_data[bin_idx].append([x, y, z, t, d])
-                
-                # Convert to arrays and store
-                cluster_brains[cluster] = {}
-                for bin_idx in range(len(time_bins)):
-                    if cluster_data[bin_idx]:
-                        cluster_brains[cluster][bin_idx] = np.array(cluster_data[bin_idx])
-        #                 print(f"Cluster {cluster}, Bin {bin_idx}: {len(cluster_data[bin_idx])} points")
-                    else:
-                        cluster_brains[cluster][bin_idx] = np.array([]).reshape(0, 5)
+                    cluster_data.append(matching_data)
+                cluster_data=np.mean(cluster_data,axis=0)
         
-        # Access data:
-        # cluster_brains[cluster_id][bin_index] gives you array with [x, y, z, time, value]
-        cluster_averages = {}
-        for cluster in cluster_brains:
-            cluster_averages[cluster] = {}
-            for bin_idx in cluster_brains[cluster]:
-                data = cluster_brains[cluster][bin_idx]
-                if len(data) > 0:
-                    # data columns are [x, y, z, timestamp, data_value]
-                    # Group by timestamp and average the data_values
-                    unique_times = np.unique(data[:, 3])  # Get unique timestamps
-                    averaged_data = []
-                    
-                    for time_point in unique_times:
-                        # Find all spatial points at this timepoint
-                        time_mask = data[:, 3] == time_point
-                        spatial_values = data[time_mask, 4]  # Get all data_values at this time
-                        avg_value = np.mean(spatial_values)
-                        averaged_data.append([time_point, avg_value])
-                    
-                    cluster_averages[cluster][bin_idx] = np.array(averaged_data)
-        #             print(f"Cluster {cluster}, Bin {bin_idx}: {len(averaged_data)} time points")
-                else:
-                    cluster_averages[cluster][bin_idx] = np.array([]).reshape(0, 2)
-        save_file=os.path.join(later_path,f'{fly_num}_{event}_individual_clusters_ch_{ch_num}_dict.pkl')
+        
+        cluster_brains[cluster] = {}
+        for event_idx in range(len(events)):
+            cluster_brains[cluster][event_idx] = np.array(cluster_data)
+        save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_ch_{ch_num}_dict.pkl')
         with open(save_file, 'wb') as file:
-            pickle.dump(cluster_averages, file)
+            pickle.dump(cluster_brains, file)
         printlog(f'Finished fly {fly_num} saved in {save_file}')
     
     
