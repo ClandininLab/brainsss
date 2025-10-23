@@ -15,7 +15,6 @@ import pickle
 def main(args):
     later_path = args['later_path']
     temp_dir=args['temp_directory']
-    event = args['event']
     cluster_dir = os.path.join(temp_dir, 'clustering')
     ch_num = args['ch_num']
     fly_nums = args['fly_num']
@@ -36,7 +35,7 @@ def main(args):
  
     n_clusters=500
     
-    total_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    total_path = os.path.join(later_path, f'10flies_5sec_event_times_split_dic.pkl')
     with open(total_path, 'rb') as file:
         total_data_dict = pickle.load(file)
     
@@ -98,9 +97,9 @@ def main(args):
                 cluster_data=np.mean(cluster_data,axis=0)
         
         
-            cluster_brains[cluster] = {}
-            for event_idx in range(len(events)):
-                cluster_brains[cluster][event_idx] = np.array(cluster_data)
+                cluster_brains[cluster] = {}
+                for event_idx in range(len(events)):
+                    cluster_brains[cluster][event_idx] = np.array(cluster_data)
         save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_ch_{ch_num}_dict.pkl')
         with open(save_file, 'wb') as file:
             pickle.dump(cluster_brains, file)
