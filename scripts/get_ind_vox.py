@@ -43,7 +43,9 @@ def main(args):
         behaviors=list(event_times_struct[f].keys())
         printlog(f"Found behaviors: {behaviors}")
     
-    fly_superclust_dict={'inc':{}, 'dec':{}, 'flat':{}, 'total':{}}
+    fly_superclust_dict={}
+    for b in behaviors:
+        fly_superclust_dict[b]={}
     # range_start=-2000; range_end=3000; steps=500
     intervals=np.asarray([[-600,0],[700,1300]])
     super_clust=500
