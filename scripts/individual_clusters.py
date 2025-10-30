@@ -74,32 +74,44 @@ def main(args):
                 if n_voxels == 0:
                     continue
                     
-                # Initialize dictionary for this cluster's bins
-                cluster_data = []
-                
-                for i, (x, y, z) in enumerate(zip(x_idx, y_idx, z_idx)):
-                    voxel_times = time_ds[x, y, z, :]
-                    voxel_data = data_ds[x, y, z, :]
-                    
-                    # For each time bin, find matching data
-                    for event_idx in range(np.shape(events)[0]):
-                        if event_idx!=0:
-                            seconds_after = 2
-                            ms_per_unit = 10
-
-                            units = (seconds_after * 1000) // ms_per_unit
-                            new_timepoint = (events[event_idx-1]) + units
-                            matching_data=np.asarray(voxel_data[(voxel_times>=new_timepoint) & (voxel_times<=events[event_idx])])[-10:]
-                        else:
-                            matching_data=np.asarray(voxel_data[(voxel_times<=events[event_idx])])[-10:]
-                            
-                    cluster_data.append(matching_data)
-                cluster_data=np.mean(cluster_data,axis=0)
-        
-        
                 cluster_brains[cluster] = {}
-                for event_idx in range(len(events)):
-                    cluster_brains[cluster][event_idx] = np.array(cluster_data)
+                for event_idx in range(np.shape(events)[0]):
+                    # Initialize dictionary for this cluster's bins
+                    event_time = events[event_idx]
+                        # Define time window
+                    if event_idx == 0:
+                        # First event: get last 10 points before it
+                        time_min = -np.inf
+                    else:
+                        # Subsequent events: start 2 seconds after previous event
+                        seconds_after = 2
+                        ms_per_unit = 10
+                        units = (seconds_after * 1000) // ms_per_unit
+                        time_min = events[event_idx - 1] + units
+                    
+                    time_max = event_time
+                    cluster_data = []
+                    for i, (x, y, z) in enumerate(zip(x_idx, y_idx, z_idx)):
+                        voxel_times = time_ds[x, y, z, :]
+                        voxel_data = data_ds[x, y, z, :]
+                    # For each time bin, find matching data
+                        valid_indices = np.where((voxel_times >= time_min) & (voxel_times <= time_max))[0]                        
+                        if len(valid_indices) >= 10:
+                            # Get the last 10 timepoints before the event
+                            matching_data = voxel_data[valid_indices[-10:]]
+                        elif len(valid_indices) > 0:
+                            # If less than 10 points available, pad with NaN or skip
+                            printlog(f"Warning: Only {len(valid_indices)} timepoints before event {event_idx} for cluster {cluster}")
+                            matching_data = voxel_data[valid_indices]
+                            # Pad with NaN if needed
+                            matching_data = np.pad(matching_data, (10 - len(matching_data), 0), 
+                                                  constant_values=np.nan)
+                        else:
+                            # No valid timepoints
+                            matching_data = np.full(10, np.nan)
+                            
+                        cluster_data.append(matching_data)
+                    cluster_brains[cluster][event_idx] = np.nanmean(cluster_data, axis=0)
         save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_ch_{ch_num}_dict.pkl')
         with open(save_file, 'wb') as file:
             pickle.dump(cluster_brains, file)
