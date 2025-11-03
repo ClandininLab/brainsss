@@ -87,18 +87,18 @@ def main(args):
                 cluster_brains[cluster] = {}
                 for event_idx in range(np.shape(events)[0]):
                     event_time = events[event_idx]
-                        # Define time window
-                    if event_idx == 0:
+                    # Define time window
+                    if event_idx == np.shape(events)[0]:
                         # First event: get last 10 points before it
-                        time_min = -np.inf
+                        time_max = np.inf
                     else:
                         # Subsequent events: start 2 seconds after previous event
                         seconds_after = 2
                         ms_per_unit = 10
                         units = (seconds_after * 1000) // ms_per_unit
-                        time_min = events[event_idx - 1] + units
+                        time_max = events[event_idx] + units
 
-                    time_max = event_time
+                    time_min = event_time
                     cluster_data = []
                     for voxel_idx in range(n_voxels):
                         voxel_times = voxel_times_cache[voxel_idx]
@@ -120,7 +120,7 @@ def main(args):
                             
                         cluster_data.append(matching_data)
                     cluster_brains[cluster][event_idx] = np.nanmean(cluster_data, axis=0)
-        save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_ch_{ch_num}_dict.pkl')
+        save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_ch_{ch_num}_after_dict.pkl')
         with open(save_file, 'wb') as file:
             pickle.dump(cluster_brains, file)
         printlog(f'Finished fly {fly_num} saved in {save_file}')
