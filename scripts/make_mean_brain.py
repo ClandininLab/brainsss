@@ -55,6 +55,14 @@ def main(args):
         except FileNotFoundError:
             printlog(F"Not found (skipping){file:.>{width-20}}")
             #printlog(f'{file} not found.')
+        except Exception as e:
+            printlog(f"ERROR processing {file}: {str(e)}")
+            
+        finally:
+            # ALWAYS clean up memory, even if error occurs
+            del brain
+            del meanbrain
+            gc.collect()  # Force garbage collection
 
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
