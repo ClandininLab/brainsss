@@ -87,16 +87,20 @@ def main(args):
                 cluster_brains[cluster] = {}
                 for event_idx in range(np.shape(events)[0]):
                     event_time = events[event_idx]
-                    # Define time window
-                    if event_idx == np.shape(events)[0]:
-                        # First event: get last 10 points before it
-                        time_max = np.inf
-                    else:
-                        # Subsequent events: start 2 seconds after previous event
+                    
+                    # Get 10 points AFTER the event (within 2 seconds)
+                    if event_idx == np.shape(events)[0] - 1:  # FIXED: Last event
+                        # Last event: can go up to 2 seconds after
                         seconds_after = 2
                         ms_per_unit = 10
                         units = (seconds_after * 1000) // ms_per_unit
-                        time_max = events[event_idx] + units
+                        time_max = event_time + units
+                    else:
+                        # For other events: stop at next event or 2 seconds, whichever comes first
+                        seconds_after = 2
+                        ms_per_unit = 10
+                        units = (seconds_after * 1000) // ms_per_unit
+                        time_max = min(events[event_idx + 1], event_time + units)
 
                     time_min = event_time
                     cluster_data = []
@@ -108,13 +112,11 @@ def main(args):
                                                 (voxel_times <= time_max))[0]
                         
                         if len(valid_indices) >= 10:
-                            matching_data = voxel_data[valid_indices[-10:]]
+                            matching_data = voxel_data[valid_indices[:10]]  # FIRST 10, not last 10
                         elif len(valid_indices) > 0:
-                            # if event_idx % 10 == 0 and voxel_idx == 0:  # Reduce log spam
-                                # printlog(f"Warning: Only {len(valid_indices)} timepoints before event {event_idx} for cluster {cluster}")
                             matching_data = voxel_data[valid_indices]
-                            matching_data = np.pad(matching_data, (10 - len(matching_data), 0), 
-                                                constant_values=np.nan)
+                            matching_data = np.pad(matching_data, (0, 10 - len(matching_data)), 
+                                                constant_values=np.nan)  # Pad at END
                         else:
                             matching_data = np.full(10, np.nan)
                             
