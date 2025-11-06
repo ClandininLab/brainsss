@@ -7,6 +7,7 @@ import brainsss
 import numpy as np
 import nibabel as nib
 import h5py
+import gc
 
 def main(args):
 
