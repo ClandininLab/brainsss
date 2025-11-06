@@ -107,7 +107,7 @@ def main(args):
             fly_dirs.append(fly_name)
         printlog(f"Flies to be processed {fly_dirs}")
     elif args["FLIES"] != "":
-        fly_num = None
+        fly_num = args["FLIES"].split(",")
         fly_dirs = args["FLIES"].split(",")
         printlog(f"Fly being processed: {fly_dirs}")
     ### add 'fly_' to beginning if it isn't there
