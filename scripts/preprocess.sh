@@ -6,6 +6,8 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=./logs/mainlog.out
 #SBATCH --open-mode=append
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=watlw@stanford.edu
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -117,5 +119,5 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 
 ml python/3.6
 date
-echo "Running: python3 -u ./postprocess.py $ARGS"
+echo "Running: python3 -u ./preprocess.py $ARGS"
 python3 -u ./preprocess.py $ARGS
