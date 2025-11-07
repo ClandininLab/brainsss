@@ -112,10 +112,10 @@ def main(args):
                                                 (voxel_times <= time_max))[0]
                         
                         if len(valid_indices) >= 10:
-                            matching_data = voxel_data[valid_indices[:10]]  # FIRST 10, not last 10
+                            matching_data = voxel_data[valid_indices[:5]]  # FIRST 5, not last 10
                         elif len(valid_indices) > 0:
                             matching_data = voxel_data[valid_indices]
-                            matching_data = np.pad(matching_data, (0, 10 - len(matching_data)), 
+                            matching_data = np.pad(matching_data, (0,5 - len(matching_data)), 
                                                 constant_values=np.nan)  # Pad at END
                         else:
                             matching_data = np.full(10, np.nan)
