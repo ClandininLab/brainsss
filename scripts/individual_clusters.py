@@ -87,29 +87,27 @@ def main(args):
                 cluster_brains[cluster] = {}
                 for event_idx in range(np.shape(events)[0]):
                     event_time = events[event_idx]
-                    
-                    # Get 10 points AFTER the event (within 2 seconds)
-                    if event_idx == np.shape(events)[0] - 1:  # FIXED: Last event
-                        # Last event: can go up to 2 seconds after
-                        seconds_after = 2
-                        ms_per_unit = 10
-                        units = (seconds_after * 1000) // ms_per_unit
-                        time_max = event_time + units
-                    else:
-                        # For other events: stop at next event or 2 seconds, whichever comes first
-                        seconds_after = 2
-                        ms_per_unit = 10
-                        units = (seconds_after * 1000) // ms_per_unit
-                        time_max = min(events[event_idx + 1], event_time + units)
+                    # # Get 10 points AFTER the event (within 2 seconds)
+                    # if event_idx == np.shape(events)[0] - 1:  # FIXED: Last event
+                    #     # Last event: can go up to 2 seconds after
+                    #     seconds_after = 2
+                    #     ms_per_unit = 10
+                    #     units = (seconds_after * 1000) // ms_per_unit
+                    #     time_max = event_time + units
+                    # else:
+                    #     # For other events: stop at next event or 2 seconds, whichever comes first
+                    #     seconds_after = 2
+                    #     ms_per_unit = 10
+                    #     units = (seconds_after * 1000) // ms_per_unit
+                    #     time_max = min(events[event_idx + 1], event_time + units)
 
-                    time_min = event_time
+                    # time_min = event_time
                     cluster_data = []
                     for voxel_idx in range(n_voxels):
                         voxel_times = voxel_times_cache[voxel_idx]
                         voxel_data = voxel_data_cache[voxel_idx]
                         
-                        valid_indices = np.where((voxel_times >= time_min) & 
-                                                (voxel_times <= time_max))[0]
+                        valid_indices = np.where((voxel_times >= event_time))[0]
                         
                         if len(valid_indices) >= 5:
                             matching_data = voxel_data[valid_indices[:5]]  # FIRST 5, not last 10
