@@ -111,14 +111,14 @@ def main(args):
                         valid_indices = np.where((voxel_times >= time_min) & 
                                                 (voxel_times <= time_max))[0]
                         
-                        if len(valid_indices) >= 10:
+                        if len(valid_indices) >= 5:
                             matching_data = voxel_data[valid_indices[:5]]  # FIRST 5, not last 10
                         elif len(valid_indices) > 0:
                             matching_data = voxel_data[valid_indices]
                             matching_data = np.pad(matching_data, (0,5 - len(matching_data)), 
                                                 constant_values=np.nan)  # Pad at END
                         else:
-                            matching_data = np.full(10, np.nan)
+                            matching_data = np.full(5, np.nan)
                             
                         cluster_data.append(matching_data)
                     cluster_brains[cluster][event_idx] = np.nanmean(cluster_data, axis=0)
