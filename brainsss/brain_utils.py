@@ -344,6 +344,8 @@ def supervoxel_to_full_res(brain, cluster_labels, n_clusters):
         reformed_brain.append(colored_by_betas)
     return np.asarray(reformed_brain)
 def dual_channel_remove_noise(arr_r, arr_g, printlog):
+    arr_r=np.asarray(arr_r)
+    arr_g=np.asarray(arr_g)
     shape=np.shape(arr_g)
     flat_red=arr_r.reshape(-1,shape[-1])
     flat_green=arr_g.reshape(-1,shape[-1])
