@@ -56,7 +56,8 @@ def main(args):
         if arr_g is None or arr_r is None:
             printlog(f"Skipping behavior {behave} due to missing data.")
             continue
-        total_behave=brainsss.dual_channel_remove_noise(arr_r, arr_g, printlog)
+        else:
+            total_behave=brainsss.dual_channel_remove_noise(arr_r, arr_g, printlog)
         behave_dict_total[behave]=total_behave
         
     # Save the results to pickle file
