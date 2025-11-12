@@ -53,7 +53,7 @@ def main(args):
         printlog(behave)
         arr_g=behave_dict_g[behave]
         arr_r=behave_dict_r[behave]
-        if arr_g is None or arr_r is None:
+        if arr_g == [] or arr_r == []:
             printlog(f"Skipping behavior {behave} due to missing data.")
         else:
             total_behave=brainsss.dual_channel_remove_noise(arr_r, arr_g, printlog)
