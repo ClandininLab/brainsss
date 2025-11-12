@@ -55,22 +55,24 @@ def main(args):
         arr_r=behave_dict_r[behave]
         if arr_g is None or arr_r is None:
             printlog(f"Skipping behavior {behave} due to missing data.")
-            continue
         else:
             total_behave=brainsss.dual_channel_remove_noise(arr_r, arr_g, printlog)
-        behave_dict_total[behave]=total_behave
+            behave_dict_total[behave]=total_behave
         
     # Save the results to pickle file
-    
-    printlog(f'Saving dict to {save_file}')
-    with open(save_file, 'wb') as file:
-        pickle.dump(behave_dict_total, file)
+    if behave_dict_total == {}:
+        printlog("No behaviors were processed. Exiting without saving.")
+        return
+    else:
+        printlog(f'Saving dict to {save_file}')
+        with open(save_file, 'wb') as file:
+            pickle.dump(behave_dict_total, file)
         
     # to open: 
     # with open('behave_dict_total_event.pkl', 'rb') as file:
         # loaded_dict = pickle.load(file)
 
-    printlog(f'Successfully saved {len(behave_dict_total)} behaviors to pickle')
+        printlog(f'Successfully saved {len(behave_dict_total)} behaviors to pickle')
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 
