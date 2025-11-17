@@ -2,3 +2,12 @@ brainsss.egg-info/
 brainsss/brainsss/__pycache__/
 brainsss/notebooks/.ipynb_checkpoints/
 brainsss/.DS_Store
+**/.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+*/__pycache__/
+**/__pycache__/
+__pycache__/
+**/__pycache__/
+*.pyc
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
