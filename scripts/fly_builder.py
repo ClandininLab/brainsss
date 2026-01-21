@@ -657,7 +657,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
 
     ### TRY TO LOAD ELSX ###
     try:
-        xlsx_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset/master_2P.xlsx'
+        xlsx_path = '/oak/stanford/groups/trc/data/WBI_shared/master_2P.xlsx'
         wb = load_workbook(filename=xlsx_path, read_only=False)
         ws = wb.active
         printlog("Sucessfully opened master_2P log")
