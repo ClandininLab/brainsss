@@ -544,19 +544,11 @@ def main(args):
             moving_resolution = res_anat
 
             # for gcamp6f with actual myr-tdtom
-<<<<<<< HEAD
             fixed_path = "/oak/stanford/groups/trc/data/WBI_shared/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"  # luke.nii"
             fixed_fly = "meanbrain"
 
             # for gcamp8s with non-myr-tdtom
             # fixed_path = "/oak/stanford/groups/trc/data/WBI_shared/anat_templates/non_myr_2_fdaatlas_40_8.nii"
-=======
-            fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"  # luke.nii"
-            fixed_fly = "meanbrain"
-
-            # for gcamp8s with non-myr-tdtom
-            # fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20220421_make_nonmyr_meanbrain/non_myr_2_fdaatlas_40_8.nii"
->>>>>>> 7249d16c019212ba3aacc5e36fbc3fdf979a9402
             # fixed_fly = 'non_myr_mean'
 
             fixed_resolution = res_meanbrain

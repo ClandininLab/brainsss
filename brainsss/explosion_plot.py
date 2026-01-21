@@ -10,11 +10,7 @@ import time
 import matplotlib
 
 def load_roi_atlas():
-<<<<<<< HEAD
     atlas_path = "/oak/stanford/groups/trc/data/WBI_shared/anat_templates/jfrc_2018_rois_improve_reorient_transformed.nii"
-=======
-    atlas_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/jfrc_2018_rois_improve_reorient_transformed.nii"
->>>>>>> 7249d16c019212ba3aacc5e36fbc3fdf979a9402
     atlas = np.asarray(nib.load(atlas_path).get_fdata().squeeze(), dtype='float32')
     atlas = ants.from_numpy(atlas)
     atlas.set_spacing((.76,.76,.76))
@@ -28,11 +24,7 @@ def load_roi_atlas():
     return atlas_clean
 
 def load_explosion_groups():
-<<<<<<< HEAD
     explosion_rois_file = '/oak/stanford/groups/trc/data/WBI_shared/anat_templates/20220425_explosion_plot_rois.pickle'
-=======
-    explosion_rois_file = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220425_explosion_plot_rois.pickle'
->>>>>>> 7249d16c019212ba3aacc5e36fbc3fdf979a9402
     explosion_rois = pickle.load(open(explosion_rois_file,"rb"))
     return explosion_rois
     
