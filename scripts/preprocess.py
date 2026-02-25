@@ -624,7 +624,9 @@ def main(args):
 
         for func in funcs:
             load_directory = os.path.join(func, "moco")
-            save_directory = os.path.join(func)
+            save_directory = os.path.join(func,"playground")
+            if not os.path.exists(save_directory):
+                os.mkdir(save_directory)
             brain_file = f"functional_channel_{ch_num}_moco.h5"
                 
             args = {
@@ -659,13 +661,12 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             
-            load_directory = os.path.join(fly_directory, "func_0", "background_subtraction")
-
-            save_directory = os.path.join(fly_directory, "warp")
+            load_directory = os.path.join(fly_directory, "func_0", "playground")
+            save_directory = os.path.join(fly_directory, "func_0", "playground")
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_bgsub.h5"
             
             args = {
                 "redo": redo,
@@ -741,13 +742,13 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             
-            load_directory = os.path.join(fly_directory, "warp")
+            load_directory = os.path.join(fly_directory, "func_0", "playground")
 
-            save_directory = os.path.join(fly_directory, "dff")
+            save_directory = os.path.join(fly_directory, "func_0", "playground")
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_bgsub_warp.h5"
             
             args = {
                 "redo": redo,
@@ -781,11 +782,11 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             
-            load_directory = os.path.join(fly_directory, "dff")
+            load_directory = os.path.join(fly_directory, "func_0", "playground")
 
-            save_directory = os.path.join(fly_directory, "dff")
+            save_directory = os.path.join(fly_directory, "func_0", "playground")
             
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_bgsub_warp_blurred.h5"
             
             args = {
                 "redo": redo,
@@ -819,14 +820,14 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             
-            load_directory = os.path.join(fly_directory, "dff")
+            load_directory = os.path.join(fly_directory, "func_0", "playground")
 
-            save_directory = os.path.join(fly_directory, "dff")
+            save_directory = os.path.join(fly_directory, "func_0", "playground")
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf.h5"
-            # brain_file_l = f"functional_channel_{ch_num}_moco_warp_blurred_lpf.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_bgsub_warp_blurred_hpf.h5"
+            # brain_file_l = f"functional_channel_{ch_num}_moco_bgsub_warp_blurred_lpf.h5"
             
             args = {
                 "redo": redo,
