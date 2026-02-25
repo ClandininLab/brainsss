@@ -661,12 +661,12 @@ def main(args):
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             
-            load_directory = os.path.join(fly_directory, "func_0", "playground")
+            load_directory = os.path.join(fly_directory, "func_0", "playground","background_subtraction")
             save_directory = os.path.join(fly_directory, "func_0", "playground")
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco_bgsub.h5"
+            brain_file = f"functional_channel_{ch_num}_moco.h5"
             
             args = {
                 "redo": redo,
@@ -748,7 +748,7 @@ def main(args):
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco_bgsub_warp.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
             
             args = {
                 "redo": redo,
@@ -786,7 +786,7 @@ def main(args):
 
             save_directory = os.path.join(fly_directory, "func_0", "playground")
             
-            brain_file = f"functional_channel_{ch_num}_moco_bgsub_warp_blurred.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
             
             args = {
                 "redo": redo,
@@ -826,8 +826,8 @@ def main(args):
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco_bgsub_warp_blurred_hpf.h5"
-            # brain_file_l = f"functional_channel_{ch_num}_moco_bgsub_warp_blurred_lpf.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf.h5"
+            # brain_file_l = f"functional_channel_{ch_num}_moco_warp_blurred_lpf.h5"
             
             args = {
                 "redo": redo,
