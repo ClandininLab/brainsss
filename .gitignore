@@ -11,3 +11,6 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+*.pyo
