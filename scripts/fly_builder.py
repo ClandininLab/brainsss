@@ -253,7 +253,7 @@ def copy_file(source, target, printlog):
 def copy_visual(destination_region, printlog):
     width=120
     printlog(F"Copying visual stimulus data{'':.^{width-28}}")
-    visual_folder = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/visual'
+    visual_folder = '/oak/stanford/groups/trc/data/WBI_shared/visual'
     visual_destination = os.path.join(destination_region, 'visual')
 
     # Find time of experiment based on functional.xml
@@ -657,7 +657,7 @@ def add_fly_to_xlsx(fly_folder, printlog):
 
     ### TRY TO LOAD ELSX ###
     try:
-        xlsx_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset/master_2P.xlsx'
+        xlsx_path = '/oak/stanford/groups/trc/data/WBI_shared/master_2P.xlsx'
         wb = load_workbook(filename=xlsx_path, read_only=False)
         ws = wb.active
         printlog("Sucessfully opened master_2P log")

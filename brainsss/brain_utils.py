@@ -191,7 +191,7 @@ def STA_supervoxel_to_full_res(STA_brain, cluster_labels):
     return np.asarray(reformed_STA_brain)
 
 def load_fda_meanbrain():
-    fixed_path = "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
+    fixed_path = "/oak/stanford/groups/trc/data/WBI_shared/anat_templates/20220301_luke_2_jfrc_affine_zflip_2umiso.nii"#luke.nii"
     fixed_resolution = (2,2,2)
     fixed = np.asarray(nib.load(fixed_path).get_fdata().squeeze(), dtype='float32')
     fixed = ants.core.ants_image_io.from_numpy(fixed)
