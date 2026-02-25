@@ -7,7 +7,7 @@
 #SBATCH --output=./logs/mainlog.out
 #SBATCH --open-mode=append
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --mail-user=ilanazs@stanford.edu
+######### SBATCH --mail-user=ilanazs@stanford.edu ###### set to your email if you want email notifications
 
 while [[ $# -gt 0 ]]; do
   case $1 in
