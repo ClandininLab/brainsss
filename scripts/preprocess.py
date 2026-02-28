@@ -643,7 +643,7 @@ def main(args):
                 modules=modules,
                 args=args,
                 logfile=logfile,
-                time=1,
+                time=2,
                 cpus=10,
                 mem='150GB',
                 nice=nice,

@@ -2,6 +2,7 @@
     "imports_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports",
     "dataset_path": "/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset",
     "scratch_path": "/scratch/users/yandanw",
+    "later_path": "/oak/stanford/groups/trc/data/Yandan/2P_Imaging/optomotor_response_analysis",
     "fictrac_qc": "True",
     "bleaching_qc": "True",
     "temporal_mean_brain_pre": "True",
