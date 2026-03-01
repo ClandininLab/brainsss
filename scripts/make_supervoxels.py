@@ -27,76 +27,76 @@ THIS IS A JOBLIB ISSUE. If you can, kindly provide the joblib's team with an
 
 def main(args):
     func_path = args['func_path']
-	logfile = args['logfile']
-	load_directory = args['load_directory']
-	later_path = args['later_path']
-	event = args['event']
-	ch_num = args['ch_num']
-	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
-	n_clusters = 2000
+    logfile = args['logfile']
+    load_directory = args['load_directory']
+    later_path = args['later_path']
+    event = args['event']
+    ch_num = args['ch_num']
+    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+    n_clusters = 2000
  
  
 
-	#Get behaviors
-	if event != None:
-		event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-	else:
-		event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
-	with open(event_times_path, 'rb') as file:
-		event_times_struct = pickle.load(file)
-		f=list(event_times_struct.keys())[0]
-		behaviors=list(event_times_struct[f].keys())
-		
-	for behavior in behaviors:
- 	### LOAD BRAIN ###
-		brain_file = f'functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5'
-		brain_path = os.path.join(load_directory, brain_file)
-		with h5py.File(brain_path, 'r+') as hf:
-			brain = np.nan_to_num(hf['brain'][:].astype('float32'))
-			dims=np.shape(brain)
-			printlog(f'brain shape: {dims}')
+    #Get behaviors
+    if event != None:
+        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+    with open(event_times_path, 'rb') as file:
+        event_times_struct = pickle.load(file)
+        f=list(event_times_struct.keys())[0]
+        behaviors=list(event_times_struct[f].keys())
+        
+    for behavior in behaviors:
+     ### LOAD BRAIN ###
+        brain_file = f'functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5'
+        brain_path = os.path.join(load_directory, brain_file)
+        with h5py.File(brain_path, 'r+') as hf:
+            brain = np.nan_to_num(hf['brain'][:].astype('float32'))
+            dims=np.shape(brain)
+            printlog(f'brain shape: {dims}')
 
-		### MAKE CLUSTER DIRECTORY ###
+        ### MAKE CLUSTER DIRECTORY ###
 
-		cluster_dir = os.path.join(func_path, 'clustering')
-		if not os.path.exists(cluster_dir):
-			os.mkdir(cluster_dir)
+        cluster_dir = os.path.join(func_path, 'clustering')
+        if not os.path.exists(cluster_dir):
+            os.mkdir(cluster_dir)
 
-		### FIT CLUSTERS ###
-		printlog('fitting clusters')
-		shape= np.shape(brain)
-		connectivity = grid_to_graph(shape[0],shape[1])
-		cluster_labels = []
-		for z in range(shape[-2]): #THIS SHOULD NOT BE HARD CODED
-			neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
-			cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
-										memory=cluster_dir,
-										linkage='ward',
-										connectivity=connectivity)
-			cluster_model.fit(neural_activity)
-			cluster_labels.append(cluster_model.labels_)
-		cluster_labels = np.asarray(cluster_labels)
-		save_file = os.path.join(cluster_dir, f'cluster_labels_{ch_num}_{behavior}_{n_clusters}.npy')
-		np.save(save_file,cluster_labels)
+        ### FIT CLUSTERS ###
+        printlog('fitting clusters')
+        shape= np.shape(brain)
+        connectivity = grid_to_graph(shape[0],shape[1])
+        cluster_labels = []
+        for z in range(shape[-2]): #THIS SHOULD NOT BE HARD CODED
+            neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
+            cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
+                                        memory=cluster_dir,
+                                        linkage='ward',
+                                        connectivity=connectivity)
+            cluster_model.fit(neural_activity)
+            cluster_labels.append(cluster_model.labels_)
+        cluster_labels = np.asarray(cluster_labels)
+        save_file = os.path.join(cluster_dir, f'cluster_labels_{ch_num}_{behavior}_{n_clusters}.npy')
+        np.save(save_file,cluster_labels)
 
-		### GET CLUSTER AVERAGE SIGNAL ###
+        ### GET CLUSTER AVERAGE SIGNAL ###
 
-		printlog('getting cluster averages')
-		all_signals = []
-		for z in range(shape[-2]):
-			neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
-			signals = []
-			for cluster_num in range(n_clusters):
-				cluster_indicies = np.where(cluster_labels[z,:]==cluster_num)[0]
-				mean_signal = np.mean(neural_activity[cluster_indicies,:], axis=0)
-				signals.append(mean_signal)
-			signals = np.asarray(signals)
-			all_signals.append(signals)
-		all_signals = np.asarray(all_signals)
-		save_file = os.path.join(cluster_dir, f'cluster_signals_{ch_num}_{behavior}_{n_clusters}.npy')
-		np.save(save_file, all_signals)
-		printlog(f'Clustering for {behavior} done bitches')
-		printlog(f'Saved in {cluster_dir}')
+        printlog('getting cluster averages')
+        all_signals = []
+        for z in range(shape[-2]):
+            neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
+            signals = []
+            for cluster_num in range(n_clusters):
+                cluster_indicies = np.where(cluster_labels[z,:]==cluster_num)[0]
+                mean_signal = np.mean(neural_activity[cluster_indicies,:], axis=0)
+                signals.append(mean_signal)
+            signals = np.asarray(signals)
+            all_signals.append(signals)
+        all_signals = np.asarray(all_signals)
+        save_file = os.path.join(cluster_dir, f'cluster_signals_{ch_num}_{behavior}_{n_clusters}.npy')
+        np.save(save_file, all_signals)
+        printlog(f'Clustering for {behavior} done bitches')
+        printlog(f'Saved in {cluster_dir}')
 
 if __name__ == '__main__':
-	main(json.loads(sys.argv[1]))
+    main(json.loads(sys.argv[1]))

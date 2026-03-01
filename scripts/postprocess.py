@@ -302,30 +302,55 @@ def main(args):
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             load_directory = os.path.join(fly_directory, "temp_filter")
-            for func in funcs:
-                brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
-                args = {"logfile": logfile,
-                        "redo": redo,
-                        "func_path": func, 
-                        "brain_file": brain_file, 
-                        "ch_num": ch_num,
-                        "event": event,
-                        "later_path": later_path,
-                        "load_directory": load_directory,
-                        }
-                script = "make_supervoxels.py"
-                job_id = brainsss.sbatch(
-                    jobname="supervox",
-                    script=os.path.join(scripts_path, script),
-                    modules=modules,
-                    args=args,
-                    logfile=logfile,
-                    cpus=20,
-                    mem='100GB',
-                    nice=nice,
-                    nodes=nodes,
-                )
+            func_path = os.path.join(fly_directory, "func_0")
+            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
+            args = {"logfile": logfile,
+                    "redo": redo,
+                    "func_path": func_path,
+                    "brain_file": brain_file,
+                    "ch_num": ch_num,
+                    "event": event,
+                    "later_path": later_path,
+                    "load_directory": load_directory,
+                    }
+            script = "make_supervoxels.py"
+            job_id = brainsss.sbatch(
+                jobname="supervox",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                cpus=20,
+                mem='250GB',
+                nice=nice,
+                nodes=nodes,
+            )
             brainsss.wait_for_job(job_id, logfile, com_path)
+
+           # for func in funcs:
+               # brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
+               # args = {"logfile": logfile,
+                       # "redo": redo,
+                       # "func_path": func, 
+                       # "brain_file": brain_file, 
+                       # "ch_num": ch_num,
+                       # "event": event,
+                       # "later_path": later_path,
+                       # "load_directory": load_directory,
+                       # }
+               # script = "make_supervoxels.py"
+               # job_id = brainsss.sbatch(
+                   # jobname="supervox",
+                   # script=os.path.join(scripts_path, script),
+                   # modules=modules,
+                   # args=args,
+                   # logfile=logfile,
+                   # cpus=20,
+                   # mem='250GB',
+                   # nice=nice,
+                   # nodes=nodes,
+               # )
+           # brainsss.wait_for_job(job_id, logfile, com_path)
 
     if tf_to_STA:
         temp_directory = os.path.join(later_path, "temp_filter")
@@ -364,6 +389,8 @@ def main(args):
                     "fly_directory": fly_directory,
                     "redo": redo,
                     'ch_num': ch_num,
+                    "event": event,
+                    "later_path": later_path,
                     "load_directory": load_directory,
                     "save_directory": save_directory,
                     }
@@ -378,7 +405,7 @@ def main(args):
                 mem='250GB',
                 nice=nice,
                 nodes=nodes,
-                global_resources=True,
+               # global_resources=True,
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
             

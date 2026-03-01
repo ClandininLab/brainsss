@@ -50,7 +50,7 @@ def main(args):
     ###########
 
     printlog("Beginning STA")
-    behaviors = ['inc', 'dec', 'flat', 'total']
+    behaviors = ['syn_turn_0', 'syn_turn_180', 'anti_turn_0', 'anti_turn_180', 'flat_0', 'flat_180', 'total']
     for behavior in behaviors:
     #load brain
         tf_load_path = os.path.join(load_directory, f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5")
@@ -83,7 +83,7 @@ def main(args):
         STA_brain = gaussian_filter1d(reformed_STA_brain,sigma=1,axis=1,truncate=1)
         STA_brain_temp=np.moveaxis(STA_brain,0,-1).astype('float32')
         STA_brain_final=np.moveaxis(STA_brain_temp,0,-1)
-        range_start=-500; range_end=1900
+        range_start=-1000; range_end=1000
         STA=[]  
         
         for i in range(range_start, range_end, steps):
