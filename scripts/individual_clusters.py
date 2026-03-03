@@ -18,6 +18,7 @@ def main(args):
     cluster_dir = os.path.join(temp_dir, 'clustering')
     ch_num = args['ch_num']
     fly_nums = args['fly_num']
+    event = args['event']
 
     #####################
     ### SETUP LOGGING ###
@@ -35,7 +36,10 @@ def main(args):
  
     n_clusters=500
     
-    total_path = os.path.join(later_path, f'10flies_5sec_event_times_split_dic.pkl')
+    if event != None:
+        total_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        total_path = os.path.join(later_path, 'event_times_split_dic.pkl')
     with open(total_path, 'rb') as file:
         total_data_dict = pickle.load(file)
     
