@@ -28,7 +28,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -cc|--channel_change)
-      CHANNEL_CHANGE=True
+      CHANNEL_CHANGE="$2"
       shift
       ;;
     --redo)
