@@ -58,7 +58,7 @@ def main(args):
 
 		### MAKE CLUSTER DIRECTORY ###
 
-		cluster_dir = os.path.join(func_path, 'clustering')
+		cluster_dir = os.path.join(func_path, 'func_0', 'clustering')
 		if not os.path.exists(cluster_dir):
 			os.mkdir(cluster_dir)
 

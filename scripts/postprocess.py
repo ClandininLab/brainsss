@@ -68,7 +68,6 @@ def main(args):
         relative_ts = brainsss.parse_true_false(settings.get("relative_ts", False))
         temp_filter = brainsss.parse_true_false(settings.get("temp_filter", False))
         make_supervoxels = brainsss.parse_true_false(settings.get("make_supervoxels", False))
-        channel_change = brainsss.parse_true_false(settings.get("channel_change", False))
         tf_to_STA = brainsss.parse_true_false(settings.get("tf_to_STA", False))
         build_STA = brainsss.parse_true_false(settings.get("build_STA", False))
         later_transfer = brainsss.parse_true_false(settings.get("later_transfer", False))
@@ -82,7 +81,6 @@ def main(args):
         relative_ts = False
         temp_filter = False
         make_supervoxels = False
-        channel_change = False
         tf_to_STA = False
         build_STA = False
         later_transfer = False
@@ -140,8 +138,6 @@ def main(args):
         temp_filter = True
     if args["MAKE_SUPERVOXELS"] != "":
         make_supervoxels = True
-    if args["CHANNEL_CHANGE"] != "":
-        channel_change = True
     if args["TF_TO_STA"] != "":
         tf_to_STA = True
     if args["BUILD_STA"] != "":
@@ -168,11 +164,11 @@ def main(args):
 #     ############# BEGIN #############
 #     #################################
 
-    if channel_change:
-        ch_num = '1'
+    if args["CHANNEL_CHANGE"] != "":
+        ch_nums = [str(args["CHANNEL_CHANGE"])]
     else:
-        ch_num = '2'
-    printlog(f"Channel number: {ch_num}")
+        ch_nums = ['1', '2']  # default: process both channels
+    printlog(f"Channel numbers to process: {ch_nums}")
         
 
     if filter_bins:
@@ -189,32 +185,33 @@ def main(args):
                 os.mkdir(save_directory)
             
             timestamp_file = "warp/timestamps_warp.h5"
-            args = {
-                "logfile": logfile,
-                "redo": redo,
-                "later_path": later_path,
-                "event": event,
-                "cc": ch_num,
-                "fly": fly,
-                "fly_directory": fly_directory,
-                "save_directory": save_directory,
-                "timestamp_file": timestamp_file,
-            }
-            script = "filter_bins.py"
-            job_id = brainsss.sbatch(
-                jobname="filter_bins",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=10,
-                cpus=10,
-                mem='200GB',
-                nice=nice,
-                nodes=nodes,
-                #global_resources=True, 
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
+            for ch_num in ch_nums:
+                args = {
+                    "logfile": logfile,
+                    "redo": redo,
+                    "later_path": later_path,
+                    "event": event,
+                    "cc": ch_num,
+                    "fly": fly,
+                    "fly_directory": fly_directory,
+                    "save_directory": save_directory,
+                    "timestamp_file": timestamp_file,
+                }
+                script = "filter_bins.py"
+                job_id = brainsss.sbatch(
+                    jobname="filter_bins",
+                    script=os.path.join(scripts_path, script),
+                    modules=modules,
+                    args=args,
+                    logfile=logfile,
+                    time=10,
+                    cpus=10,
+                    mem='200GB',
+                    nice=nice,
+                    nodes=nodes,
+                    #global_resources=True, 
+                )
+                brainsss.wait_for_job(job_id, logfile, com_path)
 
     if relative_ts:
 
@@ -229,31 +226,32 @@ def main(args):
                 os.mkdir(save_directory)
             
             timestamp_file = "warp/timestamps_warp.h5"
-            args = {
-                "logfile": logfile,
-                "redo": redo,
-                "event": event,
-                "later_path": later_path,
-                "fly_directory": fly_directory,
-                "save_directory": save_directory,
-                "timestamp_file": timestamp_file,
-                "cc": ch_num,
-            }
-            script = "relative_ts.py"
-            job_id = brainsss.sbatch(
-                jobname="relative_ts",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=10,
-                cpus=32,
-                mem='250GB',
-                nice=nice,
-                nodes=nodes,
-                #global_resources=True, 
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
+            for ch_num in ch_nums:
+                args = {
+                    "logfile": logfile,
+                    "redo": redo,
+                    "event": event,
+                    "later_path": later_path,
+                    "fly_directory": fly_directory,
+                    "save_directory": save_directory,
+                    "timestamp_file": timestamp_file,
+                    "cc": ch_num,
+                }
+                script = "relative_ts.py"
+                job_id = brainsss.sbatch(
+                    jobname="relative_ts",
+                    script=os.path.join(scripts_path, script),
+                    modules=modules,
+                    args=args,
+                    logfile=logfile,
+                    time=10,
+                    cpus=32,
+                    mem='250GB',
+                    nice=nice,
+                    nodes=nodes,
+                    #global_resources=True, 
+                )
+                brainsss.wait_for_job(job_id, logfile, com_path)
         
     
     if temp_filter:
@@ -266,47 +264,47 @@ def main(args):
             fly_directory = os.path.join(dataset_path, fly)
             load_directory = os.path.join(fly_directory, "dff")
             scratch_directory = os.path.join(scratch_path, fly)
-            
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
             # timestamp_file = "warp/timestamps_warp.h5" ##### CHANGED TO TRY SCRATCH WILL NEED TO BE CHANGED BACK
             timestamp_file = "timestamps_warp.h5"
-            args = {
-                "logfile": logfile,
-                "fly_directory": fly_directory,
-                "redo": redo,
-                "later_path": later_path,
-                "event": event,
-                "load_directory": load_directory,
-                "scratch_directory": scratch_directory,
-                "brain_file": brain_file,
-                "timestamp_file": timestamp_file,
-                "cc": ch_num,
-            }
-            script = "temp_filter.py"
-            job_id = brainsss.sbatch(
-                jobname="temp_filter",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=10,
-                cpus=32,
-                mem='250GB',
-                nice=nice,
-                nodes=nodes,
-                #global_resources=True, 
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
+            for ch_num in ch_nums:
+                brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
+                args = {
+                    "logfile": logfile,
+                    "fly_directory": fly_directory,
+                    "redo": redo,
+                    "later_path": later_path,
+                    "event": event,
+                    "load_directory": load_directory,
+                    "scratch_directory": scratch_directory,
+                    "brain_file": brain_file,
+                    "timestamp_file": timestamp_file,
+                    "cc": ch_num,
+                }
+                script = "temp_filter.py"
+                job_id = brainsss.sbatch(
+                    jobname="temp_filter",
+                    script=os.path.join(scripts_path, script),
+                    modules=modules,
+                    args=args,
+                    logfile=logfile,
+                    time=10,
+                    cpus=32,
+                    mem='250GB',
+                    nice=nice,
+                    nodes=nodes,
+                    #global_resources=True, 
+                )
+                brainsss.wait_for_job(job_id, logfile, com_path)
 
     if make_supervoxels:
         for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
             load_directory = os.path.join(fly_directory, "temp_filter")
-            for func in funcs:
+            for ch_num in ch_nums:
                 brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
                 args = {"logfile": logfile,
                         "redo": redo,
-                        "func_path": func, 
+                        "func_path": fly_directory, 
                         "brain_file": brain_file, 
                         "ch_num": ch_num,
                         "event": event,
@@ -329,29 +327,30 @@ def main(args):
 
     if tf_to_STA:
         temp_directory = os.path.join(later_path, "temp_filter")
-        args = {"logfile": logfile, 
-                "temp_directory": temp_directory, 
-                "later_path": later_path,
-                "event": event,
-                "ch_num": ch_num,
-                "fly_num": fly_num,
-                "scratch_dir": scratch_path,
-                }
-        script = "tf_to_STA.py"
-        job_id = brainsss.sbatch(
-            jobname="tf_to_STA",
-            script=os.path.join(scripts_path, script),
-            modules=modules,
-            args=args,
-            logfile=logfile,
-            time=48,
-            cpus=32,
-            mem='250GB',
-            nice=nice,
-            nodes=nodes,
-            # global_resources=True,
-        )
-        brainsss.wait_for_job(job_id, logfile, com_path)
+        for ch_num in ch_nums:
+            args = {"logfile": logfile, 
+                    "temp_directory": temp_directory, 
+                    "later_path": later_path,
+                    "event": event,
+                    "ch_num": ch_num,
+                    "fly_num": fly_num,
+                    "scratch_dir": scratch_path,
+                    }
+            script = "tf_to_STA.py"
+            job_id = brainsss.sbatch(
+                jobname="tf_to_STA",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=48,
+                cpus=32,
+                mem='250GB',
+                nice=nice,
+                nodes=nodes,
+                # global_resources=True,
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
     
     if build_STA:
         for fly in fly_dirs:
@@ -360,51 +359,53 @@ def main(args):
             save_directory = os.path.join(fly_directory, "STA")
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
+            for ch_num in ch_nums:
+                args = {"logfile": logfile, 
+                        "fly_directory": fly_directory,
+                        "redo": redo,
+                        'ch_num': ch_num,
+                        "load_directory": load_directory,
+                        "save_directory": save_directory,
+                        }
+                script = "build_STA.py"
+                job_id = brainsss.sbatch(
+                    jobname="STA",
+                    script=os.path.join(scripts_path, script),
+                    modules=modules,
+                    args=args,
+                    logfile=logfile,
+                    cpus=32,
+                    mem='250GB',
+                    nice=nice,
+                    nodes=nodes,
+                    global_resources=True,
+                )
+                brainsss.wait_for_job(job_id, logfile, com_path)
+            
+    if later_transfer:
+        for ch_num in ch_nums:
             args = {"logfile": logfile, 
-                    "fly_directory": fly_directory,
-                    "redo": redo,
-                    'ch_num': ch_num,
-                    "load_directory": load_directory,
-                    "save_directory": save_directory,
+                    "later_directory": later_path, 
+                    "event": event,
+                    "dataset_path": dataset_path,
+                    "flies": fly_num,
+                    "ch_num": ch_num,
+                    "scratch_dir": scratch_path,
                     }
-            script = "build_STA.py"
+            script = "later_transfer.py"
             job_id = brainsss.sbatch(
-                jobname="STA",
+                jobname="later_transfer",
                 script=os.path.join(scripts_path, script),
                 modules=modules,
                 args=args,
                 logfile=logfile,
+                time=48,
                 cpus=32,
                 mem='250GB',
                 nice=nice,
                 nodes=nodes,
-                global_resources=True,
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
-            
-    if later_transfer:
-        args = {"logfile": logfile, 
-                "later_directory": later_path, 
-                "event": event,
-                "dataset_path": dataset_path,
-                "flies": fly_num,
-                "ch_num": ch_num,
-                "scratch_dir": scratch_path,
-                }
-        script = "later_transfer.py"
-        job_id = brainsss.sbatch(
-            jobname="later_transfer",
-            script=os.path.join(scripts_path, script),
-            modules=modules,
-            args=args,
-            logfile=logfile,
-            time=48,
-            cpus=32,
-            mem='250GB',
-            nice=nice,
-            nodes=nodes,
-        )
-        brainsss.wait_for_job(job_id, logfile, com_path)
         
     if regress_noise:
         temp_directory = os.path.join(later_path, "temp_filter")
@@ -452,51 +453,53 @@ def main(args):
         brainsss.wait_for_job(job_id, logfile, com_path)
         
     if get_ind_vox:
-        args = {"logfile": logfile, 
-                "dataset_path": dataset_path,
-                "later_path": later_path, 
-                "event": event,
-                "fly_num": fly_num,
-                "ch_num": ch_num,
-                }
-        script = "get_ind_vox.py"
-        job_id = brainsss.sbatch(
-            jobname="get_ind_vox",
-            script=os.path.join(scripts_path, script),
-            modules=modules,
-            args=args,
-            logfile=logfile,
-            time=48,
-            cpus=32,
-            mem='250GB',
-            nice=nice,
-            nodes=nodes,
-        )
-        brainsss.wait_for_job(job_id, logfile, com_path)
+        for ch_num in ch_nums:
+            args = {"logfile": logfile, 
+                    "dataset_path": dataset_path,
+                    "later_path": later_path, 
+                    "event": event,
+                    "fly_num": fly_num,
+                    "ch_num": ch_num,
+                    }
+            script = "get_ind_vox.py"
+            job_id = brainsss.sbatch(
+                jobname="get_ind_vox",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=48,
+                cpus=32,
+                mem='250GB',
+                nice=nice,
+                nodes=nodes,
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
         
     if individual_clusters:
         temp_directory = os.path.join(later_path, "temp_filter")
-        args = {"logfile": logfile,
-                "later_path": later_path,
-                "temp_directory": temp_directory,
-                "scratch_dir": scratch_path,
-                "fly_num": fly_num,
-                "ch_num": ch_num,
-                }
-        script = "individual_clusters.py"
-        job_id = brainsss.sbatch(
-            jobname="individual_clusters",
-            script=os.path.join(scripts_path, script),
-            modules=modules,
-            args=args,
-            logfile=logfile,
-            time=72,
-            cpus=32,
-            mem='250GB',
-            nice=nice,
-            nodes=nodes,
-        )
-        brainsss.wait_for_job(job_id, logfile, com_path)
+        for ch_num in ch_nums:
+            args = {"logfile": logfile,
+                    "later_path": later_path,
+                    "temp_directory": temp_directory,
+                    "scratch_dir": scratch_path,
+                    "fly_num": fly_num,
+                    "ch_num": ch_num,
+                    }
+            script = "individual_clusters.py"
+            job_id = brainsss.sbatch(
+                jobname="individual_clusters",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=72,
+                cpus=32,
+                mem='250GB',
+                nice=nice,
+                nodes=nodes,
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
     
     ############
     ### Done ###
