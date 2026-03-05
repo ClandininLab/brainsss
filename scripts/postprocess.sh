@@ -6,6 +6,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=./logs/mainlog.out
 #SBATCH --open-mode=append
+#SBATCH --mail-type=BEGIN,END,FAIL
 
 while [[ $# -gt 0 ]]; do
   case $1 in
