@@ -69,7 +69,7 @@ def main(args):
                 starts_loom_ms = event_times_struct[fly_name][behavior]
                 starts_loom_ms=np.sort(starts_loom_ms)# this one was comment out by ilana
                 
-                bin_start = -1000; bin_end = 1000; bin_size = 100 #ms
+                bin_start = -800; bin_end = 800; bin_size = 100 #ms
 
                 #bin_start = -2000; bin_end = 3000; bin_size = 100 Ilana's setting
                 #if loom starts are outside of the neural data, remove them
