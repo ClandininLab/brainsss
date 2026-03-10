@@ -22,5 +22,6 @@
     "make_supervoxels": "False",
     "channel_change": "False",
     "tf_to_STA": "True",
-    "regress_noise": "True"
+    "regress_noise": "True",
+    "supercluster": "True"
 }
