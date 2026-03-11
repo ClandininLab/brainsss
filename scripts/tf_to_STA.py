@@ -18,6 +18,7 @@ def main(args):
     event = args['event']
     flies = args['fly_num']
     scratch_dir = args['scratch_dir']
+    redo=args
     
     
     #####################
@@ -46,7 +47,6 @@ def main(args):
     
     range_start=-2000; range_end=3000; steps=100
     printlog(f"Flies: {flies}")
-    num_flies = len(flies)
     
     for behavior in behaviors:
         printlog(f"\n=======================================")
@@ -69,39 +69,42 @@ def main(args):
                     if not os.path.exists(temp_dir_behave):
                         os.makedirs(temp_dir_behave)
                     save_file= os.path.join(temp_dir_behave, f'STA_{cc}_{behavior}_{steps}.h5')
-        printlog(f"Following files to process: {tf_files}")
-        if tf_files:
-            for file in tf_files:
-                fly_val=int(file.split("_")[0])
-                if fly_val in flies:
-                    load_path = os.path.join(behave_dir,file)
-                    printlog(f"being processes {load_path}")
-                    temp=[]
-                    with h5py.File(load_path, 'r+') as hf:    
-                            ts = hf['time_stamps'][:]
-                            brain = hf['brain']
-                            dimst = np.shape(ts)
-                            dims = np.shape(brain)
-                            # printlog(f'Brain shape: {dims}, time stamp shape: {dimst}')
-                            for i in range(range_start, range_end, steps):
-                                end = i + steps if i + steps < range_end else range_end
-                                mask = (ts > i) & (ts < end)
-                                result = np.nanmean(np.where(mask, brain, np.nan),axis=-1)
-                                temp.append(result)
-                    # printlog(f'Temp shape is {np.shape(temp)}')
-                    STA.append(temp)
-                    # printlog(f'STA is {np.shape(STA)}')
-                else:
-                    printlog(f'Fly {fly_val} not in {flies}')
-            STA=np.asarray(np.nanmean(STA, axis=0))
-        
-            # printlog(f'Saving STA to {save_file}')
-            with h5py.File(save_file, "w") as data_file:
-                    data_file.create_dataset("data", data=STA.astype('float32'))
+        if not os.path.exists(save_file) or redo:
+            printlog(f"Following files to process: {tf_files}")
+            if tf_files:
+                for file in tf_files:
+                    fly_val=int(file.split("_")[0])
+                    if fly_val in flies:
+                        load_path = os.path.join(behave_dir,file)
+                        printlog(f"being processes {load_path}")
+                        temp=[]
+                        with h5py.File(load_path, 'r+') as hf:    
+                                ts = hf['time_stamps'][:]
+                                brain = hf['brain']
+                                dimst = np.shape(ts)
+                                dims = np.shape(brain)
+                                # printlog(f'Brain shape: {dims}, time stamp shape: {dimst}')
+                                for i in range(range_start, range_end, steps):
+                                    end = i + steps if i + steps < range_end else range_end
+                                    mask = (ts > i) & (ts < end)
+                                    result = np.nanmean(np.where(mask, brain, np.nan),axis=-1)
+                                    temp.append(result)
+                        # printlog(f'Temp shape is {np.shape(temp)}')
+                        STA.append(temp)
+                        # printlog(f'STA is {np.shape(STA)}')
+                    else:
+                        printlog(f'Fly {fly_val} not in {flies}')
+                STA=np.asarray(np.nanmean(STA, axis=0))
             
-            printlog(f"STA for {behavior} done. Data saved in {save_file}")
+                # printlog(f'Saving STA to {save_file}')
+                with h5py.File(save_file, "w") as data_file:
+                        data_file.create_dataset("data", data=STA.astype('float32'))
+                
+                printlog(f"STA for {behavior} done. Data saved in {save_file}")
+            else:
+                printlog(f"No files found for {behavior}")
         else:
-            printlog(f"No files found for {behavior}")
+            printlog(f"STA file {save_file} already exists, skipping")
 if __name__ == '__main__':
     main(json.loads(sys.argv[1]))
 

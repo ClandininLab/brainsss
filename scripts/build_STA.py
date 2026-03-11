@@ -32,6 +32,8 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     ch_num = args['ch_num'] 
+    later_path = args['later_path']
+    event = args['event']
     
     steps=100
 
@@ -50,7 +52,15 @@ def main(args):
     ###########
 
     printlog("Beginning STA")
-    behaviors = ['inc', 'dec', 'flat', 'total']
+    if event != None:
+        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+    with open(event_times_path, 'rb') as file:
+        event_times_struct = pickle.load(file)
+        f=list(event_times_struct.keys())[0]
+        behaviors=list(event_times_struct[f].keys())
+        printlog(f"Found behaviors: {behaviors}")
     for behavior in behaviors:
     #load brain
         tf_load_path = os.path.join(load_directory, f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5")

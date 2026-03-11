@@ -16,6 +16,7 @@ def main(args):
     flies = args['flies']
     dataset_path = args['dataset_path']
     scratch_dir = args['scratch_dir']
+    redo=args['redo']
     
     #####################
     ### SETUP LOGGING ###
@@ -56,12 +57,15 @@ def main(args):
                 if not os.path.exists(tf_behave_dir):
                     os.makedirs(tf_behave_dir)
                 destination_path = os.path.join(tf_behave_dir, new_file)
-                with h5py.File(source_path, "r") as source:
-                    fly_brain = source['brain']
-                    fly_ts = source['time_stamps']
-                    with h5py.File(destination_path, "w") as target:
-                        target.create_dataset("brain", data=fly_brain)
-                        target.create_dataset("time_stamps", data=fly_ts)
+                if not os.path.exists(destination_path) or redo:
+                    with h5py.File(source_path, "r") as source:
+                        fly_brain = source['brain']
+                        fly_ts = source['time_stamps']
+                        with h5py.File(destination_path, "w") as target:
+                            target.create_dataset("brain", data=fly_brain)
+                            target.create_dataset("time_stamps", data=fly_ts)
+                else:
+                    printlog(f"File {destination_path} already exists, skipping")
 
             else:
                 printlog(f"File {file} not found for {behavior} in {fly_path}")

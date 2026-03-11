@@ -335,6 +335,7 @@ def main(args):
                     "ch_num": ch_num,
                     "fly_num": fly_num,
                     "scratch_dir": scratch_path,
+                    'redo': redo,
                     }
             script = "tf_to_STA.py"
             job_id = brainsss.sbatch(
@@ -363,6 +364,8 @@ def main(args):
                 args = {"logfile": logfile, 
                         "fly_directory": fly_directory,
                         "redo": redo,
+                        "later_path": later_path,
+                        "event": event,
                         'ch_num': ch_num,
                         "load_directory": load_directory,
                         "save_directory": save_directory,
@@ -390,6 +393,7 @@ def main(args):
                     "dataset_path": dataset_path,
                     "flies": fly_num,
                     "ch_num": ch_num,
+                    "redo": redo,
                     "scratch_dir": scratch_path,
                     }
             script = "later_transfer.py"
@@ -413,6 +417,7 @@ def main(args):
                 "later_path": later_path, 
                 "temp_directory": temp_directory,
                 "event": event,
+                "redo": redo,
                 }
         script = "regress_noise.py"
         job_id = brainsss.sbatch(
@@ -436,6 +441,7 @@ def main(args):
                 "temp_directory": temp_directory,
                 "event": event,
                 "clust_num": clust_num,
+                "redo": redo,
                 }
         script = "supercluster.py"
         job_id = brainsss.sbatch(
@@ -460,6 +466,7 @@ def main(args):
                     "event": event,
                     "fly_num": fly_num,
                     "ch_num": ch_num,
+                    "redo": redo,
                     }
             script = "get_ind_vox.py"
             job_id = brainsss.sbatch(
@@ -485,6 +492,7 @@ def main(args):
                     "scratch_dir": scratch_path,
                     "fly_num": fly_num,
                     "ch_num": ch_num,
+                    "redo": redo,
                     }
             script = "individual_clusters.py"
             job_id = brainsss.sbatch(
