@@ -123,7 +123,7 @@ def main(args):
         
     if args["SUPERCLUSTER"] == "":
         # printlog('not building flies')
-        clust_num = None
+        clust_num = 500
     else:
         # printlog('building flies')
         clust_num = int(args["SUPERCLUSTER"])
