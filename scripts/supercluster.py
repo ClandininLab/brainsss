@@ -34,11 +34,11 @@ def main(args):
 
     printlog("Beginning superclustering")
     
+    super_vox = 2000
+    super_clust = clust_num
+    
     save_file_clusters = os.path.join(cluster_dir, f'superclust_clusters_{super_clust}_{event}.pkl')
     if not os.path.exists(save_file_clusters) or redo:
-    
-        super_vox = 2000
-        super_clust = clust_num
         
         behave_dict_path=os.path.join(temp_dir,f'behave_dict_total_{event}.pkl')
         giant_vox_labels = np.load(os.path.join(cluster_dir, 'cluster_labels_best_flies.npy'))

@@ -325,6 +325,32 @@ def main(args):
                 )
             brainsss.wait_for_job(job_id, logfile, com_path)
 
+    if later_transfer:
+        for ch_num in ch_nums:
+            args = {"logfile": logfile, 
+                    "later_directory": later_path, 
+                    "event": event,
+                    "dataset_path": dataset_path,
+                    "flies": fly_num,
+                    "ch_num": ch_num,
+                    "redo": redo,
+                    "scratch_dir": scratch_path,
+                    }
+            script = "later_transfer.py"
+            job_id = brainsss.sbatch(
+                jobname="later_transfer",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=48,
+                cpus=32,
+                mem='250GB',
+                nice=nice,
+                nodes=nodes,
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+    
     if tf_to_STA:
         temp_directory = os.path.join(later_path, "temp_filter")
         for ch_num in ch_nums:
@@ -384,32 +410,6 @@ def main(args):
                     global_resources=True,
                 )
                 brainsss.wait_for_job(job_id, logfile, com_path)
-            
-    if later_transfer:
-        for ch_num in ch_nums:
-            args = {"logfile": logfile, 
-                    "later_directory": later_path, 
-                    "event": event,
-                    "dataset_path": dataset_path,
-                    "flies": fly_num,
-                    "ch_num": ch_num,
-                    "redo": redo,
-                    "scratch_dir": scratch_path,
-                    }
-            script = "later_transfer.py"
-            job_id = brainsss.sbatch(
-                jobname="later_transfer",
-                script=os.path.join(scripts_path, script),
-                modules=modules,
-                args=args,
-                logfile=logfile,
-                time=48,
-                cpus=32,
-                mem='250GB',
-                nice=nice,
-                nodes=nodes,
-            )
-            brainsss.wait_for_job(job_id, logfile, com_path)
         
     if regress_noise:
         temp_directory = os.path.join(later_path, "temp_filter")
