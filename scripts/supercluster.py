@@ -41,7 +41,7 @@ def main(args):
     if not os.path.exists(save_file_clusters) or redo:
         
         behave_dict_path=os.path.join(temp_dir,f'behave_dict_total_{event}.pkl')
-        giant_vox_labels = np.load(os.path.join(cluster_dir, 'cluster_labels_best_flies.npy'))
+        giant_vox_labels = np.load(os.path.join(cluster_dir, '10flies_cluster_labels_best_flies.npy'))
         full_res = brainsss.vox_to_full_res(behave_dict_path, giant_vox_labels, super_vox)
         fixed = brainsss.load_fda_meanbrain().numpy()
         
