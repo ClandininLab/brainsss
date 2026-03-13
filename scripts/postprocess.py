@@ -121,13 +121,6 @@ def main(args):
         # printlog('building flies')
         event = args["EVENTS"].lower()
         
-    if args["SUPERCLUSTER"] == "":
-        # printlog('not building flies')
-        clust_num = 500
-    else:
-        # printlog('building flies')
-        clust_num = int(args["SUPERCLUSTER"])
-        
         
     # These command line arguments will be empty unless the flag is called from the command line
     if args["FILTER_BINS"] != "":
@@ -164,11 +157,32 @@ def main(args):
 #     ############# BEGIN #############
 #     #################################
 
+    channel_change_num = args.get("CHANNEL_CHANGE_NUM", "")
     if args["CHANNEL_CHANGE"] != "":
-        ch_nums = [str(args["CHANNEL_CHANGE"])]
+        if channel_change_num != "":
+            try:
+                ch_nums = [str(int(channel_change_num))]
+            except ValueError:
+                printlog(f"ERROR: CHANNEL_CHANGE_NUM must be an integer, got: {channel_change_num}")
+                printlog("Aborting.")
+                return
+        else:
+            ch_nums = ['1']  # default when -cc is called without a value
     else:
-        ch_nums = ['1', '2']  # default: process both channels
+        ch_nums = ['1', '2']  # default when -cc is not called
     printlog(f"Channel numbers to process: {ch_nums}")
+       
+    supercluster_num = args.get("SUPERCLUSTER_NUM", "")
+    if args["SUPERCLUSTER"] != "":
+        if supercluster_num != "":
+            try:
+                clust_num = int(supercluster_num)
+            except ValueError:
+                printlog(f"ERROR: SUPERCLUSTER_NUM must be an integer, got: {supercluster_num}")
+                printlog("Aborting.")
+                return
+        else:
+            clust_num = 500  # default when -sc is called without a value
         
 
     if filter_bins:

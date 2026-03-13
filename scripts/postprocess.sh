@@ -29,8 +29,14 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -cc|--channel_change)
-      CHANNEL_CHANGE="$2"
-      shift
+      CHANNEL_CHANGE=True
+      if [[ -n "$2" && "$2" != -* ]]; then
+        CHANNEL_CHANGE_NUM="$2"
+        shift
+        shift
+      else
+        shift
+      fi
       ;;
     --redo)
       REDO=True
@@ -69,9 +75,14 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -sc|--supercluster)
-      SUPERCLUSTER="$2"
-      shift
-      shift
+      SUPERCLUSTER=True
+      if [[ -n "$2" && "$2" != -* ]]; then
+        SUPERCLUSTER_NUM="$2"
+        shift
+        shift
+      else
+        shift
+      fi
       ;;
     -giv|--get_ind_vox)
       GET_IND_VOX=True
@@ -89,8 +100,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 ARGS="{\"PWD\":\"$PWD\",\"BEST_FLIES\":\"$BEST_FLIES\",\"POSTPROCESS\":\"$POSTPROCESS\",\"FILTER_BINS\":\"$FILTER_BINS\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\
-\"FLIES\":\"$FLIES\",\"EVENTS\":\"$EVENTS\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\",\
-\"BUILD_STA\":\"$BUILD_STA\",\"REDO\":\"$REDO\",\"LATER_TRANSFER\":\"$LATER_TRANSFER\",\"REGRESS_NOISE\":\"$REGRESS_NOISE\",\"SUPERCLUSTER\":\"$SUPERCLUSTER\",\
+\"FLIES\":\"$FLIES\",\"EVENTS\":\"$EVENTS\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"CHANNEL_CHANGE_NUM\":\"$CHANNEL_CHANGE_NUM\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\",\
+\"BUILD_STA\":\"$BUILD_STA\",\"REDO\":\"$REDO\",\"LATER_TRANSFER\":\"$LATER_TRANSFER\",\"REGRESS_NOISE\":\"$REGRESS_NOISE\",\"SUPERCLUSTER\":\"$SUPERCLUSTER\",\"SUPERCLUSTER_NUM\":\"$SUPERCLUSTER_NUM\",\
 \"TF_TO_STA\":\"$TF_TO_STA\",\"GET_IND_VOX\":\"$GET_IND_VOX\",\"INDIVIDUAL_CLUSTERS\":\"$INDIVIDUAL_CLUSTERS\"}"
 
 ml python/3.6
