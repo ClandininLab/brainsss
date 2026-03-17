@@ -46,7 +46,7 @@ def main(args):
         fixed = brainsss.load_fda_meanbrain().numpy()
         
         printlog('clustering.........')
-        giant_cluster_labels_path = os.path.join(cluster_dir, f'supercluster_labels_total_{super_clust}_{event}.npy')
+        giant_cluster_labels_path = os.path.join(cluster_dir, f'supercluster_labels_total_{super_clust}.npy')
         if not os.path.exists(giant_cluster_labels_path) or redo:
             total_dict_path=os.path.join(temp_dir,'behave_dict_total_10flies.pkl')
             full_res_total = brainsss.vox_to_full_res(total_dict_path, giant_vox_labels, super_vox)
