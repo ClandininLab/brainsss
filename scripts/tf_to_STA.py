@@ -17,6 +17,7 @@ def main(args):
     cc = args['ch_num'] 
     event = args['event']
     flies = args['fly_num']
+    flies = [int(f) for f in flies]  #newly addeded20260322
     scratch_dir = args['scratch_dir']
     
     
@@ -44,7 +45,7 @@ def main(args):
         printlog(f"Found behaviors: {behaviors}")
     
     
-    range_start=-2000; range_end=3000; steps=100
+    range_start=-500; range_end=1000; steps=100
     printlog(f"Flies: {flies}")
     num_flies = len(flies)
     
