@@ -519,9 +519,10 @@ def main(args):
                 logfile=logfile,
                 time=72,
                 cpus=32,
-                mem='250GB',
+                mem='300GB',
                 nice=nice,
                 nodes=nodes,
+                bigmem=True,
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
     
