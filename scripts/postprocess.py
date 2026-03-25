@@ -508,6 +508,7 @@ def main(args):
                     "ch_num": ch_num,
                     "redo": redo,
                     "event": event,
+                    "clust_num": clust_num,
                     }
             script = "individual_clusters.py"
             job_id = brainsss.sbatch(

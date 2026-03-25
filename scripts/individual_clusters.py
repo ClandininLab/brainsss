@@ -20,6 +20,7 @@ def main(args):
     fly_nums = args['fly_num']
     event = args['event']
     redo=args['redo']
+    n_clusters = args['clust_num']
 
     #####################
     ### SETUP LOGGING ###
@@ -35,7 +36,7 @@ def main(args):
 
     printlog("Beginning individual clusters")
  
-    n_clusters=500
+    n_clusters=n_clusters
     
     if event != None:
         total_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
@@ -94,36 +95,36 @@ def main(args):
                     cluster_brains[cluster] = {}
                     for event_idx in range(np.shape(events)[0]):
                         event_time = events[event_idx]
-                        # # Get 10 points AFTER the event (within 2 seconds)
-                        # if event_idx == np.shape(events)[0] - 1:  # FIXED: Last event
-                        #     # Last event: can go up to 2 seconds after
-                        #     seconds_after = 2
-                        #     ms_per_unit = 10
-                        #     units = (seconds_after * 1000) // ms_per_unit
-                        #     time_max = event_time + units
-                        # else:
-                        #     # For other events: stop at next event or 2 seconds, whichever comes first
-                        #     seconds_after = 2
-                        #     ms_per_unit = 10
-                        #     units = (seconds_after * 1000) // ms_per_unit
-                        #     time_max = min(events[event_idx + 1], event_time + units)
+                            # Define time window
+                        if event_idx == 0:
+                            # First event: get last 10 points before it
+                            time_min = -np.inf
+                        else:
+                            # Subsequent events: start 2 seconds after previous event
+                            seconds_after = 2
+                            ms_per_unit = 10
+                            units = (seconds_after * 1000) // ms_per_unit
+                            time_min = events[event_idx - 1] + units
 
-                        # time_min = event_time
+                        time_max = event_time
                         cluster_data = []
                         for voxel_idx in range(n_voxels):
                             voxel_times = voxel_times_cache[voxel_idx]
                             voxel_data = voxel_data_cache[voxel_idx]
                             
-                            valid_indices = np.where((voxel_times >= event_time))[0]
+                            valid_indices = np.where((voxel_times >= time_min) & 
+                                                    (voxel_times <= time_max))[0]
                             
-                            if len(valid_indices) >= 5:
-                                matching_data = voxel_data[valid_indices[:5]]  # FIRST 5, not last 10
+                            if len(valid_indices) >= 10:
+                                matching_data = voxel_data[valid_indices[-10:]]
                             elif len(valid_indices) > 0:
+                                if event_idx % 10 == 0 and voxel_idx == 0:  # Reduce log spam
+                                    printlog(f"Warning: Only {len(valid_indices)} timepoints before event {event_idx} for cluster {cluster}")
                                 matching_data = voxel_data[valid_indices]
-                                matching_data = np.pad(matching_data, (0,5 - len(matching_data)), 
-                                                    constant_values=np.nan)  # Pad at END
+                                matching_data = np.pad(matching_data, (10 - len(matching_data), 0), 
+                                                    constant_values=np.nan)
                             else:
-                                matching_data = np.full(5, np.nan)
+                                matching_data = np.full(10, np.nan)
                                 
                             cluster_data.append(matching_data)
                         cluster_brains[cluster][event_idx] = np.nanmean(cluster_data, axis=0)
@@ -131,8 +132,7 @@ def main(args):
                 pickle.dump(cluster_brains, file)
             printlog(f'Finished fly {fly_num} saved in {save_file}')
         else:
-            printlog(f"File {save_file} already exists, skipping fly {fly_num}")
-    
+            printlog(f"File {save_file} already exists, skipping fly {fly_num}")    
     
     
 if __name__ == '__main__':
