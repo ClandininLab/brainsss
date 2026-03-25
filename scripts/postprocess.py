@@ -183,6 +183,8 @@ def main(args):
                 return
         else:
             clust_num = 500  # default when -sc is called without a value
+    else:
+        clust_num = 500  # default 
         
 
     if filter_bins:
