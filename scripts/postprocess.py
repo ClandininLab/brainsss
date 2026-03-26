@@ -524,7 +524,7 @@ def main(args):
                 mem='300GB',
                 nice=nice,
                 nodes=nodes,
-                bigmem=True,
+                global_resources=True,
             )
             brainsss.wait_for_job(job_id, logfile, com_path)
     
