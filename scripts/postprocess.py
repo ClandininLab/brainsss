@@ -106,13 +106,13 @@ def main(args):
         printlog(f"Flies to be processed {fly_dirs}")
     elif args["FLIES"] != "":
         fly_num = args["FLIES"].split(",")
-        fly_dirs = args["FLIES"].split(",")
-        printlog(f"Fly being processed: {fly_dirs}")
-    ### add 'fly_' to beginning if it isn't there
-        for i in range(len(fly_dirs)):
-            if not fly_dirs[i].startswith("fly_"):
-                fly_dirs[i] = "fly_" + fly_dirs[i] 
-            # printlog(f"Flies to process: {dirs_to_process}")
+        fly_count = len(fly_num)
+        printlog(f"Number of flies to process: {fly_count}")
+        fly_dirs = []
+        for fly in fly_num:
+            fly_name= f"fly_{fly}"
+            fly_dirs.append(fly_name)
+        printlog(f"Flies to be processed: {fly_dirs}")
         
     if args["EVENTS"] == "":
         # printlog('not building flies')
