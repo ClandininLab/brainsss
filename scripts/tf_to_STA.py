@@ -74,7 +74,7 @@ def main(args):
             if tf_files:
                 for file in tf_files:
                     fly_val=int(file.split("_")[0])
-                    if fly_val in flies:
+                    if int(fly_val) in flies or fly_val in flies:
                         load_path = os.path.join(behave_dir,file)
                         printlog(f"being processes {load_path}")
                         temp=[]
