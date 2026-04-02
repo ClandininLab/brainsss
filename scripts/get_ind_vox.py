@@ -17,6 +17,7 @@ def main(args):
     flies = args['fly_num']
     channel = args['ch_num']
     redo=args['redo']
+    event_times_path = args['event_times_path']
     
     
     #####################
@@ -41,10 +42,6 @@ def main(args):
     
         supercluster_labels=np.load(os.path.join(later_dir, 'clustering', 'supercluster_labels_total_500.npy'))
         
-        if event != None:
-            event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-        else:
-            event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
         with open(event_times_path, 'rb') as file:
             event_times_struct = pickle.load(file)
             f=list(event_times_struct.keys())[0]

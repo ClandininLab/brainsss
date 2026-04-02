@@ -5,6 +5,7 @@ import re
 import sys
 import textwrap
 import time
+import pickle
 
 import brainsss
 import nibabel as nib
@@ -90,29 +91,7 @@ def main(args):
         individual_clusters = False
 
      ### Parse remaining command line args
-    if args["BEST_FLIES"] == "" and args["FLIES"] == "":
-        printlog('no flies specified')
-        fly_dirs = None
-    elif args["BEST_FLIES"] != "":
-        # fly_list = [234,239,240,241,242,249,250]
-        # fly_num=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
-        fly_num=[226,227,228,234,239,240,241,242,249,250]
-        fly_count = len(fly_num)
-        printlog(f"Number of flies to process: {fly_count}")
-        fly_dirs = []
-        for fly in fly_num:
-            fly_name= f"fly_{fly}"
-            fly_dirs.append(fly_name)
-        printlog(f"Flies to be processed {fly_dirs}")
-    elif args["FLIES"] != "":
-        fly_num = args["FLIES"].split(",")
-        fly_count = len(fly_num)
-        printlog(f"Number of flies to process: {fly_count}")
-        fly_dirs = []
-        for fly in fly_num:
-            fly_name= f"fly_{fly}"
-            fly_dirs.append(fly_name)
-        printlog(f"Flies to be processed: {fly_dirs}")
+   
         
     if args["EVENTS"] == "":
         # printlog('not building flies')
@@ -121,7 +100,41 @@ def main(args):
         # printlog('building flies')
         event = args["EVENTS"].lower()
     printlog(f"Working on event: {event}")
+    
+    if event != None:
+        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+    else:
+        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+    with open(event_times_path, 'rb') as file:
+        event_times_struct = pickle.load(file)
+        event_flies=list(event_times_struct.keys())
         
+    if args["BEST_FLIES"] == "" and args["FLIES"] == "":
+        fly_num=event_flies
+        fly_count = len(fly_num)
+        fly_dirs = []
+        for fly in fly_num:
+            fly_name= f"fly_{fly}"
+            fly_dirs.append(fly_name)
+    elif args["BEST_FLIES"] != "":
+        # fly_list = [234,239,240,241,242,249,250]
+        # fly_num=[208,209, 210,217,218,226,227,228,233,234,239,240,241,242,249,250]
+        fly_num=[226,227,228,234,239,240,241,242,249,250]
+        fly_count = len(fly_num)
+        fly_dirs = []
+        for fly in fly_num:
+            fly_name= f"fly_{fly}"
+            fly_dirs.append(fly_name)
+        
+    elif args["FLIES"] != "":
+        fly_num = args["FLIES"].split(",")
+        fly_count = len(fly_num)
+        printlog(f"Number of flies to process: {fly_count}")
+        fly_dirs = []
+        for fly in fly_num:
+            fly_name= f"fly_{fly}"
+            fly_dirs.append(fly_name)
+    printlog(f"{fly_count} flies to be processed: {fly_dirs}")
         
     # These command line arguments will be empty unless the flag is called from the command line
     if args["FILTER_BINS"] != "":
@@ -213,6 +226,7 @@ def main(args):
                     "fly_directory": fly_directory,
                     "save_directory": save_directory,
                     "timestamp_file": timestamp_file,
+                    "event_times_path": event_times_path,
                 }
                 script = "filter_bins.py"
                 job_id = brainsss.sbatch(
@@ -253,6 +267,7 @@ def main(args):
                     "save_directory": save_directory,
                     "timestamp_file": timestamp_file,
                     "cc": ch_num,
+                    "event_times_path": event_times_path,
                 }
                 script = "relative_ts.py"
                 job_id = brainsss.sbatch(
@@ -297,6 +312,7 @@ def main(args):
                     "brain_file": brain_file,
                     "timestamp_file": timestamp_file,
                     "cc": ch_num,
+                    "event_times_path": event_times_path,
                 }
                 script = "temp_filter.py"
                 job_id = brainsss.sbatch(
@@ -329,6 +345,7 @@ def main(args):
                         "event": event,
                         "later_path": later_path,
                         "load_directory": load_directory,
+                        "event_times_path": event_times_path,
                         }
                 script = "make_supervoxels.py"
                 job_id = brainsss.sbatch(
@@ -354,6 +371,7 @@ def main(args):
                     "ch_num": ch_num,
                     "redo": redo,
                     "scratch_dir": scratch_path,
+                    "event_times_path": event_times_path,
                     }
             script = "later_transfer.py"
             job_id = brainsss.sbatch(
@@ -381,6 +399,7 @@ def main(args):
                     "fly_num": fly_num,
                     "scratch_dir": scratch_path,
                     'redo': redo,
+                    "event_times_path": event_times_path,
                     }
             script = "tf_to_STA.py"
             job_id = brainsss.sbatch(
@@ -414,6 +433,7 @@ def main(args):
                         'ch_num': ch_num,
                         "load_directory": load_directory,
                         "save_directory": save_directory,
+                        "event_times_path": event_times_path,
                         }
                 script = "build_STA.py"
                 job_id = brainsss.sbatch(
@@ -437,6 +457,7 @@ def main(args):
                 "temp_directory": temp_directory,
                 "event": event,
                 "redo": redo,
+                "event_times_path": event_times_path,
                 }
         script = "regress_noise.py"
         job_id = brainsss.sbatch(
@@ -461,6 +482,7 @@ def main(args):
                 "event": event,
                 "clust_num": clust_num,
                 "redo": redo,
+                "event_times_path": event_times_path,
                 }
         script = "supercluster.py"
         job_id = brainsss.sbatch(
@@ -486,6 +508,8 @@ def main(args):
                     "fly_num": fly_num,
                     "ch_num": ch_num,
                     "redo": redo,
+                    "event_times_path": event_times_path,
+
                     }
             script = "get_ind_vox.py"
             job_id = brainsss.sbatch(
@@ -514,6 +538,8 @@ def main(args):
                     "redo": redo,
                     "event": event,
                     "clust_num": clust_num,
+                    "event_times_path": event_times_path,
+
                     }
             script = "individual_clusters.py"
             job_id = brainsss.sbatch(

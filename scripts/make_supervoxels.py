@@ -27,22 +27,19 @@ THIS IS A JOBLIB ISSUE. If you can, kindly provide the joblib's team with an
 
 def main(args):
     func_path = args['func_path']
-	logfile = args['logfile']
-	load_directory = args['load_directory']
-	later_path = args['later_path']
-	event = args['event']
-	ch_num = args['ch_num']
- 	redo=args['redo']
-	printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
-	n_clusters = 2000
+    logfile = args['logfile']
+    load_directory = args['load_directory']
+    later_path = args['later_path']
+    event = args['event']
+    ch_num = args['ch_num']
+    redo=args['redo']
+    event_times_path = args['event_times_path']
+    printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
+    n_clusters = 2000
  
  
 
 	#Get behaviors
-	if event != None:
-		event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-	else:
-		event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
 	with open(event_times_path, 'rb') as file:
 		event_times_struct = pickle.load(file)
 		f=list(event_times_struct.keys())[0]

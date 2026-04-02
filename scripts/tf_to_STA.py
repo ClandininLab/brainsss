@@ -18,7 +18,8 @@ def main(args):
     event = args['event']
     flies = args['fly_num']
     scratch_dir = args['scratch_dir']
-    redo=args
+    redo=args['redo']
+    event_times_path = args['event_times_path']
     
     
     #####################
@@ -34,10 +35,6 @@ def main(args):
     ###########
 
     printlog("Beginning giant STA")
-    if event != None:
-        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-    else:
-        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
     with open(event_times_path, 'rb') as file:
         event_times_struct = pickle.load(file)
         f=list(event_times_struct.keys())[0]

@@ -9,6 +9,7 @@ import h5py
 import ants
 import psutil
 import gc
+import pickle
 
 def STA_supervoxel_to_full_res(STA_brain, cluster_labels):
     n_clusters = STA_brain.shape[2]
@@ -34,6 +35,7 @@ def main(args):
     ch_num = args['ch_num'] 
     later_path = args['later_path']
     event = args['event']
+    event_times_path = args['event_times_path']
     
     steps=100
 
@@ -52,10 +54,6 @@ def main(args):
     ###########
 
     printlog("Beginning STA")
-    if event != None:
-        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-    else:
-        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
     with open(event_times_path, 'rb') as file:
         event_times_struct = pickle.load(file)
         f=list(event_times_struct.keys())[0]

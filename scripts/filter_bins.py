@@ -18,6 +18,7 @@ def main(args):
     event = args['event']
     redo = args['redo']
     cc = args['cc']
+    event_times_path = args['event_times_path']
     # behavior = args['behavior']
 
     load_path = os.path.join(fly_directory, timestamp_file)
@@ -37,11 +38,6 @@ def main(args):
 
     printlog("Beginning bin creation")
     
-    # behaviors = ['inc', 'dec', 'flat', 'total']
-    if event != None:
-        event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-    else:
-        event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
     with open(event_times_path, 'rb') as file:
         event_times_struct = pickle.load(file)
         f=list(event_times_struct.keys())[0]

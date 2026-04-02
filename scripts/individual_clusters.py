@@ -21,6 +21,7 @@ def main(args):
     event = args['event']
     redo=args['redo']
     n_clusters = args['clust_num']
+    total_path = args['event_times_path']
 
     #####################
     ### SETUP LOGGING ###
@@ -37,11 +38,6 @@ def main(args):
     printlog("Beginning individual clusters")
  
     n_clusters=n_clusters
-    
-    if event != None:
-        total_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
-    else:
-        total_path = os.path.join(later_path, 'event_times_split_dic.pkl')
     with open(total_path, 'rb') as file:
         total_data_dict = pickle.load(file)
     
