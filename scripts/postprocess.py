@@ -120,6 +120,7 @@ def main(args):
     else:
         # printlog('building flies')
         event = args["EVENTS"].lower()
+    printlog(f"Working on event: {event}")
         
         
     # These command line arguments will be empty unless the flag is called from the command line
