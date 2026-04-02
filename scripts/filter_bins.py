@@ -57,14 +57,14 @@ def main(args):
         else:
             filter_needs_file = os.path.join(save_directory, f'filter_needs_{cc}_{behavior}.h5')
             file_name = f'filter_needs_{cc}_{behavior}.h5'
+        fly_name= fly[4:7]
         
-        if file_name not in os.listdir(save_directory) or redo:
+        if file_name not in os.listdir(save_directory) or redo and fly_name in list(event_times_struct.keys()):
             with h5py.File(load_path, 'r') as hf:
                 ts = hf['data']
                 dimst = np.shape(ts)
                 printlog(f"Timestamp shape is {dimst}")
                 
-                fly_name= fly[4:7]
                 printlog(f"Fly name is {fly_name} and behavior is {behavior}")
                 starts_loom_ms = event_times_struct[fly_name][behavior]
                 # starts_loom_ms=np.sort(starts_loom_ms)
