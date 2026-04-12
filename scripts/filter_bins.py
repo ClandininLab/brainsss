@@ -55,7 +55,7 @@ def main(args):
             file_name = f'filter_needs_{cc}_{behavior}.h5'
         fly_name= fly[4:7]
         
-        if file_name not in os.listdir(save_directory) or redo and fly_name in list(event_times_struct.keys()):
+        if file_name not in os.listdir(save_directory) and fly_name in list(event_times_struct.keys()) or redo:
             with h5py.File(load_path, 'r') as hf:
                 ts = hf['data']
                 dimst = np.shape(ts)
