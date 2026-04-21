@@ -237,10 +237,10 @@ def main(args):
                     logfile=logfile,
                     time=10,
                     cpus=10,
-                    mem='300GB',
+                    mem='250GB',
                     nice=nice,
                     nodes=nodes,
-                    bigmem=True, 
+                    # bigmem=True, 
                 )
                 brainsss.wait_for_job(job_id, logfile, com_path)
 
@@ -278,10 +278,10 @@ def main(args):
                     logfile=logfile,
                     time=10,
                     cpus=32,
-                    mem='300GB',
+                    mem='250GB',
                     nice=nice,
                     nodes=nodes,
-                    bigmem=True,
+                    # bigmem=True,
                     #global_resources=True, 
                 )
                 brainsss.wait_for_job(job_id, logfile, com_path)
@@ -323,10 +323,10 @@ def main(args):
                     logfile=logfile,
                     time=10,
                     cpus=32,
-                    mem='300GB',
+                    mem='250GB',
                     nice=nice,
                     nodes=nodes,
-                    bigmem=True, 
+                    #bigmem=True, 
                     #global_resources=True, 
                 )
                 brainsss.wait_for_job(job_id, logfile, com_path)
