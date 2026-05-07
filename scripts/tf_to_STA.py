@@ -97,17 +97,17 @@ def main(args):
                 with h5py.File(save_file, "w") as data_file:
                         data_file.create_dataset("data", data=STA.astype('float32'))
                 
-                ## Clean up tf building files in scratch
-                for num in flies:
-                    fly_name=f'fly_{num}'
-                    tp=os.path.join(scratch_dir,fly_name)
-                    for file in os.listdir(tp):
-                        if event in file and behavior in file:
-                            os.remove(os.path.join(tp,file))
-                ## Clean up tf files in scratch
-                for file in os.listdir(behave_dir):
-                    if event in file and '_tf_' in file and behavior in file:
-                        os.remove(os.path.join(behave_dir,file))
+                # ## Clean up tf building files in scratch
+                # for num in flies:
+                #     fly_name=f'fly_{num}'
+                #     tp=os.path.join(scratch_dir,fly_name)
+                #     for file in os.listdir(tp):
+                #         if event in file and behavior in file:
+                #             os.remove(os.path.join(tp,file))
+                # ## Clean up tf files in scratch
+                # for file in os.listdir(behave_dir):
+                #     if event in file and '_tf_' in file and behavior in file:
+                #         os.remove(os.path.join(behave_dir,file))
                 printlog(f"STA for {behavior} done. Data saved in {save_file}")
             else:
                 printlog(f"No files found for {behavior}")
