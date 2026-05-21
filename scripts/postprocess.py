@@ -57,6 +57,10 @@ def main(args):
         redo = False
     else:
         redo = True
+    if args["AFTER"] == "":
+        after = False
+    else:
+        after = True
     
         
     ### Parse user settings
@@ -536,6 +540,7 @@ def main(args):
                     "fly_num": fly_num,
                     "ch_num": ch_num,
                     "redo": redo,
+                    "after": after,
                     "event": event,
                     "clust_num": clust_num,
                     "event_times_path": event_times_path,

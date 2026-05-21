@@ -92,6 +92,10 @@ while [[ $# -gt 0 ]]; do
       INDIVIDUAL_CLUSTERS=True
       shift
       ;;
+    --after)
+      AFTER=True
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -102,7 +106,7 @@ done
 ARGS="{\"PWD\":\"$PWD\",\"BEST_FLIES\":\"$BEST_FLIES\",\"POSTPROCESS\":\"$POSTPROCESS\",\"FILTER_BINS\":\"$FILTER_BINS\",\"RELATIVE_TS\":\"$RELATIVE_TS\",\
 \"FLIES\":\"$FLIES\",\"EVENTS\":\"$EVENTS\",\"TEMP_FILTER\":\"$TEMP_FILTER\",\"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"CHANNEL_CHANGE_NUM\":\"$CHANNEL_CHANGE_NUM\",\"MAKE_SUPERVOXELS\":\"$MAKE_SUPERVOXELS\",\
 \"BUILD_STA\":\"$BUILD_STA\",\"REDO\":\"$REDO\",\"LATER_TRANSFER\":\"$LATER_TRANSFER\",\"REGRESS_NOISE\":\"$REGRESS_NOISE\",\"SUPERCLUSTER\":\"$SUPERCLUSTER\",\"SUPERCLUSTER_NUM\":\"$SUPERCLUSTER_NUM\",\
-\"TF_TO_STA\":\"$TF_TO_STA\",\"GET_IND_VOX\":\"$GET_IND_VOX\",\"INDIVIDUAL_CLUSTERS\":\"$INDIVIDUAL_CLUSTERS\"}"
+\"TF_TO_STA\":\"$TF_TO_STA\",\"GET_IND_VOX\":\"$GET_IND_VOX\",\"INDIVIDUAL_CLUSTERS\":\"$INDIVIDUAL_CLUSTERS\",\"AFTER\":\"$AFTER\"}"
 
 ml python/3.6
 date

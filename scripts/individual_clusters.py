@@ -22,6 +22,7 @@ def main(args):
     redo=args['redo']
     n_clusters = args['clust_num']
     total_path = args['event_times_path']
+    after=args['after']
 
     #####################
     ### SETUP LOGGING ###
@@ -91,11 +92,18 @@ def main(args):
                     cluster_brains[cluster] = {}
                     for event_idx in range(np.shape(events)[0]):
                         event_time = events[event_idx]
-                            # Define time window
-                        if event_idx == 0:
+                        # Define time window
+                        if after:
+                            #if starting with the end of the stimulus
+                            seconds_after=1
+                            ms_per_unit=10
+                            units=(seconds_after * 1000) // ms_per_unit
+                            event_time=events[event_idx]+units
+                            time_min=events[event_idx]
+                        elif event_idx == 0:
                             # First event: get last 10 points before it
                             time_min = -np.inf
-                        else:
+                        elif:
                             # Subsequent events: start 2 seconds after previous event
                             seconds_after = 2
                             ms_per_unit = 10
