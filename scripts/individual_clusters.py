@@ -53,9 +53,9 @@ def main(args):
         printlog(f'Processing fly {fly_num}')
         dff_path = f'/oak/stanford/groups/trc/data/Ilana/2P/data/fly_{fly_num}/dff'
         warp_path = f'/oak/stanford/groups/trc/data/Ilana/2P/data/fly_{fly_num}/warp'
-        save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_new_ch_{ch_num}_dict.pkl')
+        save_file=os.path.join(later_path,f'{fly_num}_individual_clusters_new_ch_{ch_num}_dict_{event}.pkl')
         if after:
-            save_file=os.path.join(later_path,f'{fly_num}_after_individual_clusters_new_ch_{ch_num}_dict.pkl')
+            save_file=os.path.join(later_path,f'{fly_num}_after_individual_clusters_new_ch_{ch_num}_dict_{event}.pkl')
         if not os.path.exists(save_file) or redo:
             for file in os.listdir(dff_path):
                 if f'_{ch_num}_' in file:
