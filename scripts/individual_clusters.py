@@ -124,8 +124,8 @@ def main(args):
                             if len(valid_indices) >= 10:
                                 matching_data = voxel_data[valid_indices[-10:]]
                             elif len(valid_indices) > 0:
-                                if event_idx % 10 == 0 and voxel_idx == 0:  # Reduce log spam
-                                    printlog(f"Warning: Only {len(valid_indices)} timepoints before event {event_idx} for cluster {cluster}")
+                                # if event_idx % 10 == 0 and voxel_idx == 0:  # Reduce log spam
+                                #     printlog(f"Warning: Only {len(valid_indices)} timepoints before event {event_idx} for cluster {cluster}")
                                 matching_data = voxel_data[valid_indices]
                                 matching_data = np.pad(matching_data, (10 - len(matching_data), 0), 
                                                     constant_values=np.nan)
