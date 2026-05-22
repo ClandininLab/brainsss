@@ -105,7 +105,7 @@ def main(args):
                         elif event_idx == 0:
                             # First event: get last 10 points before it
                             time_min = -np.inf
-                        elif:
+                        else:
                             # Subsequent events: start 2 seconds after previous event
                             seconds_after = 2
                             ms_per_unit = 10
