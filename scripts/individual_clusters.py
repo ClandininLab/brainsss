@@ -97,22 +97,26 @@ def main(args):
                         # Define time window
                         if after:
                             #if starting with the end of the stimulus
-                            seconds_after=1
+                            seconds_after=0.5
                             ms_per_unit=10
                             units=(seconds_after * 1000) // ms_per_unit
-                            event_time=events[event_idx]+units
-                            time_min=events[event_idx]
+                            event_time=events[event_idx]
+                            time_min=event_time+units
+                            if event_idx<(np.shape(events)[0])-1:
+                                time_max=events[event_idx + 1] - (units*4)
+                            else:
+                                time_max = np.inf
                         elif event_idx == 0:
                             # First event: get last 10 points before it
                             time_min = -np.inf
+                            time_max = event_time
                         else:
                             # Subsequent events: start 2 seconds after previous event
                             seconds_after = 2
                             ms_per_unit = 10
                             units = (seconds_after * 1000) // ms_per_unit
                             time_min = events[event_idx - 1] + units
-
-                        time_max = event_time
+                            time_max = event_time
                         cluster_data = []
                         for voxel_idx in range(n_voxels):
                             voxel_times = voxel_times_cache[voxel_idx]
