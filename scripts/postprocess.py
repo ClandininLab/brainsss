@@ -239,12 +239,12 @@ def main(args):
                     modules=modules,
                     args=args,
                     logfile=logfile,
-                    time=10,
+                    time=5,
                     cpus=10,
-                    mem='250GB',
+                    mem='500GB',
                     nice=nice,
                     nodes=nodes,
-                    # bigmem=True, 
+                    bigmem=True, 
                 )
                 brainsss.wait_for_job(job_id, logfile, com_path)
 
@@ -280,12 +280,12 @@ def main(args):
                     modules=modules,
                     args=args,
                     logfile=logfile,
-                    time=10,
+                    time=5,
                     cpus=32,
-                    mem='250GB',
+                    mem='500GB',
                     nice=nice,
                     nodes=nodes,
-                    # bigmem=True,
+                    bigmem=True,
                     #global_resources=True, 
                 )
                 brainsss.wait_for_job(job_id, logfile, com_path)
@@ -325,12 +325,12 @@ def main(args):
                     modules=modules,
                     args=args,
                     logfile=logfile,
-                    time=10,
+                    time=5,
                     cpus=32,
-                    mem='250GB',
+                    mem='500GB',
                     nice=nice,
                     nodes=nodes,
-                    #bigmem=True, 
+                    bigmem=True, 
                     #global_resources=True, 
                 )
                 brainsss.wait_for_job(job_id, logfile, com_path)
