@@ -361,3 +361,255 @@ def convert_fly_to_nwb(fly_folder, output_file):
         
         # Load red channel (TdTomato)
         red_nii = os.path.join(imaging_folder, 'anatomy_channel_1.nii.gz')
+        if os.path.exists(red_nii):
+            print(f"  Loading anatomical scan {anat_idx} (red channel)...")
+            img = nib.load(red_nii)
+            data = img.get_fdata().astype(np.float32)
+            
+            # Create TwoPhotonSeries for anatomical red channel
+            anat_series_red = TwoPhotonSeries(
+                name=f'AnatomicalSeries_TdTomato_{anat_idx}',
+                data=data,
+                imaging_plane=imaging_plane,
+                unit='normalized amplitude',
+                format='raw',
+                description=f'Anatomical scan {anat_idx} - TdTomato channel (red)',
+                comments=f'Shape: {data.shape}, used for motion correction',
+                rate=1.0,  # Single volume
+            )
+            nwbfile.add_acquisition(anat_series_red)
+            print(f"    Added red channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
+        
+        # Load green channel (GCaMP) if exists
+        green_nii = os.path.join(imaging_folder, 'anatomy_channel_2.nii.gz')
+        if os.path.exists(green_nii):
+            print(f"  Loading anatomical scan {anat_idx} (green channel)...")
+            img = nib.load(green_nii)
+            data = img.get_fdata().astype(np.float32)
+            
+            anat_series_green = TwoPhotonSeries(
+                name=f'AnatomicalSeries_GCaMP_{anat_idx}',
+                data=data,
+                imaging_plane=imaging_plane,
+                unit='normalized amplitude',
+                format='raw',
+                description=f'Anatomical scan {anat_idx} - GCaMP6f channel (green)',
+                rate=1.0,
+            )
+            nwbfile.add_acquisition(anat_series_green)
+            print(f"    Added green channel: shape {data.shape}")
+    
+    # Process functional scans
+    print("\nProcessing functional scans...")
+    
+    for func_idx, func_folder in enumerate(func_folders):
+        print(f"\n  Processing {os.path.basename(func_folder)}...")
+        
+        imaging_folder = os.path.join(func_folder, 'imaging')
+        
+        # Load functional red channel (TdTomato)
+        red_nii = os.path.join(imaging_folder, 'functional_channel_1.nii.gz')
+        if os.path.exists(red_nii):
+            print(f"    Loading functional red channel...")
+            img = nib.load(red_nii)
+            data = img.get_fdata().astype(np.float32)
+            
+            # Get scan metadata
+            scan_json = os.path.join(imaging_folder, 'scan.json')
+            if os.path.exists(scan_json):
+                scan_meta = load_json(scan_json)
+                rate = 1.0  # Will be updated if we have framerate info
+            else:
+                scan_meta = {}
+                rate = 1.0
+            
+            func_series_red = TwoPhotonSeries(
+                name=f'FunctionalSeries_TdTomato_{func_idx}',
+                data=data,
+                imaging_plane=imaging_plane,
+                unit='normalized amplitude',
+                format='raw',
+                description=f'Functional scan {func_idx} - TdTomato channel',
+                comments=f'Laser power: {scan_meta.get("laser_power", "unknown")} mW, '
+                        f'PMT gain: {scan_meta.get("PMT_red", "unknown")}',
+                rate=rate,
+            )
+            nwbfile.add_acquisition(func_series_red)
+            print(f"      Red channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
+        
+        # Load functional green channel (GCaMP)
+        green_nii = os.path.join(imaging_folder, 'functional_channel_2.nii.gz')
+        if os.path.exists(green_nii):
+            print(f"    Loading functional green channel...")
+            img = nib.load(green_nii)
+            data = img.get_fdata().astype(np.float32)
+            
+            func_series_green = TwoPhotonSeries(
+                name=f'FunctionalSeries_GCaMP_{func_idx}',
+                data=data,
+                imaging_plane=imaging_plane,
+                unit='normalized amplitude',
+                format='raw',
+                description=f'Functional scan {func_idx} - GCaMP6f channel',
+                comments=f'Laser power: {scan_meta.get("laser_power", "unknown")} mW, '
+                        f'PMT gain: {scan_meta.get("PMT_green", "unknown")}',
+                rate=rate,
+            )
+            nwbfile.add_acquisition(func_series_green)
+            print(f"      Green channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
+        
+        # Load visual stimulus data
+        visual_folder = os.path.join(func_folder, 'visual')
+        if os.path.exists(visual_folder):
+            print(f"    Loading visual stimulus data...")
+            
+            # Load stimulus metadata
+            visual_json = os.path.join(visual_folder, 'visual.json')
+            if os.path.exists(visual_json):
+                visual_meta = load_json(visual_json)
+            else:
+                visual_meta = []
+            
+            # Load stimulus HDF5
+            stimulus_data = load_visual_stimulus(visual_folder)
+            if stimulus_data:
+                # Store stimulus info as TimeSeries or in stimulus module
+                # This is flexible based on your HDF5 structure
+                for key, value in stimulus_data.items():
+                    if isinstance(value, np.ndarray) and value.ndim == 1:
+                        # Store 1D arrays as TimeSeries
+                        try:
+                            ts = TimeSeries(
+                                name=f'Stimulus_{func_idx}_{key.replace("/", "_")}',
+                                data=value,
+                                unit='a.u.',
+                                description=f'Visual stimulus parameter: {key}'
+                            )
+                            nwbfile.add_stimulus(ts)
+                        except:
+                            pass
+                
+                print(f"      Added stimulus data with {len(stimulus_data)} fields")
+            
+            # Load photodiode data
+            photodiode_data = load_photodiode_data(visual_folder)
+            if photodiode_data:
+                pd_series = TimeSeries(
+                    name=f'Photodiode_{func_idx}',
+                    data=photodiode_data['data'],
+                    unit='volts',
+                    description='Photodiode recordings for stimulus synchronization',
+                    comments=f'Columns: {photodiode_data["column_names"]}'
+                )
+                nwbfile.add_acquisition(pd_series)
+                print(f"      Added photodiode data: shape {photodiode_data['data'].shape}")
+        
+        # Load FicTrac behavioral data
+        fictrac_folder = os.path.join(func_folder, 'fictrac')
+        if os.path.exists(fictrac_folder):
+            print(f"    Loading FicTrac behavioral data...")
+            
+            fictrac_data = load_fictrac_data(fictrac_folder)
+            
+            if fictrac_data:
+                # Create behavioral processing module
+                behavior_module = nwbfile.create_processing_module(
+                    name=f'behavior_{func_idx}',
+                    description=f'Behavioral data from FicTrac for functional scan {func_idx}'
+                )
+                
+                # Add position data
+                position_series = SpatialSeries(
+                    name='Position',
+                    data=np.column_stack([
+                        fictrac_data['position_x'],
+                        fictrac_data['position_y']
+                    ]),
+                    reference_frame='lab coordinates',
+                    unit='arbitrary',
+                    timestamps=fictrac_data['timestamps'],
+                    description='Integrated position of fly on ball'
+                )
+                position = Position(spatial_series=position_series)
+                behavior_module.add(position)
+                
+                # Add heading direction
+                heading_series = SpatialSeries(
+                    name='Heading',
+                    data=fictrac_data['heading'],
+                    reference_frame='lab coordinates',
+                    unit='radians',
+                    timestamps=fictrac_data['timestamps'],
+                    description='Integrated heading angle'
+                )
+                compass = CompassDirection(spatial_series=heading_series)
+                behavior_module.add(compass)
+                
+                # Add velocity as TimeSeries
+                velocity_series = TimeSeries(
+                    name='Velocity',
+                    data=fictrac_data['velocity'],
+                    unit='arbitrary units/s',
+                    timestamps=fictrac_data['timestamps'],
+                    description='Animal movement speed'
+                )
+                behavior_module.add(velocity_series)
+                
+                # Add rotational velocities
+                for rotation_name in ['delta_rot_lab_side', 'delta_rot_lab_forward', 'delta_rot_lab_turn']:
+                    rot_series = TimeSeries(
+                        name=rotation_name,
+                        data=fictrac_data[rotation_name],
+                        unit='radians/frame',
+                        timestamps=fictrac_data['timestamps'],
+                        description=f'Rotational velocity: {rotation_name}'
+                    )
+                    behavior_module.add(rot_series)
+                
+                print(f"      Added FicTrac data: {len(fictrac_data['timestamps'])} timepoints")
+    
+    # Write NWB file with compression
+    print(f"\nWriting NWB file to {output_file}...")
+    print("This may take several minutes for large files...")
+    
+    with NWBHDF5IO(output_file, 'w') as io:
+        io.write(nwbfile)
+    
+    # Validate
+    print("\nValidating NWB file...")
+    try:
+        from pynwb import validate
+        with NWBHDF5IO(output_file, 'r') as io:
+            nwbfile_in = io.read()
+            results = validate(nwbfile_in)
+            if results:
+                print("Validation warnings:")
+                for r in results:
+                    print(f"  - {r}")
+            else:
+                print("Validation passed!")
+    except Exception as e:
+        print(f"Validation error: {e}")
+    
+    # Print file size
+    file_size = os.path.getsize(output_file) / (1024**3)
+    print(f"\nOutput file size: {file_size:.2f} GB")
+    print(f"{'='*80}\n")
+
+def main():
+    if len(sys.argv) < 3:
+        print("Usage: python convert_2p_to_nwb.py <fly_folder> <output_file>")
+        print("Example: python convert_2p_to_nwb.py /path/to/fly_001 /path/to/output/fly_001.nwb")
+        sys.exit(1)
+    
+    fly_folder = sys.argv[1]
+    output_file = sys.argv[2]
+    
+    if not os.path.exists(fly_folder):
+        print(f"Error: Fly folder does not exist: {fly_folder}")
+        sys.exit(1)
+    
+    convert_fly_to_nwb(fly_folder, output_file)
+
+if __name__ == '__main__':
+    main()
