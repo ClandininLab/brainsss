@@ -286,6 +286,7 @@ def load_visual_stimulus(hdf5_file):
 def convert_fly_to_nwb(fly_folder, output_file):
     """
     Convert a complete fly dataset to NWB format
+    Works with raw imports (no JSON files required)
     
     Parameters:
     -----------
@@ -299,74 +300,62 @@ def convert_fly_to_nwb(fly_folder, output_file):
     print(f"Converting {os.path.basename(fly_folder)} to NWB format")
     print(f"{'='*80}\n")
     
-    # Load fly metadata
-    fly_json = os.path.join(fly_folder, 'fly.json')
-    if os.path.exists(fly_json):
-        fly_metadata = load_json(fly_json)
-    else:
-        fly_metadata = {}
-        print("Warning: No fly.json found")
+    # Extract date from parent folder name (e.g., 20240403__queue__)
+    parent_folder = os.path.basename(os.path.dirname(fly_folder))
+    date_match = parent_folder[:8] if len(parent_folder) >= 8 else 'unknown'
+    fly_name = os.path.basename(fly_folder)
     
-    # Find functional folders (use first one for main metadata)
+    print(f"Date from folder: {date_match}")
+    print(f"Fly name: {fly_name}")
+    
+    # Find functional folders
     func_folders = sorted([os.path.join(fly_folder, x) for x in os.listdir(fly_folder) if 'func' in x])
     
     if not func_folders:
         print("Error: No functional folders found!")
         return
     
-    # Load metadata from first functional scan
+    print(f"Found {len(func_folders)} functional folder(s)")
+    
+    # Load metadata from first functional scan's XML
     func_0 = func_folders[0]
-    
-    # Load experiment metadata
-    expt_json = os.path.join(func_0, 'expt.json')
-    if os.path.exists(expt_json):
-        expt_metadata = load_json(expt_json)
-    else:
-        expt_metadata = {}
-        print("Warning: No expt.json found")
-    
-    # Load scan metadata from XML
     imaging_folder_0 = os.path.join(func_0, 'imaging')
     tseries_0 = find_tseries_folder(imaging_folder_0)
     
     func_xml = None
     if tseries_0:
         func_xml = find_xml_file(tseries_0, 'functional')
+        print(f"Found XML: {func_xml if func_xml else 'None'}")
     
     if func_xml and os.path.exists(func_xml):
         scan_metadata = load_xml_metadata(func_xml)
+        session_start_time = scan_metadata.get('session_start_time', datetime.now(tzlocal()))
     else:
-        scan_metadata = {'session_start_time': datetime.now(tzlocal())}
-        print("Warning: No functional.xml found")
+        print("Warning: No functional.xml found, using current time")
+        scan_metadata = {}
+        session_start_time = datetime.now(tzlocal())
     
-    # Create NWB file
+    # Create NWB file with minimal metadata
     print("Creating NWB file...")
     
     nwbfile = NWBFile(
-        session_description=f"Two-photon imaging of Drosophila brain. "
-                          f"Area: {expt_metadata.get('brain_area', 'unknown')}. "
-                          f"{expt_metadata.get('notes', '')}",
-        identifier=f"{os.path.basename(fly_folder)}_{fly_metadata.get('date', 'unknown')}",
-        session_start_time=scan_metadata.get('session_start_time', datetime.now(tzlocal())),
-        experimenter=[expt_metadata.get('experimenter', 'Unknown')],
+        session_description=f"Two-photon imaging of Drosophila brain",
+        identifier=f"{fly_name}_{date_match}",
+        session_start_time=session_start_time,
+        experimenter=['Unknown'],
         lab='Clandinin Lab',
         institution='Stanford University',
-        experiment_description=f"Two-photon calcium imaging with visual stimulation. "
-                              f"Genotype: {fly_metadata.get('genotype', 'unknown')}",
-        session_id=os.path.basename(fly_folder),
+        experiment_description=f"Two-photon calcium imaging session",
+        session_id=fly_name,
     )
     
     # Add subject information
     nwbfile.subject = Subject(
-        subject_id=os.path.basename(fly_folder),
-        age=fly_metadata.get('age', 'unknown'),
-        description=f"Circadian: {fly_metadata.get('circadian_on', 'unknown')} to "
-                   f"{fly_metadata.get('circadian_off', 'unknown')}. "
-                   f"Temp: {fly_metadata.get('temp', 'unknown')}. "
-                   f"{fly_metadata.get('notes', '')}",
+        subject_id=fly_name,
+        age='unknown',
+        description=f'Fly from {date_match}',
         species='Drosophila melanogaster',
-        sex=fly_metadata.get('gender', 'U'),
-        genotype=fly_metadata.get('genotype', 'unknown')
+        sex='U',  # Unknown
     )
     
     # Create device
@@ -389,17 +378,16 @@ def convert_fly_to_nwb(fly_folder, output_file):
         emission_lambda=510.0  # GCaMP6f peak emission
     )
     
-    # Create imaging plane
+    # Create imaging plane with BOTH optical channels
     imaging_plane = nwbfile.create_imaging_plane(
         name='ImagingPlane',
-        optical_channel=optical_channel_green,  # Primary channel
-        description=f"Multiplane imaging with 49 z-planes. "
-                   f"Brain area: {expt_metadata.get('brain_area', 'unknown')}",
+        optical_channel=[optical_channel_green, optical_channel_red],  # Pass as list
+        description=f"Multiplane imaging with 49 z-planes",
         device=device,
         excitation_lambda=920.0,  # Typical 2P excitation for GCaMP
         imaging_rate=scan_metadata.get('framerate', 1.0),
         indicator='GCaMP6f',
-        location=expt_metadata.get('brain_area', 'unknown'),
+        location='brain',
         grid_spacing=[
             scan_metadata.get('x_voxel_size', 1.0),
             scan_metadata.get('y_voxel_size', 1.0),
@@ -409,12 +397,14 @@ def convert_fly_to_nwb(fly_folder, output_file):
         reference_frame='Drosophila brain'
     )
     
-    # Add additional optical channel for red
-    imaging_plane.add_optical_channel(optical_channel_red)
-    
     # Process anatomical scans
     print("\nProcessing anatomical scans...")
     anat_folders = sorted([os.path.join(fly_folder, x) for x in os.listdir(fly_folder) if 'anat' in x])
+    
+    if anat_folders:
+        print(f"Found {len(anat_folders)} anatomical folder(s)")
+    else:
+        print("No anatomical folders found")
     
     for anat_idx, anat_folder in enumerate(anat_folders):
         imaging_folder = os.path.join(anat_folder, 'imaging')
@@ -449,6 +439,8 @@ def convert_fly_to_nwb(fly_folder, output_file):
             )
             nwbfile.add_acquisition(anat_series_red)
             print(f"    Added red channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
+        else:
+            print(f"  No channel_1 nifti found")
         
         # Load green channel (GCaMP) if exists
         if nifti_files['channel_2']:
@@ -488,14 +480,17 @@ def convert_fly_to_nwb(fly_folder, output_file):
         # Find nifti files
         nifti_files = find_nifti_files(tseries_folder)
         
-        # Find XML file for metadata (in tseries folder)
+        # Try to get scan metadata from XML
         func_xml = find_xml_file(tseries_folder, 'functional')
         scan_meta = {}
         
         if func_xml:
-            scan_json = os.path.join(imaging_folder, 'scan.json')
-            if os.path.exists(scan_json):
-                scan_meta = load_json(scan_json)
+            try:
+                xml_meta = load_xml_metadata(func_xml)
+                scan_meta = xml_meta
+                print(f"  Loaded metadata from XML")
+            except Exception as e:
+                print(f"  Warning: Could not load XML metadata: {e}")
         
         # Load functional red channel (TdTomato)
         if nifti_files['channel_1']:
@@ -516,6 +511,8 @@ def convert_fly_to_nwb(fly_folder, output_file):
             )
             nwbfile.add_acquisition(func_series_red)
             print(f"      Red channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
+        else:
+            print(f"    No channel_1 nifti found")
         
         # Load functional green channel (GCaMP)
         if nifti_files['channel_2']:
@@ -536,6 +533,8 @@ def convert_fly_to_nwb(fly_folder, output_file):
             )
             nwbfile.add_acquisition(func_series_green)
             print(f"      Green channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
+        else:
+            print(f"    No channel_2 nifti found")
         
         # Load visual stimulus data (HDF5 can be in multiple locations)
         print(f"    Looking for visual stimulus data...")
@@ -556,17 +555,18 @@ def convert_fly_to_nwb(fly_folder, output_file):
                             )
                             nwbfile.add_stimulus(ts)
                         except Exception as e:
-                            print(f"      Warning: Could not add stimulus {key}: {e}")
+                            pass  # Skip problematic stimulus data
                 print(f"      Added stimulus data with {len(stimulus_data)} fields")
         else:
             print(f"    No HDF5 stimulus file found")
         
         # Load voltage recording data (CSV in tseries folder)
         voltage_csv = None
-        for file in os.listdir(tseries_folder):
-            if 'VoltageRecording' in file and file.endswith('.csv'):
-                voltage_csv = os.path.join(tseries_folder, file)
-                break
+        if os.path.exists(tseries_folder):
+            for file in os.listdir(tseries_folder):
+                if 'VoltageRecording' in file and file.endswith('.csv'):
+                    voltage_csv = os.path.join(tseries_folder, file)
+                    break
         
         if voltage_csv:
             try:
