@@ -28,6 +28,90 @@ def load_json(file):
         data = json.load(f)
     return data
 
+def find_tseries_folder(imaging_folder):
+    """
+    Find the tseries folder which may have timestamp in name
+    e.g., 'TSeries-12172018-1322-001' or just 'tseries'
+    
+    Returns the full path to the tseries folder, or imaging_folder if not found
+    """
+    if not os.path.exists(imaging_folder):
+        return None
+    
+    # Look for any folder starting with 'TSeries' or exactly named 'tseries'
+    for item in os.listdir(imaging_folder):
+        item_path = os.path.join(imaging_folder, item)
+        if os.path.isdir(item_path):
+            if item.startswith('TSeries') or item.lower() == 'tseries':
+                return item_path
+    
+    # If no tseries folder found, return the imaging folder itself
+    return imaging_folder
+
+def find_nifti_files(tseries_folder):
+    """
+    Find nifti files in tseries folder
+    Returns dict with channel_1 and channel_2 paths
+    """
+    nifti_files = {'channel_1': None, 'channel_2': None}
+    
+    if not os.path.exists(tseries_folder):
+        return nifti_files
+    
+    for file in os.listdir(tseries_folder):
+        if file.endswith('.nii.gz'):
+            if 'channel_1' in file:
+                nifti_files['channel_1'] = os.path.join(tseries_folder, file)
+            elif 'channel_2' in file:
+                nifti_files['channel_2'] = os.path.join(tseries_folder, file)
+    
+    return nifti_files
+
+def find_xml_file(folder, xml_type='functional'):
+    """
+    Find XML file in folder
+    xml_type: 'functional', 'anatomy', 'voltage_output', or 'voltage_recording'
+    """
+    if not os.path.exists(folder):
+        return None
+    
+    for file in os.listdir(folder):
+        if file.endswith('.xml'):
+            if xml_type == 'functional' and 'Voltage' not in file:
+                return os.path.join(folder, file)
+            elif xml_type == 'anatomy' and 'Voltage' not in file:
+                return os.path.join(folder, file)
+            elif xml_type == 'voltage_output' and 'VoltageOutput' in file:
+                return os.path.join(folder, file)
+            elif xml_type == 'voltage_recording' and 'VoltageRecording' in file:
+                return os.path.join(folder, file)
+    
+    return None
+
+def find_hdf5_file(func_folder):
+    """
+    Find HDF5 file (visual stimulus) 
+    Could be in func_0/, func_0/imaging/, or func_0/imaging/TSeries-XXX/
+    """
+    search_locations = [
+        func_folder,  # func_0/
+        os.path.join(func_folder, 'imaging'),  # func_0/imaging/
+    ]
+    
+    # Also check TSeries folder if it exists
+    imaging_folder = os.path.join(func_folder, 'imaging')
+    tseries = find_tseries_folder(imaging_folder)
+    if tseries:
+        search_locations.append(tseries)
+    
+    for location in search_locations:
+        if os.path.exists(location):
+            for file in os.listdir(location):
+                if file.endswith('.hdf5') or file.endswith('.h5'):
+                    return os.path.join(location, file)
+    
+    return None
+
 def load_xml_metadata(xml_file):
     """
     Extract metadata from Bruker XML file
@@ -168,17 +252,13 @@ def load_fictrac_data(fictrac_folder):
         print(f"Warning: Could not load FicTrac data: {e}")
         return None
 
-def load_visual_stimulus(visual_folder):
+def load_visual_stimulus(hdf5_file):
     """
     Load visual stimulus data from HDF5 file
     """
-    hdf5_files = [f for f in os.listdir(visual_folder) if f.endswith('.hdf5')]
-    
-    if not hdf5_files:
-        print(f"Warning: No .hdf5 file found in {visual_folder}")
+    if not hdf5_file or not os.path.exists(hdf5_file):
+        print(f"Warning: HDF5 file not found")
         return None
-    
-    hdf5_file = os.path.join(visual_folder, hdf5_files[0])
     
     try:
         with h5py.File(hdf5_file, 'r') as f:
@@ -201,32 +281,6 @@ def load_visual_stimulus(visual_folder):
         
     except Exception as e:
         print(f"Warning: Could not load stimulus data: {e}")
-        return None
-
-def load_photodiode_data(visual_folder):
-    """
-    Load photodiode data from CSV file
-    """
-    csv_file = os.path.join(visual_folder, 'photodiode.csv')
-    
-    if not os.path.exists(csv_file):
-        print(f"Warning: No photodiode.csv found in {visual_folder}")
-        return None
-    
-    try:
-        # Load photodiode data
-        # Adjust column names based on your actual CSV structure
-        df = pd.read_csv(csv_file)
-        
-        photodiode_data = {
-            'data': df.values,
-            'column_names': df.columns.tolist()
-        }
-        
-        return photodiode_data
-        
-    except Exception as e:
-        print(f"Warning: Could not load photodiode data: {e}")
         return None
 
 def convert_fly_to_nwb(fly_folder, output_file):
@@ -272,8 +326,14 @@ def convert_fly_to_nwb(fly_folder, output_file):
         print("Warning: No expt.json found")
     
     # Load scan metadata from XML
-    func_xml = os.path.join(func_0, 'imaging', 'functional.xml')
-    if os.path.exists(func_xml):
+    imaging_folder_0 = os.path.join(func_0, 'imaging')
+    tseries_0 = find_tseries_folder(imaging_folder_0)
+    
+    func_xml = None
+    if tseries_0:
+        func_xml = find_xml_file(tseries_0, 'functional')
+    
+    if func_xml and os.path.exists(func_xml):
         scan_metadata = load_xml_metadata(func_xml)
     else:
         scan_metadata = {'session_start_time': datetime.now(tzlocal())}
@@ -359,14 +419,24 @@ def convert_fly_to_nwb(fly_folder, output_file):
     for anat_idx, anat_folder in enumerate(anat_folders):
         imaging_folder = os.path.join(anat_folder, 'imaging')
         
+        # Find the tseries folder (may have timestamp in name)
+        tseries_folder = find_tseries_folder(imaging_folder)
+        
+        if tseries_folder is None:
+            print(f"  Warning: No tseries folder found for {anat_folder}")
+            continue
+        
+        print(f"  Found tseries folder: {os.path.basename(tseries_folder)}")
+        
+        # Find nifti files
+        nifti_files = find_nifti_files(tseries_folder)
+        
         # Load red channel (TdTomato)
-        red_nii = os.path.join(imaging_folder, 'anatomy_channel_1.nii.gz')
-        if os.path.exists(red_nii):
+        if nifti_files['channel_1']:
             print(f"  Loading anatomical scan {anat_idx} (red channel)...")
-            img = nib.load(red_nii)
+            img = nib.load(nifti_files['channel_1'])
             data = img.get_fdata().astype(np.float32)
             
-            # Create TwoPhotonSeries for anatomical red channel
             anat_series_red = TwoPhotonSeries(
                 name=f'AnatomicalSeries_TdTomato_{anat_idx}',
                 data=data,
@@ -375,16 +445,15 @@ def convert_fly_to_nwb(fly_folder, output_file):
                 format='raw',
                 description=f'Anatomical scan {anat_idx} - TdTomato channel (red)',
                 comments=f'Shape: {data.shape}, used for motion correction',
-                rate=1.0,  # Single volume
+                rate=1.0,
             )
             nwbfile.add_acquisition(anat_series_red)
             print(f"    Added red channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
         
         # Load green channel (GCaMP) if exists
-        green_nii = os.path.join(imaging_folder, 'anatomy_channel_2.nii.gz')
-        if os.path.exists(green_nii):
+        if nifti_files['channel_2']:
             print(f"  Loading anatomical scan {anat_idx} (green channel)...")
-            img = nib.load(green_nii)
+            img = nib.load(nifti_files['channel_2'])
             data = img.get_fdata().astype(np.float32)
             
             anat_series_green = TwoPhotonSeries(
@@ -407,21 +476,32 @@ def convert_fly_to_nwb(fly_folder, output_file):
         
         imaging_folder = os.path.join(func_folder, 'imaging')
         
-        # Load functional red channel (TdTomato)
-        red_nii = os.path.join(imaging_folder, 'functional_channel_1.nii.gz')
-        if os.path.exists(red_nii):
-            print(f"    Loading functional red channel...")
-            img = nib.load(red_nii)
-            data = img.get_fdata().astype(np.float32)
+        # Find the tseries folder (may have timestamp in name)
+        tseries_folder = find_tseries_folder(imaging_folder)
+        
+        if tseries_folder is None:
+            print(f"  Warning: No tseries folder found for {func_folder}")
+            continue
             
-            # Get scan metadata
+        print(f"  Found tseries folder: {os.path.basename(tseries_folder)}")
+        
+        # Find nifti files
+        nifti_files = find_nifti_files(tseries_folder)
+        
+        # Find XML file for metadata (in tseries folder)
+        func_xml = find_xml_file(tseries_folder, 'functional')
+        scan_meta = {}
+        
+        if func_xml:
             scan_json = os.path.join(imaging_folder, 'scan.json')
             if os.path.exists(scan_json):
                 scan_meta = load_json(scan_json)
-                rate = 1.0  # Will be updated if we have framerate info
-            else:
-                scan_meta = {}
-                rate = 1.0
+        
+        # Load functional red channel (TdTomato)
+        if nifti_files['channel_1']:
+            print(f"    Loading functional red channel...")
+            img = nib.load(nifti_files['channel_1'])
+            data = img.get_fdata().astype(np.float32)
             
             func_series_red = TwoPhotonSeries(
                 name=f'FunctionalSeries_TdTomato_{func_idx}',
@@ -432,16 +512,15 @@ def convert_fly_to_nwb(fly_folder, output_file):
                 description=f'Functional scan {func_idx} - TdTomato channel',
                 comments=f'Laser power: {scan_meta.get("laser_power", "unknown")} mW, '
                         f'PMT gain: {scan_meta.get("PMT_red", "unknown")}',
-                rate=rate,
+                rate=scan_meta.get('framerate', 1.0),
             )
             nwbfile.add_acquisition(func_series_red)
             print(f"      Red channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
         
         # Load functional green channel (GCaMP)
-        green_nii = os.path.join(imaging_folder, 'functional_channel_2.nii.gz')
-        if os.path.exists(green_nii):
+        if nifti_files['channel_2']:
             print(f"    Loading functional green channel...")
-            img = nib.load(green_nii)
+            img = nib.load(nifti_files['channel_2'])
             data = img.get_fdata().astype(np.float32)
             
             func_series_green = TwoPhotonSeries(
@@ -453,31 +532,21 @@ def convert_fly_to_nwb(fly_folder, output_file):
                 description=f'Functional scan {func_idx} - GCaMP6f channel',
                 comments=f'Laser power: {scan_meta.get("laser_power", "unknown")} mW, '
                         f'PMT gain: {scan_meta.get("PMT_green", "unknown")}',
-                rate=rate,
+                rate=scan_meta.get('framerate', 1.0),
             )
             nwbfile.add_acquisition(func_series_green)
             print(f"      Green channel: shape {data.shape}, size {data.nbytes / 1e9:.2f} GB")
         
-        # Load visual stimulus data
-        visual_folder = os.path.join(func_folder, 'visual')
-        if os.path.exists(visual_folder):
-            print(f"    Loading visual stimulus data...")
-            
-            # Load stimulus metadata
-            visual_json = os.path.join(visual_folder, 'visual.json')
-            if os.path.exists(visual_json):
-                visual_meta = load_json(visual_json)
-            else:
-                visual_meta = []
-            
-            # Load stimulus HDF5
-            stimulus_data = load_visual_stimulus(visual_folder)
+        # Load visual stimulus data (HDF5 can be in multiple locations)
+        print(f"    Looking for visual stimulus data...")
+        hdf5_file = find_hdf5_file(func_folder)
+        
+        if hdf5_file:
+            print(f"    Found stimulus file: {os.path.basename(hdf5_file)}")
+            stimulus_data = load_visual_stimulus(hdf5_file)
             if stimulus_data:
-                # Store stimulus info as TimeSeries or in stimulus module
-                # This is flexible based on your HDF5 structure
                 for key, value in stimulus_data.items():
                     if isinstance(value, np.ndarray) and value.ndim == 1:
-                        # Store 1D arrays as TimeSeries
                         try:
                             ts = TimeSeries(
                                 name=f'Stimulus_{func_idx}_{key.replace("/", "_")}',
@@ -486,23 +555,33 @@ def convert_fly_to_nwb(fly_folder, output_file):
                                 description=f'Visual stimulus parameter: {key}'
                             )
                             nwbfile.add_stimulus(ts)
-                        except:
-                            pass
-                
+                        except Exception as e:
+                            print(f"      Warning: Could not add stimulus {key}: {e}")
                 print(f"      Added stimulus data with {len(stimulus_data)} fields")
-            
-            # Load photodiode data
-            photodiode_data = load_photodiode_data(visual_folder)
-            if photodiode_data:
-                pd_series = TimeSeries(
-                    name=f'Photodiode_{func_idx}',
-                    data=photodiode_data['data'],
+        else:
+            print(f"    No HDF5 stimulus file found")
+        
+        # Load voltage recording data (CSV in tseries folder)
+        voltage_csv = None
+        for file in os.listdir(tseries_folder):
+            if 'VoltageRecording' in file and file.endswith('.csv'):
+                voltage_csv = os.path.join(tseries_folder, file)
+                break
+        
+        if voltage_csv:
+            try:
+                df = pd.read_csv(voltage_csv)
+                voltage_series = TimeSeries(
+                    name=f'VoltageRecording_{func_idx}',
+                    data=df.values,
                     unit='volts',
-                    description='Photodiode recordings for stimulus synchronization',
-                    comments=f'Columns: {photodiode_data["column_names"]}'
+                    description='Voltage recordings (photodiode)',
+                    comments=f'Columns: {df.columns.tolist()}'
                 )
-                nwbfile.add_acquisition(pd_series)
-                print(f"      Added photodiode data: shape {photodiode_data['data'].shape}")
+                nwbfile.add_acquisition(voltage_series)
+                print(f"      Added voltage recording data: shape {df.shape}")
+            except Exception as e:
+                print(f"      Warning: Could not load voltage data: {e}")
         
         # Load FicTrac behavioral data
         fictrac_folder = os.path.join(func_folder, 'fictrac')
@@ -567,6 +646,8 @@ def convert_fly_to_nwb(fly_folder, output_file):
                     behavior_module.add(rot_series)
                 
                 print(f"      Added FicTrac data: {len(fictrac_data['timestamps'])} timepoints")
+        else:
+            print(f"    No FicTrac folder found")
     
     # Write NWB file with compression
     print(f"\nWriting NWB file to {output_file}...")
