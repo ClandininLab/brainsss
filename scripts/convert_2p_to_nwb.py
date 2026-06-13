@@ -117,7 +117,7 @@ def find_hdf5_file(func_folder):
     ]
     
     # Check if there's an imaging subfolder
-    imaging_folder = os.path.join(func_folder, 'imaging')
+    imaging_folder = func_folder
     if os.path.exists(imaging_folder):
         search_locations.append(imaging_folder)
     
@@ -338,8 +338,7 @@ def convert_fly_to_nwb(fly_folder, output_file):
     
     # Load metadata from first functional scan's XML
     func_0 = func_folders[0]
-    imaging_folder_0 = os.path.join(func_0, 'imaging')
-    tseries_0 = find_tseries_folder(imaging_folder_0)
+    tseries_0 = find_tseries_folder(func_0)
     
     func_xml = None
     if tseries_0:
@@ -426,7 +425,7 @@ def convert_fly_to_nwb(fly_folder, output_file):
         print("No anatomical folders found")
     
     for anat_idx, anat_folder in enumerate(anat_folders):
-        imaging_folder = os.path.join(anat_folder, 'imaging')
+        imaging_folder =anat_folder
         
         # Find the tseries folder (may have timestamp in name)
         tseries_folder = find_tseries_folder(imaging_folder)
@@ -485,7 +484,7 @@ def convert_fly_to_nwb(fly_folder, output_file):
     for func_idx, func_folder in enumerate(func_folders):
         print(f"\n  Processing {os.path.basename(func_folder)}...")
         
-        imaging_folder = os.path.join(func_folder, 'imaging')
+        imaging_folder = func_folder
         
         # Find the tseries folder (may have timestamp in name)
         tseries_folder = find_tseries_folder(imaging_folder)
@@ -594,6 +593,7 @@ def convert_fly_to_nwb(fly_folder, output_file):
                     name=f'VoltageRecording_{func_idx}',
                     data=df.values,
                     unit='volts',
+                    rate=1000.0,  # Add sampling rate (adjust if you know the actual rate)
                     description='Voltage recordings (photodiode)',
                     comments=f'Columns: {df.columns.tolist()}'
                 )
@@ -680,8 +680,7 @@ def convert_fly_to_nwb(fly_folder, output_file):
     try:
         from pynwb import validate
         with NWBHDF5IO(output_file, 'r') as io:
-            nwbfile_in = io.read()
-            results = validate(nwbfile_in)
+            results = validate(io=io)
             if results:
                 print("Validation warnings:")
                 for r in results:
