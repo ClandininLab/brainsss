@@ -28,25 +28,42 @@ def load_json(file):
         data = json.load(f)
     return data
 
-def find_tseries_folder(imaging_folder):
+def find_tseries_folder(base_folder):
     """
     Find the tseries folder which may have timestamp in name
     e.g., 'TSeries-12172018-1322-001' or just 'tseries'
     
-    Returns the full path to the tseries folder, or imaging_folder if not found
+    Looks in:
+    1. base_folder/imaging/TSeries-XXX  (processed data)
+    2. base_folder/TSeries-XXX           (raw imports)
+    
+    Returns the full path to the tseries folder, or None if not found
     """
-    if not os.path.exists(imaging_folder):
+    if not os.path.exists(base_folder):
+        print(f"    base_folder does not exist: {base_folder}")
         return None
     
-    # Look for any folder starting with 'TSeries' or exactly named 'tseries'
-    for item in os.listdir(imaging_folder):
-        item_path = os.path.join(imaging_folder, item)
+    # First try looking in imaging subfolder (processed data)
+    imaging_folder = os.path.join(base_folder, 'imaging')
+    if os.path.exists(imaging_folder):
+        for item in os.listdir(imaging_folder):
+            item_path = os.path.join(imaging_folder, item)
+            if os.path.isdir(item_path):
+                if item.startswith('TSeries') or item.lower() == 'tseries':
+                    print(f"    Found TSeries in imaging/: {item}")
+                    return item_path
+    
+    # If not found, look directly in base_folder (raw imports)
+    for item in os.listdir(base_folder):
+        item_path = os.path.join(base_folder, item)
         if os.path.isdir(item_path):
             if item.startswith('TSeries') or item.lower() == 'tseries':
+                print(f"    Found TSeries directly: {item}")
                 return item_path
     
-    # If no tseries folder found, return the imaging folder itself
-    return imaging_folder
+    # If still not found, return None
+    print(f"    No TSeries folder found in {base_folder}")
+    return None
 
 def find_nifti_files(tseries_folder):
     """
@@ -62,8 +79,10 @@ def find_nifti_files(tseries_folder):
         if file.endswith('.nii.gz'):
             if 'channel_1' in file:
                 nifti_files['channel_1'] = os.path.join(tseries_folder, file)
+                print(f"      Found channel_1: {file}")
             elif 'channel_2' in file:
                 nifti_files['channel_2'] = os.path.join(tseries_folder, file)
+                print(f"      Found channel_2: {file}")
     
     return nifti_files
 
@@ -91,16 +110,19 @@ def find_xml_file(folder, xml_type='functional'):
 def find_hdf5_file(func_folder):
     """
     Find HDF5 file (visual stimulus) 
-    Could be in func_0/, func_0/imaging/, or func_0/imaging/TSeries-XXX/
+    Could be in func_0/, func_0/imaging/, or func_0/TSeries-XXX/
     """
     search_locations = [
         func_folder,  # func_0/
-        os.path.join(func_folder, 'imaging'),  # func_0/imaging/
     ]
     
-    # Also check TSeries folder if it exists
+    # Check if there's an imaging subfolder
     imaging_folder = os.path.join(func_folder, 'imaging')
-    tseries = find_tseries_folder(imaging_folder)
+    if os.path.exists(imaging_folder):
+        search_locations.append(imaging_folder)
+    
+    # Also check TSeries folder if it exists
+    tseries = find_tseries_folder(func_folder)
     if tseries:
         search_locations.append(tseries)
     
@@ -108,6 +130,7 @@ def find_hdf5_file(func_folder):
         if os.path.exists(location):
             for file in os.listdir(location):
                 if file.endswith('.hdf5') or file.endswith('.h5'):
+                    print(f"      Found HDF5 in {os.path.basename(location)}: {file}")
                     return os.path.join(location, file)
     
     return None
@@ -115,7 +138,6 @@ def find_hdf5_file(func_folder):
 def load_xml_metadata(xml_file):
     """
     Extract metadata from Bruker XML file
-    Based on create_imaging_json from your script
     """
     metadata = {}
     
@@ -212,13 +234,12 @@ def load_fictrac_data(fictrac_folder):
     dat_files = [f for f in os.listdir(fictrac_folder) if f.endswith('.dat')]
     
     if not dat_files:
-        print(f"Warning: No .dat file found in {fictrac_folder}")
+        print(f"      Warning: No .dat file found in {fictrac_folder}")
         return None
     
     dat_file = os.path.join(fictrac_folder, dat_files[0])
     
     # Load FicTrac data
-    # Column names based on FicTrac output format
     column_names = [
         'frame', 'delta_rot_cam_right', 'delta_rot_cam_down', 'delta_rot_cam_forward',
         'delta_rot_error', 'delta_rot_lab_side', 'delta_rot_lab_forward', 'delta_rot_lab_turn',
@@ -249,7 +270,7 @@ def load_fictrac_data(fictrac_folder):
         return fictrac_data
         
     except Exception as e:
-        print(f"Warning: Could not load FicTrac data: {e}")
+        print(f"      Warning: Could not load FicTrac data: {e}")
         return None
 
 def load_visual_stimulus(hdf5_file):
@@ -257,14 +278,12 @@ def load_visual_stimulus(hdf5_file):
     Load visual stimulus data from HDF5 file
     """
     if not hdf5_file or not os.path.exists(hdf5_file):
-        print(f"Warning: HDF5 file not found")
         return None
     
     try:
         with h5py.File(hdf5_file, 'r') as f:
             stimulus_data = {}
             
-            # Extract all datasets - customize based on your HDF5 structure
             def extract_datasets(group, path=''):
                 for key in group.keys():
                     item = group[key]
@@ -280,9 +299,9 @@ def load_visual_stimulus(hdf5_file):
         return stimulus_data
         
     except Exception as e:
-        print(f"Warning: Could not load stimulus data: {e}")
+        print(f"      Warning: Could not load stimulus data: {e}")
         return None
-
+    
 def convert_fly_to_nwb(fly_folder, output_file):
     """
     Convert a complete fly dataset to NWB format
