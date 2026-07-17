@@ -169,7 +169,7 @@ def smooth_and_interp_fictrac(fictrac, fps, resolution, expt_len, behavior, time
         
         fictrac_interp = fictrac_interp * sphere_radius * fps * 1000 # now in mm/sec
         
-    if behavior in ['dRotLabZ']:
+    if behavior in ['dRotLabZ'] or behavior in ['dRotLabX']:
         ''' starts with units of rad/frame
         * 180 / np.pi; now in deg/frame
         * fps; now in deg/sec '''
