@@ -8,3 +8,6 @@ brainsss.egg-info/
 
 # macOS
 .DS_Store
+
+# Slurm job output
+slurm-*.out
