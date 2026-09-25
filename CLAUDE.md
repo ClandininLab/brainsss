@@ -69,4 +69,3 @@ The `--events` / `-e` flag is a suffix that selects an event-times pickle (`{eve
 - `sbatch(...)` defaults are per-call — memory-heavy workers pass explicit `mem='250GB'` and `cpus=32`. `nice=True` and `nodes=2` are set at the top of the orchestrators.
 - Hardcoded fly lists live inline in the `BEST_FLIES` branch of both orchestrators.
 - `notebooks/` is a chronological scratch/figure archive (`YYYYMMDD_topic.ipynb`), not library code — figure notebooks (`fig1_images`, `fig3_FINAL`, …) are the paper-facing consumers of the pipeline outputs.
-- `.gitignore` currently contains unresolved merge-conflict markers.

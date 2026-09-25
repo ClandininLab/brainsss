@@ -1,16 +1,10 @@
-brainsss.egg-info/
-brainsss/brainsss/__pycache__/
-brainsss/notebooks/.ipynb_checkpoints/
-brainsss/.DS_Store
-<<<<<<< HEAD
-=======
-**/.ipynb_checkpoints/
-*/.ipynb_checkpoints/
-*/__pycache__/
-**/__pycache__/
+# Python
 __pycache__/
-**/__pycache__/
 *.pyc
+brainsss.egg-info/
+
+# Jupyter
 .ipynb_checkpoints/
-**/.ipynb_checkpoints/
->>>>>>> 7249d16c019212ba3aacc5e36fbc3fdf979a9402
+
+# macOS
+.DS_Store
