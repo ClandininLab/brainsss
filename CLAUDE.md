@@ -69,3 +69,7 @@ The `--events` / `-e` flag is a suffix that selects an event-times pickle (`{eve
 - `sbatch(...)` defaults are per-call — memory-heavy workers pass explicit `mem='250GB'` and `cpus=32`. `nice=True` and `nodes=2` are set at the top of the orchestrators.
 - Hardcoded fly lists live inline in the `BEST_FLIES` branch of both orchestrators.
 - `notebooks/` is a chronological scratch/figure archive (`YYYYMMDD_topic.ipynb`), not library code — figure notebooks (`fig1_images`, `fig3_FINAL`, …) are the paper-facing consumers of the pipeline outputs.
+
+## F0
+
+`dff.py` on this branch computes F0 as `lpf − global min(lpf)` (lpf-F0). This is being **replaced** by per-voxel, grey-period-anchored, behavior-state-matched F0 maps in `dff_grey/` (`F0_stationary`, `F0_moving`). Never port or reuse `dff.py`'s F0 in new scripts. New dF/F must read F0 from `dff_grey/`.
