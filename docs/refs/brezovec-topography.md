@@ -198,7 +198,9 @@ The following are not name matches but do the same step differently. They matter
 
 All of these are swappable with brainsss: `brainsss.Printlog`, `brainsss.load_timestamps`, `brainsss.load_fictrac` and `brainsss.sort_nicely` (the last appears in the dff∩bbb list in 00-index) [inferred from the identical bodies].
 
-**Reverse dependency: this repo relies on her data.** `brainsss/brain_utils.py:203` (`warp_STA_brain`) hardcodes `dataset_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset'`. It reads each fly's `warp/func-to-anat_fwdtransforms_2umiso/` transforms from there and assumes `moving_resolution = (2.611, 2.611, 5)`. brainsss-dff has the same line [from code]. STA warping therefore only works for flies that live in her walking dataset and will fail for new OMR flies, unless this is changed to the per-fly `dataset_path` from `users/<sunetid>.json` [inferred].
+**Hardcoded dataset path (a move risk, not a dependency on Bella's data).** `brainsss/brain_utils.py:203` (`warp_STA_brain`) hardcodes `dataset_path = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset'`. It reads each fly's `warp/func-to-anat_fwdtransforms_2umiso/` transforms from there and assumes `moving_resolution = (2.611, 2.611, 5)`. brainsss-dff has the same line [from code].
+
+This works today, because the OMR flies are stored in that folder (`users/yandanw.json` points there too) [from code]. The risk is the upcoming move of the flies to your own user directory: after the move this function will look in the old location. Before then, change it to take the per-fly `dataset_path` from settings. See `docs/hardcoded-paths.md`.
 
 Third-party packages: `ants` (antspy), `nibabel`, `sklearn`, `scipy`, `numpy`, `pandas`, `h5py`/`tables`, `umap` (imported by the GLM but unused), `psutil`, and for the connectome scripts `neuprint`, `networkx`, `fa2`, `nxviz`, `bokeh`/`holoviews`/`hvplot` [from code].
 

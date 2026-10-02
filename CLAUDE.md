@@ -70,8 +70,14 @@ The `--events` / `-e` flag is a suffix that selects an event-times pickle (`{eve
 - Hardcoded fly lists live inline in the `BEST_FLIES` branch of both orchestrators.
 - `notebooks/` is a chronological scratch/figure archive (`YYYYMMDD_topic.ipynb`), not library code — figure notebooks (`fig1_images`, `fig3_FINAL`, …) are the paper-facing consumers of the pipeline outputs.
 
-## F0
+## Data rules
+
+### F0
 
 `dff.py` on this branch computes F0 as `lpf − global min(lpf)` (lpf-F0). This is being **replaced** by per-voxel, grey-period-anchored, behavior-state-matched F0 maps in `dff_grey/` (`F0_stationary`, `F0_moving`). Never port or reuse `dff.py`'s F0 in new scripts. New dF/F must read F0 from `dff_grey/`.
 
-`dff_grey/` is a **data directory inside each fly's folder** (`<dataset_path>/fly_NNN/dff_grey/` on Oak, or the same path in a local fly copy), not a folder in this repo. Scripts should build its path from the fly directory, never from the repo root.
+`dff_grey/` is a **per-fly data directory**, not a folder in this repo: `<dataset_path>/fly_NNN/func_0/dff_grey/F0_stationary_channel_2.h5` and `.../F0_moving_channel_2.h5` (on Oak, or the same layout in a local fly copy). Build the path from the fly's `func_0` directory, never from the repo root.
+
+### Data location
+
+The OMR flies currently live under `/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/20190101_walking_dataset/` and will move to Yandan's own Oak user directory soon. **No script may hardcode that path** (or any dataset root): every script takes `dataset_path` from user settings (`users/<sunetid>.json`), `fly.json`, or a paths config passed in by the orchestrator. Known hardcoded occurrences to fix before the move are listed in `docs/hardcoded-paths.md`.
