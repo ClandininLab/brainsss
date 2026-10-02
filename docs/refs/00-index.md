@@ -28,6 +28,7 @@ All origins from `git remote -v` [from code].
 - **Code type:** preprocessing, postprocessing/analysis, job submission; notebooks hold exploratory figures [from code].
 - **Diff vs. `YDPlayground`** [from code]: `brainsss/fictrac.py`, `brainsss/utils.py`, and most postprocess workers differ (`build_STA`, `filter_bins`, `get_ind_vox`, `individual_clusters`, `later_transfer`, `make_supervoxels`, `regress_noise`, `relative_ts`, `supercluster`, `temp_filter`, `tf_to_STA`, both orchestrators). Only in dff: `scripts/convert_2p_to_nwb.py`. Only in YDPlayground: `scripts/make_supervoxels_backup.py`.
 - Also contains committed junk: `slurm-*.out`, `.DS_Store`, `__pycache__`, `.swp` [from code].
+- Detailed map vs. `YDPlayground` (diffs, notebooks, workers, F0, loom assumptions): [brainsss-dff.md](brainsss-dff.md).
 
 ## brezovec-bigbadbrain
 

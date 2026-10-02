@@ -73,3 +73,5 @@ The `--events` / `-e` flag is a suffix that selects an event-times pickle (`{eve
 ## F0
 
 `dff.py` on this branch computes F0 as `lpf − global min(lpf)` (lpf-F0). This is being **replaced** by per-voxel, grey-period-anchored, behavior-state-matched F0 maps in `dff_grey/` (`F0_stationary`, `F0_moving`). Never port or reuse `dff.py`'s F0 in new scripts. New dF/F must read F0 from `dff_grey/`.
+
+`dff_grey/` is a **data directory inside each fly's folder** (`<dataset_path>/fly_NNN/dff_grey/` on Oak, or the same path in a local fly copy), not a folder in this repo. Scripts should build its path from the fly directory, never from the repo root.
