@@ -5,7 +5,7 @@ import json
 import numpy as np
 import nibabel as nib
 import pandas as pd
-from time import strftime
+from time import strftime, strptime, mktime
 from shutil import copyfile
 from xml.etree import ElementTree as ET
 from lxml import etree, objectify
@@ -17,6 +17,10 @@ import brainsss
 
 # e.g. TSeries-12172018-1322-005_channel_1_s500.nii -> ('TSeries-12172018-1322-005_channel_1', '500')
 SPLIT_NII_PATTERN = re.compile(r'^(.+_channel_\d+)_s(\d+)\.nii$')
+
+# destination fly dir -> (imports session folder name, import fly name), e.g. ('20261015', 'fly1')
+# Filled by copy_fly so copy_fictrac can find this fly's Jackfish/FicTrac output
+_FICTRAC_SRC = {}
 
 def main(args):
     ### Move folders from imports to fly dataset - need to restructure folders ###
@@ -122,6 +126,10 @@ def copy_fly(source_fly, destination_fly, printlog, user):
     For anatomy folders, only copy folder. There will also be
     3) fly json data '''
 
+    source_session = os.path.dirname(os.path.normpath(source_fly))
+    _FICTRAC_SRC[os.path.normpath(destination_fly)] = (os.path.basename(source_session),
+                                                       os.path.basename(os.path.normpath(source_fly)))
+
     # look at every item in source fly folder
     for item in os.listdir(source_fly):
         ##print('Currently looking at item: {}'.format(item))
@@ -178,6 +186,19 @@ def copy_fly(source_fly, destination_fly, printlog, user):
             else:
                 printlog('Invalid file in fly folder (skipping): {}'.format(item))
                 ##sys.stdout.flush()
+
+    # Session-level StimPack .hdf5 (next to fly1, fly2, ...) goes into every func_*/visual/ of this fly
+    session_hdf5s = [item for item in os.listdir(source_session)
+                     if item.endswith('.hdf5') and os.path.isfile(os.path.join(source_session, item))]
+    if session_hdf5s:
+        for item in sorted(os.listdir(destination_fly)):
+            if not (item.startswith('func_') and os.path.isdir(os.path.join(destination_fly, item))):
+                continue
+            visual_folder = os.path.join(destination_fly, item, 'visual')
+            if not os.path.isdir(visual_folder):
+                os.mkdir(visual_folder)
+            for hdf5 in session_hdf5s:
+                copy_file(os.path.join(source_session, hdf5), os.path.join(visual_folder, hdf5), printlog)
 
 def copy_bruker_data(source, destination, folder_type, printlog):
     # Bruker can split long recordings into chunks named *_channel_N_s0.nii, *_s500.nii, ...
@@ -380,6 +401,10 @@ def copy_visual(destination_region, printlog):
 def copy_fictrac(destination_region, printlog, user):
     #fictrac_folder = '/oak/stanford/groups/trc/data/Brezovec/2P_Imaging/imports/fictrac'
 
+    if user == 'yandanw':
+        copy_fictrac_jackfish(destination_region, printlog, user)
+        return
+
     if user == 'brezovec':
         user = 'luke'
     if user == 'yandanw':
@@ -483,6 +508,84 @@ def copy_fictrac(destination_region, printlog, user):
     tree = etree.ElementTree(fictrac)
     with open(os.path.join(fictrac_destination, 'fictrac.xml'), 'wb') as file:
         tree.write(file, pretty_print=True)
+
+def copy_fictrac_jackfish(destination_region, printlog, user):
+    ''' FicTrac output recorded through Jackfish, laid out as
+    <fictrac_output_path>/<date>/<fly>/<series>/*.dat and <jackfish_path>/<date>/<fly>/<series>/cam_*.txt.
+    Both roots come from users/<user>.json; <date>/<fly> are the imports session and fly folder names. '''
+    width = 120
+    fictrac_destination = os.path.join(destination_region, 'fictrac')
+
+    settings = brainsss.load_user_settings(user, os.path.dirname(os.path.abspath(__file__)))
+    fictrac_root = settings.get('fictrac_output_path')
+    jackfish_root = settings.get('jackfish_path')
+    if not fictrac_root or not jackfish_root:
+        printlog(F"{'   fictrac_output_path / jackfish_path missing from users/' + user + '.json --- continuing without fictrac data   ':*^{width}}")
+        return
+
+    destination_fly = os.path.dirname(os.path.normpath(destination_region))
+    if destination_fly not in _FICTRAC_SRC:
+        printlog(F"{'   Unknown import session for ' + destination_fly + ' --- continuing without fictrac data   ':*^{width}}")
+        return
+    date, fly = _FICTRAC_SRC[destination_fly]
+
+    fly_folder = os.path.join(fictrac_root, date, fly)
+    series_folders = []
+    if os.path.isdir(fly_folder):
+        for series in sorted(os.listdir(fly_folder)):
+            series_path = os.path.join(fly_folder, series)
+            if os.path.isdir(series_path) and any(f.endswith('.dat') for f in os.listdir(series_path)):
+                series_folders.append(series)
+    if len(series_folders) != 1:
+        printlog(F"{'   Expected exactly 1 series folder with a .dat in ' + fly_folder + ', found ' + str(len(series_folders)) + ' ' + str(series_folders) + ' --- continuing without fictrac data   ':*^{width}}")
+        return
+    series = series_folders[0]
+    series_path = os.path.join(fly_folder, series)
+
+    dat_files = sorted(f for f in os.listdir(series_path) if f.endswith('.dat'))
+    if len(dat_files) != 1:
+        printlog(F"{'   Expected exactly 1 .dat in ' + series_path + ', found ' + str(dat_files) + ' --- continuing without fictrac data   ':*^{width}}")
+        return
+
+    os.mkdir(fictrac_destination)
+    copy_file(os.path.join(series_path, dat_files[0]), os.path.join(fictrac_destination, 'fictrac.dat'), printlog)
+
+    # FicTrac's config_used.txt sits with the .dat; fall back to the Jackfish series folder
+    jackfish_series = os.path.join(jackfish_root, date, fly, series)
+    config_source = None
+    for folder in (series_path, jackfish_series):
+        if os.path.isfile(os.path.join(folder, 'config_used.txt')):
+            config_source = os.path.join(folder, 'config_used.txt')
+            break
+    if config_source is None:
+        printlog(F"{'   No config_used.txt in ' + series_path + ' or ' + jackfish_series + '   ':*^{width}}")
+    else:
+        copy_file(config_source, os.path.join(fictrac_destination, 'config.txt'), printlog)
+
+    cam_files = []
+    if os.path.isdir(jackfish_series):
+        cam_files = sorted(f for f in os.listdir(jackfish_series) if f.startswith('cam_') and f.endswith('.txt'))
+    if len(cam_files) != 1:
+        printlog(F"{'   Expected exactly 1 cam_*.txt in ' + jackfish_series + ', found ' + str(cam_files) + ' --- no Jackfish timestamps   ':*^{width}}")
+        return
+    timestamps_target = os.path.join(fictrac_destination, 'jackfish_timestamps.txt')
+    copy_file(os.path.join(jackfish_series, cam_files[0]), timestamps_target, printlog)
+
+    # Sanity check: Jackfish first-frame unix time vs Bruker start from functional.xml (local time)
+    try:
+        with open(timestamps_target, 'r') as f:
+            first_row = next(line for line in f if line.strip())
+        jackfish_start = float(re.split(r'[,\s]+', first_row.strip())[2])
+        true_ymd, true_total_seconds = get_expt_time(os.path.join(destination_region, 'imaging'))
+        hours, rest = divmod(true_total_seconds, 3600)
+        minutes, seconds = divmod(rest, 60)
+        bruker_start = mktime(strptime('{} {}:{}:{}'.format(true_ymd, hours, minutes, seconds), '%Y%m%d %H:%M:%S'))
+        difference = jackfish_start - bruker_start
+        printlog(F"Jackfish start - Bruker start (s){difference:.>{width-33}.1f}")
+        if abs(difference) > 300:
+            printlog(F"{'   WARNING: Jackfish and Bruker start times differ by ' + str(int(round(difference))) + ' s (> 300 s)   ':*^{width}}")
+    except Exception as e:
+        printlog(F"{'   Could not compare Jackfish and Bruker start times: ' + str(e) + '   ':*^{width}}")
 
 def create_imaging_json(xml_source_file, printlog):
 
