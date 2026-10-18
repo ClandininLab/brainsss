@@ -217,8 +217,9 @@ def main(args):
             modules=modules,
             args=args,
             logfile=logfile,
-            time=3,
+            time=12,
             cpus=1,
+            mem='100GB',
             nice=nice,
             nodes=nodes,
         )

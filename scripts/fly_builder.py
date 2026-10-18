@@ -1,7 +1,9 @@
 import os
+import re
 import sys
 import json
 import numpy as np
+import nibabel as nib
 import pandas as pd
 from time import strftime
 from shutil import copyfile
@@ -12,6 +14,9 @@ from openpyxl import load_workbook
 import brainsss
 #import bigbadbrain as bbb
 #import dataflow as flow
+
+# e.g. TSeries-12172018-1322-005_channel_1_s500.nii -> ('TSeries-12172018-1322-005_channel_1', '500')
+SPLIT_NII_PATTERN = re.compile(r'^(.+_channel_\d+)_s(\d+)\.nii$')
 
 def main(args):
     ### Move folders from imports to fly dataset - need to restructure folders ###
@@ -175,8 +180,28 @@ def copy_fly(source_fly, destination_fly, printlog, user):
                 ##sys.stdout.flush()
 
 def copy_bruker_data(source, destination, folder_type, printlog):
+    # Bruker can split long recordings into chunks named *_channel_N_s0.nii, *_s500.nii, ...
+    # Merge each channel's chunks into one file; unsplit .nii files are copied as before
+    chunk_groups = {}
+    for item in os.listdir(source):
+        match = SPLIT_NII_PATTERN.match(item)
+        if match and folder_type in ('func', 'anat') and not os.path.isdir(os.path.join(source, item)):
+            chunk_groups.setdefault(match.group(1), []).append((int(match.group(2)), item))
+    chunk_items = set()
+    for prefix, chunks in chunk_groups.items():
+        chunks.sort()
+        chunk_items.update(item for _, item in chunks)
+        if folder_type == 'func':
+            item = 'functional_' + prefix.split('_')[1] + '_' + prefix.split('_')[2] + '.nii'
+        else:
+            item = 'anatomy_' + prefix.split('_')[1] + '_' + prefix.split('_')[2] + '.nii'
+        source_chunks = [os.path.join(source, chunk) for _, chunk in chunks]
+        merge_split_nii(source_chunks, os.path.join(destination, item), printlog)
+
     # Do not update destination - download all files into that destination
     for item in os.listdir(source):
+        if item in chunk_items:
+            continue
         # Create full path to item
         source_item = os.path.join(source, item)
 
@@ -241,6 +266,40 @@ def copy_bruker_data(source, destination, folder_type, printlog):
             # Actually copy the file
             target_item = os.path.join(destination, item)
             copy_file(source_item, target_item, printlog)
+
+def merge_split_nii(source_chunks, target, printlog):
+    ''' Concatenate time-split nii chunks (already sorted by start frame) along the last axis.
+    Chunks are read one at a time into a preallocated array; the first chunk's header is kept. '''
+    to_print = ('/').join(target.split('/')[-4:])
+    width = 120
+    label = 'Merging {} chunks into'.format(len(source_chunks))
+    printlog(f'{label}{to_print:.>{width-len(label)}}')
+
+    # Headers only (nibabel loads lazily) to size the output
+    chunk_imgs = [nib.load(chunk) for chunk in source_chunks]
+    first = chunk_imgs[0]
+    spatial_shape = first.shape[:3]
+    dtype = first.get_data_dtype()
+    for chunk, img in zip(source_chunks, chunk_imgs):
+        if len(img.shape) != 4 or img.shape[:3] != spatial_shape or img.get_data_dtype() != dtype:
+            raise ValueError('Cannot merge {}: shape {} / dtype {} does not match first chunk shape {} / dtype {}'.format(
+                chunk, img.shape, img.get_data_dtype(), first.shape, dtype))
+    n_frames = sum(img.shape[3] for img in chunk_imgs)
+
+    merged = np.empty(spatial_shape + (n_frames,), dtype=dtype)
+    start = 0
+    for img in chunk_imgs:
+        # Unscaled so values stay in the stored dtype; the first header's scaling is reused on save
+        data = np.asarray(img.dataobj.get_unscaled())
+        merged[..., start:start + data.shape[3]] = data
+        start += data.shape[3]
+        del data
+        img.uncache()
+
+    header = first.header.copy()
+    header.set_data_shape(merged.shape)
+    nib.Nifti1Image(merged, first.affine, header).to_filename(target)
+    del merged
 
 def copy_file(source, target, printlog):
     #printlog('Transfering file {}'.format(target))
