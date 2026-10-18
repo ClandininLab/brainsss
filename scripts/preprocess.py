@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import textwrap
 import time
@@ -60,6 +61,7 @@ def main(args):
     imports_path = settings["imports_path"]
     dataset_path = settings["dataset_path"]
     if build_flies:
+        run_fictrac = brainsss.parse_true_false(settings.get("run_fictrac", False))
         fictrac_qc = brainsss.parse_true_false(settings.get("fictrac_qc", False))
         bleaching_qc = brainsss.parse_true_false(settings.get("bleaching_qc", False))
         temporal_mean_brain_pre = brainsss.parse_true_false(
@@ -83,6 +85,7 @@ def main(args):
         func2anat = brainsss.parse_true_false(settings.get("func2anat", False))
         anat2atlas = brainsss.parse_true_false(settings.get("anat2atlas", False))
     else:
+        run_fictrac = False
         fictrac_qc = False
         bleaching_qc = False
         temporal_mean_brain_pre = False
@@ -131,6 +134,8 @@ def main(args):
         # printlog('dirtype is {}'.format(dirtype))
 
     # These command line arguments will be empty unless the flag is called from the command line
+    if args["FICTRAC"] != "":
+        run_fictrac = True
     if args["FICTRAC_QC"] != "":
         fictrac_qc = True
     if args["BLEACHING_QC"] != "":
@@ -182,6 +187,39 @@ def main(args):
     #################################
     ############# BEGIN #############
     #################################
+
+    if run_fictrac:
+
+        ###################
+        ### Run FicTrac ###
+        ###################
+
+        # Offline FicTrac on every Jackfish series of the session being built
+        fictrac_output_path = settings.get("fictrac_output_path")
+        jackfish_path = settings.get("jackfish_path")
+        if not build_flies:
+            printlog("ERROR: --fictrac needs --build_flies <session> to know which session to track. Skipping FicTrac.")
+        elif not fictrac_output_path or not jackfish_path:
+            printlog(f"ERROR: fictrac_output_path / jackfish_path missing from users/{user}.json. Skipping FicTrac.")
+        else:
+            series_list = find_fictrac_series(jackfish_path, dir_to_build)
+            printlog(f"Found Jackfish series{str([fly + '/' + series for fly, series in series_list]):.>{width-21}}")
+            job_ids = {}
+            for fly, series in series_list:
+                out_dir = os.path.join(fictrac_output_path, dir_to_build, fly, series)
+                if fictrac_done(out_dir) and not redo:
+                    printlog(f"FicTrac .dat exists, skipping{fly + '/' + series:.>{width-29}}")
+                    continue
+                job_ids[(fly, series)] = submit_fictrac(
+                    os.path.join(scripts_path, "run_fictrac.sh"),
+                    [jackfish_path, fictrac_output_path, dir_to_build, fly, series],
+                    nice,
+                    printlog,
+                )
+            for job_id in job_ids.values():
+                if job_id:
+                    brainsss.wait_for_job(job_id, logfile, com_path)
+            print_fictrac_summary(series_list, job_ids, jackfish_path, fictrac_output_path, dir_to_build, printlog, width)
 
     if build_flies:
 
@@ -920,6 +958,78 @@ def main(args):
     ############
 
     brainsss.print_footer(logfile, width)
+
+
+def _natural_key(text):
+    return [int(part) if part.isdigit() else part for part in re.split(r"(\d+)", text)]
+
+def find_fictrac_series(jackfish_path, date):
+    """ (fly, series) for every <jackfish_path>/<date>/<fly>/<series>/ folder.
+    Jackfish numbers series across the whole day, so they are discovered, never assumed. """
+    session_dir = os.path.join(jackfish_path, date)
+    series_list = []
+    if not os.path.isdir(session_dir):
+        return series_list
+    for fly in sorted(os.listdir(session_dir), key=_natural_key):
+        fly_dir = os.path.join(session_dir, fly)
+        if not os.path.isdir(fly_dir):
+            continue
+        for series in sorted(os.listdir(fly_dir), key=_natural_key):
+            if os.path.isdir(os.path.join(fly_dir, series)):
+                series_list.append((fly, series))
+    return series_list
+
+def find_dat(out_dir):
+    if not os.path.isdir(out_dir):
+        return None
+    dats = sorted(f for f in os.listdir(out_dir) if f.endswith(".dat"))
+    return os.path.join(out_dir, dats[-1]) if dats else None
+
+def fictrac_done(out_dir):
+    return find_dat(out_dir) is not None
+
+def count_rows(path):
+    if path is None:
+        return None
+    with open(path, "r") as f:
+        return sum(1 for line in f if line.strip())
+
+def submit_fictrac(script, script_args, nice, printlog):
+    """ run_fictrac.sh is a plain Slurm script (not a python worker), so it is submitted directly
+    rather than through brainsss.sbatch's --wrap. Returns the job id, or None if sbatch failed. """
+    command = ["sbatch", "--parsable"]
+    if nice:
+        command.append("--nice=1000000")
+    command += [script] + script_args
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    label = "fictrac " + script_args[3] + "/" + script_args[4]
+    if result.returncode != 0:
+        printlog(f"ERROR: sbatch failed for {label}: {result.stdout.strip()}")
+        return None
+    job_id = result.stdout.strip().split(";")[0]
+    printlog(f"Submitted batch job {job_id}{label:.>{120-21-len(job_id)}}")
+    return job_id
+
+def print_fictrac_summary(series_list, job_ids, jackfish_path, fictrac_output_path, date, printlog, width):
+    rows = []
+    for fly, series in series_list:
+        vid_dir = os.path.join(jackfish_path, date, fly, series)
+        cam_txts = sorted(f for f in os.listdir(vid_dir) if f.startswith("cam_") and f.endswith(".txt"))
+        dat_rows = count_rows(find_dat(os.path.join(fictrac_output_path, date, fly, series)))
+        txt_rows = count_rows(os.path.join(vid_dir, cam_txts[0])) if len(cam_txts) == 1 else None
+        match = "yes" if dat_rows is not None and dat_rows == txt_rows else "no"
+        if (fly, series) not in job_ids:
+            run = "skipped"
+        elif job_ids[(fly, series)] is None:
+            run = "not submitted"
+        else:
+            run = job_ids[(fly, series)]
+        rows.append((fly + "/" + series, run, "-" if dat_rows is None else str(dat_rows),
+                     "-" if txt_rows is None else str(txt_rows), match))
+    header = ("series", "job", ".dat rows", "jackfish rows", "match")
+    widths = [max(len(r[i]) for r in rows + [header]) for i in range(len(header))]
+    lines = ["  ".join(cell.ljust(w) for cell, w in zip(row, widths)) for row in [header] + rows]
+    printlog(f"\n{'   FicTrac summary   ':-^{width}}\n" + "\n".join(lines))
 
 
 if __name__ == "__main__":

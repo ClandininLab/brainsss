@@ -70,6 +70,10 @@ while [[ $# -gt 0 ]]; do
       WHOLE_BRAIN_INTERP=True
       shift
       ;;
+    --fictrac)
+      FICTRAC=True
+      shift
+      ;;
     --fictrac_qc)
       FICTRAC_QC=True
       shift
@@ -111,7 +115,7 @@ done
 
 ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DIRTYPE\":\"$DIRTYPE\",\
 \"MOCO\":\"$MOCO\",\"BACKGROUND_SUBTRACTION\":\"$BACKGROUND_SUBTRACTION\",\"DFF\":\"$DFF\",\
-\"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\
+\"RAW_WARP\":\"$RAW_WARP\",\"TIMESTAMP_WARP\":\"$TIMESTAMP_WARP\",\"FICTRAC\":\"$FICTRAC\",\"FICTRAC_QC\":\"$FICTRAC_QC\",\
 \"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
 \"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"REDO\":\"$REDO\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
 \"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"H5_TO_NII\":\"$H5_TO_NII\",\"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\

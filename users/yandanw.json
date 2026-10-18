@@ -5,6 +5,7 @@
     "later_path": "/oak/stanford/groups/trc/data/Yandan/2P_Imaging/optomotor_response_analysis",
     "fictrac_output_path": "/oak/stanford/groups/trc/data/Yandan/fictrac_output",
     "jackfish_path": "/oak/stanford/groups/trc/data/Yandan/jackfish_videos",
+    "run_fictrac": "False",
     "fictrac_qc": "True",
     "bleaching_qc": "True",
     "temporal_mean_brain_pre": "True",

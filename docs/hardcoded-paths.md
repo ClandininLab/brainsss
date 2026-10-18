@@ -24,7 +24,7 @@ No script in `scripts/` or `brainsss/` calls `warp_STA_brain`. The only callers 
 | Location | Path | Note |
 |---|---|---|
 | `scripts/individual_clusters.py:51-52` | `/oak/.../Ilana/2P/data/fly_{n}/{dff,warp}` | Ilana's data. The script ignores `dataset_path` entirely. Fix this before using it for OMR. |
-| `scripts/fly_builder.py:332` | `/oak/.../data/fictrac/<user>` | FicTrac import root, derived from the user name rather than from settings. |
+| `scripts/fly_builder.py:416` | `/oak/.../data/fictrac/<user>` | Legacy FicTrac import root, derived from the user name rather than from settings. It is still used for every user except `yandanw`. For `yandanw`, `copy_fictrac` calls `copy_fictrac_jackfish`, which reads `fictrac_output_path` and `jackfish_path` from `users/yandanw.json` and looks in `<fictrac_output_path>/<date>/<fly>/<series>/` (`<date>`/`<fly>` = imports session and fly folder names). The `run_fictrac` stage in `preprocess.py` / `run_fictrac.sh` takes the same two roots from settings, so it hardcodes nothing. |
 | `scripts/fly_builder.py:256` | `/oak/.../WBI_shared/visual` | Shared visual-stim folder. |
 | `scripts/fly_builder.py:660` | `/oak/.../WBI_shared/master_2P.xlsx` | Shared lab spreadsheet. |
 | `scripts/quick_ashley_mean.py:28,35` | `/home/users/brezovec/...`, `/oak/.../Ashley2/imports/...` | One-off script, not called by the orchestrators. Candidate for deletion. |
