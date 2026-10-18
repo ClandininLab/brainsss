@@ -18,6 +18,9 @@ import brainsss
 # e.g. TSeries-12172018-1322-005_channel_1_s500.nii -> ('TSeries-12172018-1322-005_channel_1', '500')
 SPLIT_NII_PATTERN = re.compile(r'^(.+_channel_\d+)_s(\d+)\.nii$')
 
+# Import region folders written without the underscore, e.g. anat0, func1
+REGION_NO_UNDERSCORE_PATTERN = re.compile(r'^(anat|func)(\d+)$')
+
 # destination fly dir -> (imports session folder name, import fly name), e.g. ('20261015', 'fly1')
 # Filled by copy_fly so copy_fictrac can find this fly's Jackfish/FicTrac output
 _FICTRAC_SRC = {}
@@ -139,8 +142,8 @@ def copy_fly(source_fly, destination_fly, printlog, user):
         if os.path.isdir(os.path.join(source_fly, item)):
             # Call this folder source expt folder
             source_expt_folder = os.path.join(source_fly, item)
-            # Make the same folder in destination fly folder
-            expt_folder = os.path.join(destination_fly, item)
+            # Make the same folder in destination fly folder (anat0/func0 -> anat_0/func_0, as preprocess.py expects)
+            expt_folder = os.path.join(destination_fly, normalize_region_name(item))
             os.mkdir(expt_folder)
             ##print('Created directory: {}'.format(expt_folder))
             ##sys.stdout.flush()
@@ -199,6 +202,13 @@ def copy_fly(source_fly, destination_fly, printlog, user):
                 os.mkdir(visual_folder)
             for hdf5 in session_hdf5s:
                 copy_file(os.path.join(source_session, hdf5), os.path.join(visual_folder, hdf5), printlog)
+
+def normalize_region_name(item):
+    ''' anat0 -> anat_0, func12 -> func_12; anything else (incl. anat_0) is returned unchanged '''
+    match = REGION_NO_UNDERSCORE_PATTERN.match(item)
+    if match:
+        return match.group(1) + '_' + match.group(2)
+    return item
 
 def copy_bruker_data(source, destination, folder_type, printlog):
     # Bruker can split long recordings into chunks named *_channel_N_s0.nii, *_s500.nii, ...
