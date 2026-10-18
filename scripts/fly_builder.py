@@ -300,7 +300,9 @@ def copy_bruker_data(source, destination, folder_type, printlog):
 
 def merge_split_nii(source_chunks, target, printlog):
     ''' Concatenate time-split nii chunks (already sorted by start frame) along the last axis.
-    Chunks are read one at a time into a preallocated array; the first chunk's header is kept. '''
+    On Oak (Lustre), nibabel's array-proxy reads stall for minutes per chunk, so each chunk is read with one
+    sequential np.fromfile and written straight into a memmap of the output; only one chunk is in RAM at a time.
+    The output gets the first chunk's header (and scaling) with the merged shape. '''
     to_print = ('/').join(target.split('/')[-4:])
     width = 120
     label = 'Merging {} chunks into'.format(len(source_chunks))
@@ -310,27 +312,50 @@ def merge_split_nii(source_chunks, target, printlog):
     chunk_imgs = [nib.load(chunk) for chunk in source_chunks]
     first = chunk_imgs[0]
     spatial_shape = first.shape[:3]
-    dtype = first.get_data_dtype()
+    dtype = first.get_data_dtype()  # uint16 for Bruker output
     for chunk, img in zip(source_chunks, chunk_imgs):
         if len(img.shape) != 4 or img.shape[:3] != spatial_shape or img.get_data_dtype() != dtype:
             raise ValueError('Cannot merge {}: shape {} / dtype {} does not match first chunk shape {} / dtype {}'.format(
                 chunk, img.shape, img.get_data_dtype(), first.shape, dtype))
+        if img.header['sizeof_hdr'] != 348:
+            raise ValueError('Cannot merge {}: not a NIfTI-1 file (sizeof_hdr {})'.format(chunk, img.header['sizeof_hdr']))
     n_frames = sum(img.shape[3] for img in chunk_imgs)
+    merged_shape = spatial_shape + (n_frames,)
 
-    merged = np.empty(spatial_shape + (n_frames,), dtype=dtype)
+    # 348-byte NIfTI-1 header + 4-byte extension flag, then the data
+    data_offset = 352
+    with open(target, 'wb') as f:
+        f.truncate(data_offset + int(np.prod(merged_shape)) * dtype.itemsize)
+
     start = 0
-    for img in chunk_imgs:
-        # Unscaled so values stay in the stored dtype; the first header's scaling is reused on save
-        data = np.asarray(img.dataobj.get_unscaled())
-        merged[..., start:start + data.shape[3]] = data
-        start += data.shape[3]
-        del data
-        img.uncache()
+    for chunk, img in zip(source_chunks, chunk_imgs):
+        count = int(np.prod(img.shape))
+        with open(chunk, 'rb') as f:
+            f.seek(img.dataobj.offset)
+            # Raw stored values; the first header's scaling is reused for the merged file
+            data = np.fromfile(f, dtype=dtype, count=count)
+        if data.size != count:
+            raise ValueError('Cannot merge {}: expected {} values, read {}'.format(chunk, count, data.size))
+        data = data.reshape(img.shape, order='F')
+        merged = np.memmap(target, dtype=dtype, mode='r+', offset=data_offset, shape=merged_shape, order='F')
+        merged[..., start:start + img.shape[3]] = data
+        merged.flush()
+        del merged, data
+        start += img.shape[3]
 
     header = first.header.copy()
-    header.set_data_shape(merged.shape)
-    nib.Nifti1Image(merged, first.affine, header).to_filename(target)
-    del merged
+    header.set_data_shape(merged_shape)
+    header.set_data_dtype(dtype)
+    header['vox_offset'] = data_offset
+    # nibabel moves scl_slope/scl_inter from a loaded header onto its dataobj; put them back
+    header.set_slope_inter(first.dataobj.slope, first.dataobj.inter)
+    with open(target, 'r+b') as f:
+        f.write(header.binaryblock)
+        f.write(b'\x00' * 4)  # no extensions
+
+    reloaded_shape = nib.load(target).shape
+    if reloaded_shape != merged_shape:
+        raise ValueError('Merged {} reloads with shape {}, expected {}'.format(target, reloaded_shape, merged_shape))
 
 def copy_file(source, target, printlog):
     #printlog('Transfering file {}'.format(target))
