@@ -343,6 +343,21 @@ def supervoxel_to_full_res(brain, cluster_labels, n_clusters):
         colored_by_betas = colored_by_betas.reshape(n_tp,brain_dims[0],brain_dims[1])
         reformed_brain.append(colored_by_betas)
     return np.asarray(reformed_brain)
+#def dual_channel_remove_noise(arr_r, arr_g, printlog):
+#    arr_r=np.asarray(arr_r)
+#    arr_g=np.asarray(arr_g)
+#    shape=np.shape(arr_g)
+#    flat_red=arr_r.reshape(-1,shape[-1])
+#    flat_green=arr_g.reshape(-1,shape[-1])
+#    printlog(f'flattened shape is {flat_green.shape}')
+#    flat_sig=np.zeros_like(flat_green)
+#    for i in range(np.shape(flat_red)[0]):
+#        a=np.polyfit(flat_red[i,:],flat_green[i,:],1)
+##         print(np.shape(a))
+#        sig = flat_green[i,:] - (a[0]*flat_red[i,:] + a[1])
+#        flat_sig[i,:]=sig
+#    return flat_sig.reshape(shape)
+
 def dual_channel_remove_noise(arr_r, arr_g, printlog):
     arr_r=np.asarray(arr_r)
     arr_g=np.asarray(arr_g)
@@ -352,18 +367,44 @@ def dual_channel_remove_noise(arr_r, arr_g, printlog):
     printlog(f'flattened shape is {flat_green.shape}')
     flat_sig=np.zeros_like(flat_green)
     for i in range(np.shape(flat_red)[0]):
+        if np.std(flat_red[i,:]) == 0 or np.std(flat_green[i,:]) == 0:
+            flat_sig[i,:] = flat_green[i,:]
+            continue
         a=np.polyfit(flat_red[i,:],flat_green[i,:],1)
 #         print(np.shape(a))
         sig = flat_green[i,:] - (a[0]*flat_red[i,:] + a[1])
         flat_sig[i,:]=sig
     return flat_sig.reshape(shape)
+
+#def make_multi_behave_dict(behaviors,later_dir,step_size,event,ch_num,printlog):
+#    behave_dict = {}
+#    for behavior in behaviors:
+#        behave_dir = os.path.join(later_dir, behavior)
+#        behave_dict[behavior]=[]
+#        for file in os.listdir(behave_dir):
+#            if 'STA' in file and str(step_size) in file and f'_{event}.h5' in file and f'_{ch_num}_' in file:
+#                STA_path=os.path.join(behave_dir, file)
+#                with h5py.File(STA_path, 'r') as sf:
+#                    brain = sf['data'][:]
+#                    brain[np.isnan(brain)] = 0
+#                    brain[np.isinf(brain)] = 4
+#                    brain = np.moveaxis(brain, 0, -1)
+#                    dims=np.shape(brain)
+#                    printlog(f'brain {file} shape: {dims}')
+#                    behave_dict[behavior]=brain
+#    return behave_dict
+
 def make_multi_behave_dict(behaviors,later_dir,step_size,event,ch_num,printlog):
     behave_dict = {}
     for behavior in behaviors:
         behave_dir = os.path.join(later_dir, behavior)
         behave_dict[behavior]=[]
         for file in os.listdir(behave_dir):
-            if 'STA' in file and str(step_size) in file and f'_{event}.h5' in file and f'_{ch_num}_' in file:
+            if event is not None:
+                match = 'STA' in file and str(step_size) in file and f'_{event}.h5' in file and f'_{ch_num}_' in file
+            else:
+                match = 'STA' in file and file.endswith(f'_{step_size}.h5') and f'_{ch_num}_' in file
+            if match:
                 STA_path=os.path.join(behave_dir, file)
                 with h5py.File(STA_path, 'r') as sf:
                     brain = sf['data'][:]

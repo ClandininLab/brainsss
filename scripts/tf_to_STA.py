@@ -64,7 +64,7 @@ def main(args):
                     if not os.path.exists(temp_dir_behave):
                         os.makedirs(temp_dir_behave)
                     save_file= os.path.join(temp_dir_behave, f'STA_{cc}_{behavior}_{steps}_{event}.h5')
-            elif f'_{cc}_' in file and f'_{event}.h5' not in file and '_tf_' in file and behavior in file:
+            elif file.endswith(f'_{cc}.h5') and '_tf_' in file and behavior in file:
                     tf_files.append(file)
                     temp_dir_behave = os.path.join(temp_dir, behavior)
                     if not os.path.exists(temp_dir_behave):
