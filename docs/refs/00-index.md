@@ -1,6 +1,6 @@
 # Reference repos index
 
-Index of the four read-only repos under `../refs/` (sibling of this repo). Surveyed 2026-10-02.
+Index of the six read-only repos under `../refs/` (sibling of this repo). Surveyed 2026-10-02; `mc_glom_pipeline` and `visanalysis` added 2026-10-16.
 Tags: **[from code]** = checked directly in files / git metadata; **[inferred]** = judgement from names, imports, or structure.
 Sizes are on-disk (`du -sh`), file counts exclude `.git/`.
 
@@ -12,6 +12,8 @@ Sizes are on-disk (`du -sh`), file counts exclude `.git/`.
 | `brezovec-bigbadbrain` | bellabrez/bigbadbrain | 2.2 GB (769 MB is `.git`) | 1174 | analysis + figures (notebooks), some job submission |
 | `brezovec-dataflow` | bellabrez/dataflow | 2.4 MB | 178 | data transfer/conversion + Sherlock preprocessing + analysis + job submission |
 | `brezovec-topography` | bellabrez/brezovec_topography | 272 KB | 16 | analysis (paper code), plus condensed preprocessing |
+| `mc_glom_pipeline` | minseungchoi/mc_glom_pipeline | 308 KB | 19 | per-day DAG preprocessing (glomerular imaging), not whole-brain |
+| `visanalysis` | ClandininLab/visanalysis | 1.8 MB | 26 | imaging timebase + stimulus/behavior alignment, ROI analysis |
 
 All origins from `git remote -v` [from code].
 
@@ -57,6 +59,33 @@ All origins from `git remote -v` [from code].
 - **Code type:** analysis, with a few preprocessing excerpts; no job submission (no `sbatch` calls) [from code]. Looks like cleaned-up copies extracted from `dataflow/sherlock_scripts` for publication [inferred].
 - **Depends on the other repos:** imports `dataflow` (5 files), `bigbadbrain` (4 files), `brainsss` (1 file) [from code].
 
+## mc_glom_pipeline
+
+Minseung Choi's pipeline, not a Brezovec/brainsss descendant — surveyed only for its FicTrac and alignment logic.
+
+- **Purpose:** per-day orchestration + preprocessing for *glomerular* (antennal lobe) imaging, wrapping `mcregistration` CLIs in a DAG scheduler [from code: `.agents/rules/AGENTS.md`, `README.md`]. At `83a8664` (2026-04-19), branch `main`.
+- **Main folders** [from code]:
+  - `mc_glom_pipeline/` — `pipeline.py` (DAG build/run via `graphlib.TopologicalSorter` + `ThreadPoolExecutor`), `process_imports.py`, `bleedthrough.py`, `metadata.py`, `fictrac.py`, `transfer.py`, `config.py`.
+  - `cli/` — 6 console scripts (`mcgp-process-day`, `mcgp-attach-fictrac`, …).
+  - `.agents/rules/AGENTS.md` + `.agents/docs/pipeline-dag.md` — its own agent docs.
+- **Code type:** preprocessing + orchestration. Threaded, single-machine — **no Slurm** [from code]. Depends on `mcregistration` and `visanalysis`, neither of which is in `../refs/`.
+- **FicTrac relevance:** runs the FicTrac binary on saved ball video and dumps the raw `.dat` matrix into a per-day HDF5 under `epoch_runs/series_NNN/behavior/fictrac_data`. **No unit conversion, smoothing, velocity computation, or frame→imaging-time alignment** — all delegated to `visanalysis`/`mcregistration` [from code].
+- Detailed map (FicTrac invocation, config rewriting, HDF5 keys, hardcoded calibration, dead config keys): [minseung_mc_glom_pipeline.md](minseung_mc_glom_pipeline.md).
+
+## visanalysis
+
+The lab's stimulus/behavior alignment layer — the repo `mc_glom_pipeline` delegates all timing to. Surveyed for the imaging timebase and the behavior join.
+
+- **Purpose:** attach acquisition metadata, photodiode traces and FicTrac data to a stimpack/visprotocol hdf5, then slice responses into stimulus epochs [from code: `README.md`, `plugin/base.py` docstring]. At `ec4ade7` (2026-10-09), branch `master`.
+- **Main folders** [from code]:
+  - `visanalysis/plugin/` — per-rig attach logic: `bruker.py` (Bruker/PrairieView XML → timebase), `fortyhourfitness.py` (Jackfish DAQ, camera strobes, ensemble segmentation), `twentyfourhourfitness.py` (unix-time epochs, no photodiode), `aodscope.py`, `base.py`.
+  - `visanalysis/analysis/imaging_data.py` (1120 lines) — `ImagingDataObject`: the central analysis class. `getStimulusTiming`, `getEpochResponseMatrix`, `getBehaviorTiming`, `getBehaviorData`.
+  - `visanalysis/util/` — `h5io.py` (schema-name tolerance), `daq_ensemble.py` (1510 lines, strobe-gap segmentation + validation), `plot_tools.py`.
+  - `rig_specific/` — per-user JSON configs + `move_and_attach_data.py`; `examples/`, `gui/DataGUI.py`, `attach_data.py`.
+- **Code type:** metadata attachment + analysis library. No job submission, no Slurm [from code].
+- **Key facts for this project:** imaging timebase is `acquisition/time_points` = Bruker `relativeTime` of each volume's **first z-plane**, in **sec from series start**; the epoch join is a boolean window select with **no interpolation**; FicTrac's `timestamp` column is in **ms**. Minseung's `dtype='S'` header breaks visanalysis's FicTrac readers [verified].
+- Detailed map (timebase keys/units/origin, three `getStimulusTiming` variants, behavior join, hardcoded thresholds): [visanalysis.md](visanalysis.md).
+
 ## Overlap
 
 Function-name intersections (`def` names, library + scripts dirs) [from code]:
@@ -81,3 +110,5 @@ Caveats: shared names ≠ identical code. Spot check: `load_fictrac` in topograp
 - Paper-method reference (GLM, filters, correlation, meanbrain): `brezovec-topography` first, then `dataflow/sherlock_scripts` for the full versions.
 - Old figure notebooks: `brezovec-bigbadbrain/jupyter_notebooks` (dated filenames).
 - Acquisition-side data transfer: `brezovec-dataflow/dataflow`.
+- Offline FicTrac invocation (binary, config handling, `.dat` → HDF5): `mc_glom_pipeline/mc_glom_pipeline/fictrac.py` + `process_imports.py` — but it has no alignment or kinematics code.
+- Imaging timebase, stimulus epoch timing, behavior→stimulus alignment: `visanalysis/visanalysis/analysis/imaging_data.py` + `plugin/bruker.py`. Still no kinematics (smoothing, velocity, stationary/moving threshold) in either repo.
