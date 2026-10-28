@@ -69,20 +69,34 @@ def main(args):
         if not os.path.exists(cluster_dir):
             os.mkdir(cluster_dir)
 
-        ### FIT CLUSTERS ###
-        printlog('fitting clusters')
         shape= np.shape(brain)
-        connectivity = grid_to_graph(shape[0],shape[1])
-        cluster_labels = []
-        for z in range(shape[-2]): #THIS SHOULD NOT BE HARD CODED
-            neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
-            cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
-                                        memory=cluster_dir,
-                                        linkage='ward',
-                                        connectivity=connectivity)
-            cluster_model.fit(neural_activity)
-            cluster_labels.append(cluster_model.labels_)
-        cluster_labels = np.asarray(cluster_labels)
+        if native and ch_num == '1':
+            ### REUSE CHANNEL-2 CLUSTERS ###
+            # red must share green's supervoxels so regress_noise_native compares the same regions
+            green_labels_file = os.path.join(cluster_dir, f'cluster_labels_2_native_{behavior}{event_suffix}_{n_clusters}.npy')
+            if not os.path.exists(green_labels_file):
+                printlog(f'ERROR: channel 1 needs channel-2 labels {green_labels_file}. Run --supervox for channel 2 first.')
+                raise FileNotFoundError(green_labels_file)
+            printlog(f'loading channel-2 clusters from {green_labels_file}')
+            cluster_labels = np.load(green_labels_file)
+            if cluster_labels.shape != (shape[-2], shape[0]*shape[1]):
+                printlog(f'ERROR: channel-2 labels shape {cluster_labels.shape} does not match channel-1 brain shape {shape}')
+                raise ValueError(green_labels_file)
+        else:
+            ### FIT CLUSTERS ###
+            printlog('fitting clusters')
+            connectivity = grid_to_graph(shape[0],shape[1])
+            cluster_labels = []
+            for z in range(shape[-2]): #THIS SHOULD NOT BE HARD CODED
+                neural_activity = brain[:,:,z,:].reshape(-1, shape[3])
+                cluster_model = AgglomerativeClustering(n_clusters=n_clusters,
+                                            memory=cluster_dir,
+                                            linkage='ward',
+                                            connectivity=connectivity)
+                cluster_model.fit(neural_activity)
+                cluster_labels.append(cluster_model.labels_)
+            cluster_labels = np.asarray(cluster_labels)
+        # for channel 1 in native mode this is a copy of the channel-2 labels, so build_STA finds them by name
         save_file = os.path.join(cluster_dir, f'cluster_labels_{ident}_{n_clusters}.npy')
         np.save(save_file,cluster_labels)
 
