@@ -157,6 +157,20 @@ def main(args):
     if args["INDIVIDUAL_CLUSTERS"] != "":
         individual_clusters = True
 
+    # native functional space: read the _native_ dff and the raw (t, z) imaging timestamps, no atlas warp
+    native = args.get("NATIVE", "") != ""
+    space = "native" if native else "warp"
+    if native:
+        printlog("Running in native functional space")
+        # cross-fly stages pool flies in atlas space, which native flies do not share
+        if tf_to_STA or later_transfer or supercluster or get_ind_vox or individual_clusters:
+            printlog("--native: skipping cross-fly stages (tf_to_STA, later_transfer, supercluster, get_ind_vox, individual_clusters)")
+        tf_to_STA = False
+        later_transfer = False
+        supercluster = False
+        get_ind_vox = False
+        individual_clusters = False
+
     if fly_dirs is None:
         printlog(
                 "ERROR: you did not provide a directory to build flies from, nor a fly directory to process."
@@ -189,9 +203,12 @@ def main(args):
                 os.mkdir(save_directory)
             
             timestamp_file = "warp/timestamps_warp.h5"
+            if native:
+                timestamp_file = "func_0/imaging/timestamps.h5"
             args = {
                 "logfile": logfile,
                 "redo": redo,
+                "native": native,
                 "later_path": later_path,
                 "event": event,
                 "cc": ch_num,
@@ -229,9 +246,12 @@ def main(args):
                 os.mkdir(save_directory)
             
             timestamp_file = "warp/timestamps_warp.h5"
+            if native:
+                timestamp_file = "func_0/imaging/timestamps.h5"
             args = {
                 "logfile": logfile,
                 "redo": redo,
+                "native": native,
                 "event": event,
                 "later_path": later_path,
                 "fly_directory": fly_directory,
@@ -264,16 +284,19 @@ def main(args):
 
        for fly in fly_dirs:
             fly_directory = os.path.join(dataset_path, fly)
-            load_directory = os.path.join(fly_directory, "dff")
+            load_directory = os.path.join(fly_directory, "func_0", "playground")
             scratch_directory = os.path.join(scratch_path, fly)
             
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_{space}_blurred_hpf_dff.h5"
             # timestamp_file = "warp/timestamps_warp.h5" ##### CHANGED TO TRY SCRATCH WILL NEED TO BE CHANGED BACK
             timestamp_file = "timestamps_warp.h5"
+            if native:
+                timestamp_file = "timestamps.h5"
             args = {
                 "logfile": logfile,
                 "fly_directory": fly_directory,
                 "redo": redo,
+                "native": native,
                 "later_path": later_path,
                 "event": event,
                 "load_directory": load_directory,
@@ -304,8 +327,11 @@ def main(args):
             load_directory = os.path.join(fly_directory, "temp_filter")
             func_path = os.path.join(fly_directory, "func_0")
             brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered.h5"
+            if native:
+                brain_file = f"functional_channel_{ch_num}_moco_native_blurred_hpf_dff_filtered.h5"
             args = {"logfile": logfile,
                     "redo": redo,
+                    "native": native,
                     "func_path": func_path,
                     "brain_file": brain_file,
                     "ch_num": ch_num,
@@ -388,6 +414,7 @@ def main(args):
             args = {"logfile": logfile, 
                     "fly_directory": fly_directory,
                     "redo": redo,
+                    "native": native,
                     'ch_num': ch_num,
                     "event": event,
                     "later_path": later_path,
@@ -433,7 +460,31 @@ def main(args):
         )
         brainsss.wait_for_job(job_id, logfile, com_path)
         
-    if regress_noise:
+    if regress_noise and native:
+        for fly in fly_dirs:
+            fly_directory = os.path.join(dataset_path, fly)
+            STA_directory = os.path.join(fly_directory, "STA")
+            args = {"logfile": logfile,
+                    "later_path": later_path,
+                    "STA_directory": STA_directory,
+                    "event": event,
+                    }
+            script = "regress_noise_native.py"
+            job_id = brainsss.sbatch(
+                jobname="regress_noise_native",
+                script=os.path.join(scripts_path, script),
+                modules=modules,
+                args=args,
+                logfile=logfile,
+                time=12,
+                cpus=8,
+                mem='100GB',
+                nice=nice,
+                nodes=nodes,
+            )
+            brainsss.wait_for_job(job_id, logfile, com_path)
+
+    elif regress_noise:
         temp_directory = os.path.join(later_path, "temp_filter")
         args = {"logfile": logfile, 
                 "later_path": later_path, 

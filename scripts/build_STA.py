@@ -9,11 +9,11 @@ import h5py
 import ants
 import psutil
 import gc
+import pickle
 
-def STA_supervoxel_to_full_res(STA_brain, cluster_labels):
+def STA_supervoxel_to_full_res(STA_brain, cluster_labels, brain_dims):
     n_clusters = STA_brain.shape[2]
     n_tp = STA_brain.shape[1]
-    brain_dims=[314,146]
     
     reformed_STA_brain = []
     for z in range(STA_brain.shape[0]):
@@ -32,8 +32,12 @@ def main(args):
     load_directory = args['load_directory']
     save_directory = args['save_directory']
     ch_num = args['ch_num'] 
+    native = args.get('native', False)
+    event = args['event']
+    later_path = args['later_path']
     
     steps=100
+    n_clusters = 2000
 
     cluster_dir = os.path.join(fly_directory, 'func_0','clustering')
     
@@ -51,10 +55,25 @@ def main(args):
 
     printlog("Beginning STA")
     behaviors = ['syn_turn_0', 'syn_turn_180', 'anti_turn_0', 'anti_turn_180', 'flat_0', 'flat_180', 'total']
+    if native:
+        # behaviors come from the event pickle, as in temp_filter and make_supervoxels
+        if event != None:
+            event_times_path = os.path.join(later_path, f'{event}_event_times_split_dic.pkl')
+        else:
+            event_times_path = os.path.join(later_path, 'event_times_split_dic.pkl')
+        with open(event_times_path, 'rb') as file:
+            event_times_struct = pickle.load(file)
+            f=list(event_times_struct.keys())[0]
+            behaviors=list(event_times_struct[f].keys())
     for behavior in behaviors:
     #load brain
         tf_load_path = os.path.join(load_directory, f"functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5")
         save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+ f'_STA_{behavior}.h5')
+        if native:
+            event_suffix = f'_{event}' if event != None else ''
+            ident = f'{ch_num}_native_{behavior}{event_suffix}'
+            tf_load_path = os.path.join(load_directory, f"functional_channel_{ch_num}_moco_native_blurred_hpf_dff_filtered_{behavior}{event_suffix}.h5")
+            save_file = os.path.join(save_directory, 'stepsize_'+str(steps)+ f'_STA_{ident}.h5')
         # if os.path.exists(save_file)==False:
         with h5py.File(tf_load_path, 'r') as hf:    
             ts = hf['time_stamps'][:]
@@ -63,23 +82,30 @@ def main(args):
         label_name =''
         signal_name =''
 
-        for x in sorted(os.listdir(cluster_dir)):
-            if 'label' in x and ch_num in x and behavior in x:
-                label_name = x
-                load_file = os.path.join(cluster_dir, label_name)
-                cluster_labels = np.load(load_file)
-            if 'signals' in x and ch_num in x and behavior in x:
-                signal_name = x
-                load_file = os.path.join(cluster_dir, signal_name)
-                all_signals = np.load(load_file)
-                
+        if native:
+            # exact names: substring matching would mix channels (e.g. '1' in '180') and spaces
+            label_name = f'cluster_labels_{ident}_{n_clusters}.npy'
+            signal_name = f'cluster_signals_{ident}_{n_clusters}.npy'
+            cluster_labels = np.load(os.path.join(cluster_dir, label_name))
+            all_signals = np.load(os.path.join(cluster_dir, signal_name))
+        else:
+            for x in sorted(os.listdir(cluster_dir)):
+                if 'label' in x and ch_num in x and behavior in x:
+                    label_name = x
+                    load_file = os.path.join(cluster_dir, label_name)
+                    cluster_labels = np.load(load_file)
+                if 'signals' in x and ch_num in x and behavior in x:
+                    signal_name = x
+                    load_file = os.path.join(cluster_dir, signal_name)
+                    all_signals = np.load(load_file)
+
         printlog(label_name)
         printlog(signal_name)
         all_signals_new=np.moveaxis(all_signals,-1,1)
         printlog(str(np.shape(all_signals_new)))
         
         STA_brain = np.nan_to_num(all_signals_new)
-        reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels)
+        reformed_STA_brain = STA_supervoxel_to_full_res(STA_brain, cluster_labels, dimst[:2])
         STA_brain = gaussian_filter1d(reformed_STA_brain,sigma=1,axis=1,truncate=1)
         STA_brain_temp=np.moveaxis(STA_brain,0,-1).astype('float32')
         STA_brain_final=np.moveaxis(STA_brain_temp,0,-1)

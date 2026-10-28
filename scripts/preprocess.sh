@@ -106,6 +106,10 @@ while [[ $# -gt 0 ]]; do
       ANAT2ATLAS=True
       shift
       ;;
+    --native)
+      NATIVE=True
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -119,7 +123,7 @@ ARGS="{\"PWD\":\"$PWD\",\"BUILDFLIES\":\"$BUILDFLIES\",\"FLIES\":\"$FLIES\",\"DI
 \"BLEACHING_QC\":\"$BLEACHING_QC\",\"TEMPORAL_MEAN_BRAIN_PRE\":\"$TEMPORAL_MEAN_BRAIN_PRE\",\
 \"BLUR\":\"$BLUR\",\"HPF\":\"$HPF\",\"REDO\":\"$REDO\",\"CLEAN_ANAT\":\"$CLEAN_ANAT\",\
 \"CHANNEL_CHANGE\":\"$CHANNEL_CHANGE\",\"H5_TO_NII\":\"$H5_TO_NII\",\"TEMPORAL_MEAN_BRAIN_POST\":\"$TEMPORAL_MEAN_BRAIN_POST\",\
-\"FUNC2ANAT\":\"$FUNC2ANAT\",\"BEST_FLIES\":\"$BEST_FLIES\",\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\"}"
+\"FUNC2ANAT\":\"$FUNC2ANAT\",\"BEST_FLIES\":\"$BEST_FLIES\",\"WHOLE_BRAIN_INTERP\":\"$WHOLE_BRAIN_INTERP\",\"ANAT2ATLAS\":\"$ANAT2ATLAS\",\"NATIVE\":\"$NATIVE\"}"
 
 ml python/3.6
 date

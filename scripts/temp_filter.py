@@ -21,11 +21,17 @@ def main(args):
     event= args['event']
     redo = args['redo']
     cc = args['cc']
+    native = args.get('native', False)
     stepsize = 100
+    tag = '_native' if native else ''
 
     brain_load_path = os.path.join(load_directory, brain_file)
     ts_load_path = os.path.join(fly_directory, 'warp', timestamp_file)
     save_directory = os.path.join(fly_directory, "temp_filter")
+    if native:
+        ts_load_path = os.path.join(fly_directory, 'func_0', 'imaging', timestamp_file)
+    if not os.path.exists(save_directory):
+        os.mkdir(save_directory)
 
     #####################
     ### SETUP LOGGING ###
@@ -44,7 +50,11 @@ def main(args):
     ts_dest=os.path.join(scratch_dir, timestamp_file)
     if os.path.exists(brain_dest)==False: 
         b_dest = shutil.copyfile(brain_load_path, brain_dest)
-    if os.path.exists(ts_dest)==False: 
+    if native:
+        # imaging timestamps are (t, z) ms and small, so they are read in place rather than staged
+        native_ts = brainsss.load_timestamps(os.path.dirname(ts_load_path))
+        ts_dest = ts_load_path
+    elif os.path.exists(ts_dest)==False: 
         t_dest = shutil.copyfile(ts_load_path, ts_dest)
     printlog(f"brain in {brain_dest} and timestamp in {ts_dest}")
 
@@ -62,12 +72,12 @@ def main(args):
    
     for behavior in behaviors:
         if event != None:
-            filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}_{behavior}_{event}.h5")
-            ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}_{behavior}_{event}.h5")
+            filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}{tag}_{behavior}_{event}.h5")
+            ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}{tag}_{behavior}_{event}.h5")
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}_{event}.h5')
         else:
-            filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}_{behavior}.h5")
-            ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}_{behavior}.h5")
+            filter_load_path=os.path.join(scratch_dir, f"filter_needs_{cc}{tag}_{behavior}.h5")
+            ts_rel_load_path=os.path.join(scratch_dir, f"ts_rel_odd_mask_{cc}{tag}_{behavior}.h5")
             save_file = os.path.join(save_directory, brain_file.split('.')[0] + '_filtered_' + f'{behavior}.h5')
         if os.path.exists(save_file)==False or redo:
             #load brain
@@ -77,7 +87,7 @@ def main(args):
                 h5py.File(filter_load_path, 'r') as ff:
                     
                 brain_all = hf['data']
-                ts_all = tf['data']
+                ts_all = None if native else tf['data']
                 loom_all = ff['loom_starts'] 
                 bin_shape = ff['bin_shape']
                 odd_mask = of['odd_mask']   
@@ -87,7 +97,10 @@ def main(args):
                 dims=np.shape(brain_all)
                 printlog(F"Brain data shape is {dims}")
                 
-                T=(ts_all[0,0,0,1]-ts_all[0,0,0,0])/1000
+                if native:
+                    T=(native_ts[1,0]-native_ts[0,0])/1000
+                else:
+                    T=(ts_all[0,0,0,1]-ts_all[0,0,0,0])/1000
                 fs=1/T #sample rate, Hz
                 if loom_all.shape[0]>0:
                     max_len=int((((bin_shape[1]-bin_shape[0])/1000)*fs)*np.shape(loom_all)[0])+100
@@ -102,23 +115,36 @@ def main(args):
                 within_bin_brain_np = np.full((nx, ny, nz, max_len), np.nan)
                 within_bin_ts_rel_np = np.full((nx, ny, nz, max_len), np.nan)
                 #### Loop over z planes (io access is done nz times!!)
-                for z in (range(nz)):
-                    # Read in z plane
-                    plane = brain_all[:,:,z,:]
-                    plane_ts_rel = ts_rel[:,:,z,:]
-                    for x in range(nx):
-                        for y in range(ny):
-                            within_bin_vox = plane[x, y, odd_mask[x,y,z,:]]
-                            within_bin_vox_ts_rel = plane_ts_rel[x, y, odd_mask[x,y,z,:]]
+                # native: bins, ts_rel and odd_mask are (z, t) since every voxel in a plane shares its timestamps,
+                # so each plane needs one mask and one sort
+                if native:
+                    for z in range(nz):
+                        plane = brain_all[:,:,z,:]
+                        plane_mask = odd_mask[z,:]
+                        plane_ts_rel = ts_rel[z,:][plane_mask]
+                        sorted_indices = np.argsort(plane_ts_rel)
+                        within_bin_vox = plane[:,:,plane_mask][:,:,sorted_indices]
+                        within_bin_vox_ts_rel = plane_ts_rel[sorted_indices]
+                        within_bin_brain_np[:,:,z,:len(within_bin_vox_ts_rel)] = within_bin_vox
+                        within_bin_ts_rel_np[:,:,z,:len(within_bin_vox_ts_rel)] = within_bin_vox_ts_rel
+                else:
+                    for z in (range(nz)):
+                        # Read in z plane
+                        plane = brain_all[:,:,z,:]
+                        plane_ts_rel = ts_rel[:,:,z,:]
+                        for x in range(nx):
+                            for y in range(ny):
+                                within_bin_vox = plane[x, y, odd_mask[x,y,z,:]]
+                                within_bin_vox_ts_rel = plane_ts_rel[x, y, odd_mask[x,y,z,:]]
                             
-                            # Get the sorted indices of the timestamp array and sort both arrays using the sorted indices
-                            sorted_indices = np.argsort(within_bin_vox_ts_rel)
-                            within_bin_vox = within_bin_vox[sorted_indices]
-                            within_bin_vox_ts_rel = within_bin_vox_ts_rel[sorted_indices]
+                                # Get the sorted indices of the timestamp array and sort both arrays using the sorted indices
+                                sorted_indices = np.argsort(within_bin_vox_ts_rel)
+                                within_bin_vox = within_bin_vox[sorted_indices]
+                                within_bin_vox_ts_rel = within_bin_vox_ts_rel[sorted_indices]
 
-                            # populate the output array
-                            within_bin_brain_np[x,y,z,:len(within_bin_vox)] = within_bin_vox
-                            within_bin_ts_rel_np[x,y,z,:len(within_bin_vox)] = within_bin_vox_ts_rel
+                                # populate the output array
+                                within_bin_brain_np[x,y,z,:len(within_bin_vox)] = within_bin_vox
+                                within_bin_ts_rel_np[x,y,z,:len(within_bin_vox)] = within_bin_vox_ts_rel
 
                 
                 # brain_final = np.array(brain_final)

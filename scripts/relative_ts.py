@@ -18,9 +18,11 @@ def main(args):
     event= args['event']
     redo = args['redo']
     cc = args['cc']
+    native = args.get('native', False)
     
 
     ts_load_path = os.path.join(fly_directory, timestamp_file)
+    tag = '_native' if native else ''
 
     #####################
     ### SETUP LOGGING ###
@@ -46,20 +48,23 @@ def main(args):
         f=list(event_times_struct.keys())[0]
         behaviors=list(event_times_struct[f].keys())
             
+    if native:
+        # imaging timestamps are (t, z) ms; transpose so time is the last axis, as in the warped (x, y, z, t) ones
+        native_ts = brainsss.load_timestamps(os.path.dirname(ts_load_path)).T
             
     for behavior in behaviors:
         if event != None:
-            save_name=f'ts_rel_odd_mask_{cc}_{behavior}_{event}.h5'
-            load_name=f'filter_needs_{cc}_{behavior}_{event}.h5'
+            save_name=f'ts_rel_odd_mask_{cc}{tag}_{behavior}_{event}.h5'
+            load_name=f'filter_needs_{cc}{tag}_{behavior}_{event}.h5'
         else:
-            save_name=f'ts_rel_odd_mask_{cc}_{behavior}.h5'
-            load_name=f'filter_needs_{cc}_{behavior}.h5'
+            save_name=f'ts_rel_odd_mask_{cc}{tag}_{behavior}.h5'
+            load_name=f'filter_needs_{cc}{tag}_{behavior}.h5'
         if save_name not in os.listdir(save_directory) or redo:
             #load brain
             with h5py.File(ts_load_path, 'r') as tf, \
                 h5py.File(os.path.join(save_directory, load_name), 'r') as ff:
 
-                ts = tf['data'][:].astype('float32')
+                ts = native_ts.astype('float32') if native else tf['data'][:].astype('float32')
                 bins = ff['bins'][:].astype('int32')
                 looms = ff['loom_starts'][:].astype('float32')
             

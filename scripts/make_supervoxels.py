@@ -32,6 +32,7 @@ def main(args):
     later_path = args['later_path']
     event = args['event']
     ch_num = args['ch_num']
+    native = args.get('native', False)
     printlog = getattr(brainsss.Printlog(logfile=logfile), 'print_to_log')
     n_clusters = 2000
  
@@ -50,6 +51,12 @@ def main(args):
     for behavior in behaviors:
      ### LOAD BRAIN ###
         brain_file = f'functional_channel_{ch_num}_moco_warp_blurred_hpf_dff_filtered_{behavior}.h5'
+        ident = f'{ch_num}_{behavior}'
+        if native:
+            # per-fly labels in native space; the event suffix matches temp_filter's output name
+            event_suffix = f'_{event}' if event != None else ''
+            brain_file = args['brain_file'].split('.')[0] + f'_{behavior}{event_suffix}.h5'
+            ident = f'{ch_num}_native_{behavior}{event_suffix}'
         brain_path = os.path.join(load_directory, brain_file)
         with h5py.File(brain_path, 'r+') as hf:
             brain = np.nan_to_num(hf['brain'][:].astype('float32'))
@@ -76,7 +83,7 @@ def main(args):
             cluster_model.fit(neural_activity)
             cluster_labels.append(cluster_model.labels_)
         cluster_labels = np.asarray(cluster_labels)
-        save_file = os.path.join(cluster_dir, f'cluster_labels_{ch_num}_{behavior}_{n_clusters}.npy')
+        save_file = os.path.join(cluster_dir, f'cluster_labels_{ident}_{n_clusters}.npy')
         np.save(save_file,cluster_labels)
 
         ### GET CLUSTER AVERAGE SIGNAL ###
@@ -93,7 +100,7 @@ def main(args):
             signals = np.asarray(signals)
             all_signals.append(signals)
         all_signals = np.asarray(all_signals)
-        save_file = os.path.join(cluster_dir, f'cluster_signals_{ch_num}_{behavior}_{n_clusters}.npy')
+        save_file = os.path.join(cluster_dir, f'cluster_signals_{ident}_{n_clusters}.npy')
         np.save(save_file, all_signals)
         printlog(f'Clustering for {behavior} done bitches')
         printlog(f'Saved in {cluster_dir}')

@@ -18,9 +18,11 @@ def main(args):
     event = args['event']
     redo = args['redo']
     cc = args['cc']
+    native = args.get('native', False)
     # behavior = args['behavior']
 
     load_path = os.path.join(fly_directory, timestamp_file)
+    tag = '_native' if native else ''
     
 
     #####################
@@ -49,18 +51,21 @@ def main(args):
     printlog(f"Event times from {event_times_path}")
     
     #load timestamp data
+    if native:
+        # imaging timestamps are (t, z) ms; transpose so time is the last axis, as in the warped (x, y, z, t) ones
+        native_ts = brainsss.load_timestamps(os.path.dirname(load_path)).T
 
     for behavior in behaviors:
         if event != None:
-            filter_needs_file = os.path.join(save_directory, f'filter_needs_{cc}_{behavior}_{event}.h5')
-            file_name = f'filter_needs_{cc}_{behavior}_{event}.h5'
+            filter_needs_file = os.path.join(save_directory, f'filter_needs_{cc}{tag}_{behavior}_{event}.h5')
+            file_name = f'filter_needs_{cc}{tag}_{behavior}_{event}.h5'
         else:
-            filter_needs_file = os.path.join(save_directory, f'filter_needs_{cc}_{behavior}.h5')
-            file_name = f'filter_needs_{cc}_{behavior}.h5'
+            filter_needs_file = os.path.join(save_directory, f'filter_needs_{cc}{tag}_{behavior}.h5')
+            file_name = f'filter_needs_{cc}{tag}_{behavior}.h5'
         
         if file_name not in os.listdir(save_directory) or redo:
             with h5py.File(load_path, 'r') as hf:
-                ts = hf['data']
+                ts = native_ts if native else hf['data']
                 dimst = np.shape(ts)
                 printlog(f"Timestamp shape is {dimst}")
                 

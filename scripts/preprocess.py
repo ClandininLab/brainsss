@@ -169,6 +169,15 @@ def main(args):
     if args["ANAT2ATLAS"] != "":
         anat2atlas = True
 
+    # native functional space: blur straight from background subtraction, never warp to the atlas
+    native = args.get("NATIVE", "") != ""
+    if native:
+        if raw_warp or timestamp_warp:
+            printlog("--native: skipping raw_warp and timestamp_warp")
+        raw_warp = False
+        timestamp_warp = False
+    space = "native" if native else "warp"
+
     ### catch errors with incorrect argument combos
     # if fly builder is false, fly dirs must be provided
     if not build_flies and fly_dirs is None:
@@ -788,6 +797,11 @@ def main(args):
                 os.mkdir(save_directory)
             
             brain_file = f"functional_channel_{ch_num}_moco_warp.h5"
+            save_name = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
+            if native:
+                load_directory = os.path.join(fly_directory, "func_0", "playground", "background_subtraction")
+                brain_file = f"functional_channel_{ch_num}_moco.h5"
+                save_name = f"functional_channel_{ch_num}_moco_native_blurred.h5"
             
             args = {
                 "redo": redo,
@@ -795,6 +809,7 @@ def main(args):
                 "load_directory": load_directory,
                 "save_directory": save_directory,
                 "brain_file": brain_file,
+                "save_name": save_name,
             }
             script = "blur.py"
             job_id = brainsss.sbatch(
@@ -825,7 +840,7 @@ def main(args):
 
             save_directory = os.path.join(fly_directory, "func_0", "playground")
             
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_{space}_blurred.h5"
             
             args = {
                 "redo": redo,
@@ -865,7 +880,7 @@ def main(args):
             if not os.path.exists(save_directory):
                 os.mkdir(save_directory)
             
-            brain_file = f"functional_channel_{ch_num}_moco_warp_blurred_hpf.h5"
+            brain_file = f"functional_channel_{ch_num}_moco_{space}_blurred_hpf.h5"
             # brain_file_l = f"functional_channel_{ch_num}_moco_warp_blurred_lpf.h5"
             
             args = {
