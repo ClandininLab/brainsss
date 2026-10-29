@@ -3,7 +3,7 @@
 Runs on a login node (no Slurm). For each fly, takes the static-hold onsets of the
 non-grey visual epochs, maps them from unix time onto imaging time through the
 FicTrac strobe pulses recorded in photodiode.csv, splits them by the fly's turning
-in the motion window, and merges {fly: {behavior: [onset_ms, ...]}} into
+in the classification window, and merges {fly: {behavior: [onset_ms, ...]}} into
 <later_path>/<event>_event_times_split_dic.pkl.
 
 Usage (from scripts/):
@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 import brainsss
 
 N_TRIALS = 264  # non-grey epochs in this OMR protocol
-MOTION_WINDOW_MS = (500, 1000)  # motion period, relative to static-hold onset
+CLASSIFICATION_WINDOW_MS = (500, 1250)  # motion period (500–1000) + 250 ms, matching the old design’s coverage relative to motion offset
 TURN_THRESHOLD = 50  # deg/s
 SIGN = {0: -1, 180: +1}  # signed = mean dRotLabZ * SIGN[angle]; positive = syn-directional
 MAX_RESIDUAL_MS = 5
@@ -133,9 +133,9 @@ def build_fly(func_dir, fly, subject, series, printlog):
 
     signed = np.zeros(len(onsets_ms))
     for i, (onset, angle) in enumerate(zip(onsets_ms, angles)):
-        in_window = (pulse_ms >= onset + MOTION_WINDOW_MS[0]) & (pulse_ms <= onset + MOTION_WINDOW_MS[1])
+        in_window = (pulse_ms >= onset + CLASSIFICATION_WINDOW_MS[0]) & (pulse_ms <= onset + CLASSIFICATION_WINDOW_MS[1])
         if not in_window.any():
-            raise Exception('no FicTrac frames in motion window of trial at {:.0f} ms'.format(onset))
+            raise Exception('no FicTrac frames in classification window of trial at {:.0f} ms'.format(onset))
         signed[i] = np.mean(rot_z[in_window]) * SIGN[angle]
 
     behaviors = {name: [] for name in BEHAVIORS}
@@ -243,7 +243,7 @@ def plot_qc(qc_file, fly, signed, counts, pulse_ms, residual_ms):
     ax_hist.hist(signed, bins=60, color='#4a6fa5', edgecolor='white', linewidth=0.5)
     for x in (-TURN_THRESHOLD, TURN_THRESHOLD):
         ax_hist.axvline(x, color='#333333', linestyle='--', linewidth=1)
-    ax_hist.set_xlabel('signed dRotLabZ in motion window (deg/s; + = syn)')
+    ax_hist.set_xlabel('signed dRotLabZ in classification window (deg/s; + = syn)')
     ax_hist.set_ylabel('trials')
     ax_hist.set_title('fly_{} OMR trials (n = {})'.format(fly, counts['total']))
     text = '\n'.join('{}: {}'.format(name, counts[name]) for name in BEHAVIORS)
