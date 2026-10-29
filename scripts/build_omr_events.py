@@ -31,7 +31,7 @@ CLASSIFICATION_WINDOW_MS = (500, 1250)  # motion period (500–1000) + 250 ms, m
 TURN_THRESHOLD = 50  # deg/s
 SIGN = {0: -1, 180: +1}  # signed = mean dRotLabZ * SIGN[angle]; positive = syn-directional
 MAX_RESIDUAL_MS = 5
-FIRST_PULSE_MAX_MS = 5  # the extra strobe pulse at recording start sits at ~0 ms
+FIRST_PULSE_MAX_MS = 1  # the extra strobe pulse at recording start sits at ~0 ms
 BEHAVIORS = ['syn_turn_0', 'syn_turn_180', 'anti_turn_0', 'anti_turn_180', 'flat_0', 'flat_180', 'total']
 
 
@@ -102,12 +102,20 @@ def build_fly(func_dir, fly, subject, series, printlog):
     pulse_ms = load_strobe_pulses(os.path.join(visual_dir, 'photodiode.csv'))
     frame_mono, frame_unix = load_jackfish(os.path.join(fictrac_dir, 'jackfish_timestamps.txt'))
     n_frames = len(frame_unix)
-    if len(pulse_ms) == n_frames + 1 and pulse_ms[0] < FIRST_PULSE_MAX_MS:
+    if pulse_ms[0] < FIRST_PULSE_MAX_MS:
         printlog('Dropping first strobe pulse at {:.2f} ms'.format(pulse_ms[0]))
         pulse_ms = pulse_ms[1:]
+    # Off-by-one at the end is tolerated; the max-residual check below is the real validation
+    if len(pulse_ms) == n_frames:
+        printlog('Pulse/frame match: {} pulses == {} frames, using all'.format(len(pulse_ms), n_frames))
+    elif len(pulse_ms) == n_frames - 1:
+        printlog('Pulse/frame match: {} pulses == {} frames - 1, dropping last jackfish frame'.format(len(pulse_ms), n_frames))
+        frame_mono, frame_unix = frame_mono[:-1], frame_unix[:-1]
+    elif len(pulse_ms) == n_frames + 1:
+        printlog('Pulse/frame match: {} pulses == {} frames + 1, dropping last strobe pulse'.format(len(pulse_ms), n_frames))
+        pulse_ms = pulse_ms[:-1]
     else:
-        raise Exception('Strobe pulses ({}, first at {:.2f} ms) do not match jackfish frames ({}) + 1'.format(
-            len(pulse_ms), pulse_ms[0], n_frames))
+        raise Exception('Strobe pulses ({}) do not match jackfish frames ({}) within one'.format(len(pulse_ms), n_frames))
 
     # Fit relative to the first frame for conditioning; unix = a + b * t_ms
     b, a_rel = np.polyfit(pulse_ms, frame_unix - frame_unix[0], 1)
@@ -130,6 +138,7 @@ def build_fly(func_dir, fly, subject, series, printlog):
     if len(fictrac_raw) != n_frames:
         raise Exception('fictrac.dat has {} frames, jackfish has {}'.format(len(fictrac_raw), n_frames))
     rot_z = np.asarray(fictrac_raw['dRotLabZ'], dtype=float) * 180 / np.pi * fps  # rad/frame -> deg/s
+    rot_z = rot_z[:len(pulse_ms)]  # frames without a matched pulse have no imaging time
 
     signed = np.zeros(len(onsets_ms))
     for i, (onset, angle) in enumerate(zip(onsets_ms, angles)):
